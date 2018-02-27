@@ -1,3 +1,3 @@
 class PantherEngine(object):
-    def say_hi(self):
+    def say_hello(self):
         print('Hello world!')
