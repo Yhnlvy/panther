@@ -19,6 +19,7 @@ import ast
 import logging
 import os.path
 import sys
+from slimit.visitors import nodevisitor
 
 try:
     import configparser
@@ -215,7 +216,7 @@ def linerange(node):
 
     lines_min = 9999999999
     lines_max = -1
-    for n in ast.walk(node):
+    for n in nodevisitor.visit(node):
         if hasattr(n, 'lineno'):
             lines_min = min(lines_min, n.lineno)
             lines_max = max(lines_max, n.lineno)
@@ -326,11 +327,12 @@ def parse_ini_file(f_loc):
 
 def check_ast_node(name):
     'Check if the given name is that of a valid AST node.'
-    try:
-        node = getattr(ast, name)
-        if issubclass(node, ast.AST):
-            return name
-    except AttributeError:  # nosec(tkelsey): catching expected exception
-        pass
+    return name
+    # try:
+    #     node = getattr(ast, name)
+    #     if issubclass(node, ast.AST):
+    #         return name
+    # except AttributeError:  # nosec(tkelsey): catching expected exception
+    #     pass
 
-    raise TypeError("Error: %s is not a valid node type in AST" % name)
+    # raise TypeError("Error: %s is not a valid node type in AST" % name)

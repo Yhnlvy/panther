@@ -67,7 +67,7 @@ class Metrics(object):
         """
         def proc(line):
             tmp = line.strip()
-            return bool(tmp and not tmp.startswith(b'#'))
+            return bool(tmp) # and not tmp.startswith(b'#')) TODO: handle comments
 
         self.current['loc'] += sum(proc(line) for line in lines)
 

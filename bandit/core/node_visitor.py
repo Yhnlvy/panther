@@ -18,13 +18,14 @@ import ast
 import logging
 import operator
 
-from bandit.core import tester as b_tester
-from bandit.core import utils as b_utils
-from bandit.core import constants
-
 from slimit import ast
 from slimit.parser import Parser
 from slimit.visitors import nodevisitor
+
+from bandit.core import constants
+from bandit.core import tester as b_tester
+from bandit.core import utils as b_utils
+
 
 LOG = logging.getLogger(__name__)
 
@@ -47,7 +48,6 @@ class BanditNodeVisitor(object):
         self.import_aliases = {}
         self.tester = b_tester.BanditTester(
             self.testset, self.debug, nosec_lines)
-
         # in some cases we can't determine a qualified name
         try:
             self.namespace = b_utils.get_module_qualname_from_path(fname)
@@ -187,7 +187,6 @@ class BanditNodeVisitor(object):
         self.context['import_aliases'] = self.import_aliases
 
         if self.debug:
-            LOG.debug(ast.dump(node))
             self.metaast.add_node(node, '', self.depth)
 
         if hasattr(node, 'lineno'):
@@ -214,8 +213,6 @@ class BanditNodeVisitor(object):
         method = 'visit_' + name
         visitor = getattr(self, method, None)
         if visitor is not None:
-            if self.debug:
-                LOG.debug("%s called (%s)", method, ast.dump(node))
             visitor(node)
         else:
             self.update_scores(self.tester.run_tests(self.context, name))
@@ -231,30 +228,33 @@ class BanditNodeVisitor(object):
 
     def generic_visit(self, node):
         """Drive the visitor."""
-        for _, value in ast.iter_fields(node):
-            if isinstance(value, list):
-                max_idx = len(value) - 1
-                for idx, item in enumerate(value):
-                    if isinstance(item, ast.AST):
-                        if idx < max_idx:
-                            setattr(item, 'sibling', value[idx + 1])
-                        else:
-                            setattr(item, 'sibling', None)
-                        setattr(item, 'parent', node)
+        # for _, value in ast.iter_fields(node):
+        #     if isinstance(value, list):
+        #         max_idx = len(value) - 1
+        #         for idx, item in enumerate(value):
+        #             if isinstance(item, ast.AST):
+        #                 if idx < max_idx:
+        #                     setattr(item, 'sibling', value[idx + 1])
+        #                 else:
+        #                     setattr(item, 'sibling', None)
+        #                 setattr(item, 'parent', node)
 
-                        if self.pre_visit(item):
-                            self.visit(item)
-                            self.generic_visit(item)
-                            self.post_visit(item)
+        #                 if self.pre_visit(item):
+        #                     self.visit(item)
+        #                     self.generic_visit(item)
+        #                     self.post_visit(item)
 
-            elif isinstance(value, ast.AST):
-                setattr(value, 'sibling', None)
-                setattr(value, 'parent', node)
+        #     elif isinstance(value, ast.AST):
+        #         setattr(value, 'sibling', None)
+        #         setattr(value, 'parent', node)
 
-                if self.pre_visit(value):
-                    self.visit(value)
-                    self.generic_visit(value)
-                    self.post_visit(value)
+        #         if self.pre_visit(value):
+        #             self.visit(value)
+        #             self.generic_visit(value)
+        #             self.post_visit(value)
+        for node in nodevisitor.visit(node):
+            if self.pre_visit(node):
+                self.visit(node)
 
     def update_scores(self, scores):
         '''Score updater

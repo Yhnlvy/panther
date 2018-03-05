@@ -54,6 +54,7 @@ class BanditTester(object):
         tests = self.testset.get_tests(checktype)
         for test in tests:
             name = test.__name__
+            raw_context['lineno'] = 71 #TODO: remove this hardcoded beast
             # execute test with the an instance of the context class
             temp_context = copy.copy(raw_context)
             context = b_context.Context(temp_context)
@@ -66,7 +67,7 @@ class BanditTester(object):
                 # if we have a result, record it and update scores
                 if (result is not None and
                         result.lineno not in self.nosec_lines and
-                        temp_context['lineno'] not in self.nosec_lines):
+                        True): #temp_context['lineno'] not in self.nosec_lines):
 
                     if isinstance(temp_context['filename'], bytes):
                         result.fname = temp_context['filename'].decode('utf-8')
