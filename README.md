@@ -1,4 +1,0 @@
-# panther
-------------------
-Paypal ITC Project
-
