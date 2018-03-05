@@ -18,10 +18,13 @@ import ast
 import logging
 import operator
 
-from bandit.core import constants
 from bandit.core import tester as b_tester
 from bandit.core import utils as b_utils
+from bandit.core import constants
 
+from slimit import ast
+from slimit.parser import Parser
+from slimit.visitors import nodevisitor
 
 LOG = logging.getLogger(__name__)
 
@@ -274,6 +277,7 @@ class BanditNodeVisitor(object):
         :param lines: lines code to process
         :return score: the aggregated score for the current file
         '''
-        f_ast = ast.parse(data)
+        parser = Parser()
+        f_ast = parser.parse(data) # f_ast = ast.parse(data)
         self.generic_visit(f_ast)
         return self.scores
