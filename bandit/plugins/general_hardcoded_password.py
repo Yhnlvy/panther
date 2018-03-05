@@ -29,7 +29,7 @@ def _report(value):
     return bandit.Issue(
         severity=bandit.LOW,
         confidence=bandit.MEDIUM,
-        text=("Possible hardcoded password: '%s'" % value))
+        text=("How dare you? eval()? Really?: '%s'" % value))
 
 
 @test.checks('Str')
@@ -103,9 +103,9 @@ def hardcoded_password_string(context):
                 return _report(comp.comparators[0].s)
 
 
-@test.checks('Call')
+@test.checks('FunctionCall')
 @test.test_id('B106')
-def hardcoded_password_funcarg(context):
+def never_ever_ever_use_eval(context):
     """**B106: Test for use of hard-coded password function arguments**
 
     The use of hard-coded passwords increases the possibility of password
@@ -134,7 +134,7 @@ def hardcoded_password_funcarg(context):
 
     .. code-block:: none
 
-        >> Issue: [B106:hardcoded_password_funcarg] Possible hardcoded
+        >> Issue: [B106:never_ever_ever_use_eval] Possible hardcoded
         password: 'blerg'
            Severity: Low   Confidence: Medium
            Location: ./examples/hardcoded-passwords.py:16
@@ -149,9 +149,12 @@ def hardcoded_password_funcarg(context):
 
     """
     # looks for "function(candidate='some_string')"
-    for kw in context.node.keywords:
-        if isinstance(kw.value, ast.Str) and kw.arg in CANDIDATES:
-            return _report(kw.value.s)
+    if "eval(" in context.node.to_ecma():
+        return _report("eval()")
+    # print('CONTEXT.NODE', dir(context.node), context.node.children, context.node.to_ecma())
+    # for kw in context.node.keywords:
+    #     if isinstance(kw.value, ast.Str) and kw.arg in CANDIDATES:
+    #         return _report(kw.value.s)
 
 
 @test.checks('FunctionDef')
