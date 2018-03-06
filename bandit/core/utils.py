@@ -328,7 +328,6 @@ def parse_ini_file(f_loc):
 
 def check_ast_node(name):
     'Check if the given name is that of a valid AST node.'
-    print("NAME", name)
     return name
     # try:
     #     node = getattr(ast, name)

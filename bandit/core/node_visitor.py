@@ -187,10 +187,10 @@ class BanditNodeVisitor(object):
         if self.debug:
             self.metaast.add_node(node, '', self.depth)
 
-        if hasattr(node, 'lineno'):
-            self.context['lineno'] = node.lineno
+        if hasattr(node, 'loc'):
+            self.context['lineno'] = node.loc['start']['line']
 
-            if node.lineno in self.nosec_lines:
+            if self.context['lineno'] in self.nosec_lines:
                 LOG.debug("skipped, nosec")
                 self.metrics.note_nosec()
                 return False
@@ -250,9 +250,7 @@ class BanditNodeVisitor(object):
         #             self.visit(value)
         #             self.generic_visit(value)
         #             self.post_visit(value)
-        print('JE SUIS APPELLLELLELELELELLELLELE')
         for n in visitor.objectify(node).traverse():
-            print('n', n)
             if self.pre_visit(n):
                 self.visit(n)
 
