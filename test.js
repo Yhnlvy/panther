@@ -68,7 +68,7 @@ MongoClient.connect(config.db, function(err, db) {
 
     // Adding/ remove HTTP Headers for security
     app.use(favicon(__dirname + "/app/assets/favicon.ico"));
-    var cmd = eval(user_input);
+    const cmd = eval(user_input);
     // Express middleware to populate "req.body" so we can access POST variables
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({
