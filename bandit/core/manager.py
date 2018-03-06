@@ -273,7 +273,7 @@ class BanditManager(object):
                 nosec_lines = set(
                     lineno + 1 for
                     (lineno, line) in enumerate(lines)
-                    if '#nosec' in line or '# nosec' in line)
+                    if '//nosec' in line or '// nosec' in line)
             score = self._execute_ast_visitor(fname, data, nosec_lines)
             self.scores.append(score)
             self.metrics.count_issues([score, ])

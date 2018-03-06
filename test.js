@@ -141,7 +141,7 @@ MongoClient.connect(config.db, function(err, db) {
             autoescape: true // default value
             */
         });
-        const cmd = eval(user_input);
+        const cmd = eval(user_input); //nosec
 
     // Insecure HTTP connection
     http.createServer(app).listen(config.port, function() {
