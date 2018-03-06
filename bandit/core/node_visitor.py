@@ -250,7 +250,9 @@ class BanditNodeVisitor(object):
         #             self.visit(value)
         #             self.generic_visit(value)
         #             self.post_visit(value)
-        for n in visitor.objectify(node):
+        print('JE SUIS APPELLLELLELELELELLELLELE')
+        for n in visitor.objectify(node).traverse():
+            print('n', n)
             if self.pre_visit(n):
                 self.visit(n)
 
@@ -276,5 +278,5 @@ class BanditNodeVisitor(object):
         :return score: the aggregated score for the current file
         '''
         f_ast = esprima.parse(data, {'loc': True}) # f_ast = ast.parse(data)
-        self.generic_visit(f_ast)
+        self.generic_visit(f_ast.to_dict())
         return self.scores

@@ -103,7 +103,7 @@ def hardcoded_password_string(context):
                 return _report(comp.comparators[0].s)
 
 
-@test.checks('FunctionCall')
+@test.checks('CallExpression')
 @test.test_id('B106')
 def never_ever_ever_use_eval(context):
     """**B106: Test for use of hard-coded password function arguments**
@@ -149,8 +149,11 @@ def never_ever_ever_use_eval(context):
 
     """
     # looks for "function(candidate='some_string')"
-    if "eval(" in context.node.to_ecma():
-        return _report("eval()")
+    try:
+        if context.node.callee.name == 'eval':
+            return _report("eval()")
+    except:
+        pass
     # print('CONTEXT.NODE', dir(context.node), context.node.children, context.node.to_ecma())
     # for kw in context.node.keywords:
     #     if isinstance(kw.value, ast.Str) and kw.arg in CANDIDATES:

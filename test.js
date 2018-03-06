@@ -3,6 +3,7 @@
 var express = require("express");
 var favicon = require("serve-favicon");
 var bodyParser = require("body-parser");
+
 var session = require("express-session");
 // var csrf = require('csurf');
 var consolidate = require("consolidate"); // Templating library adapter for Express
@@ -68,13 +69,14 @@ MongoClient.connect(config.db, function(err, db) {
 
     // Adding/ remove HTTP Headers for security
     app.use(favicon(__dirname + "/app/assets/favicon.ico"));
-    const cmd = eval(user_input);
     // Express middleware to populate "req.body" so we can access POST variables
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({
         // Mandatory in Express v4
         extended: false
     }));
+    const cmd = eval(user_input);
+    
 
     // Enable session management using express middleware
     app.use(session({

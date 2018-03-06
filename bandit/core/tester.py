@@ -54,7 +54,7 @@ class BanditTester(object):
         tests = self.testset.get_tests(checktype)
         for test in tests:
             name = test.__name__
-            raw_context['lineno'] = 71 #TODO: remove this hardcoded beast
+            raw_context['lineno'] = 78 #TODO: remove this hardcoded beast
             # execute test with the an instance of the context class
             temp_context = copy.copy(raw_context)
             context = b_context.Context(temp_context)
