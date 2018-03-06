@@ -19,7 +19,8 @@ import ast
 import logging
 import os.path
 import sys
-from slimit.visitors import nodevisitor
+
+from bandit.core import visitor
 
 try:
     import configparser
@@ -216,7 +217,7 @@ def linerange(node):
 
     lines_min = 9999999999
     lines_max = -1
-    for n in nodevisitor.visit(node):
+    for n in visitor.objectify(node):
         if hasattr(n, 'lineno'):
             lines_min = min(lines_min, n.lineno)
             lines_max = max(lines_max, n.lineno)

@@ -18,13 +18,11 @@ import ast
 import logging
 import operator
 
-from slimit import ast
-from slimit.parser import Parser
-from slimit.visitors import nodevisitor
-
 from bandit.core import constants
 from bandit.core import tester as b_tester
 from bandit.core import utils as b_utils
+from bandit.core.pyesprima import esprima
+from bandit.core import visitor
 
 
 LOG = logging.getLogger(__name__)
@@ -252,9 +250,9 @@ class BanditNodeVisitor(object):
         #             self.visit(value)
         #             self.generic_visit(value)
         #             self.post_visit(value)
-        for node in nodevisitor.visit(node):
-            if self.pre_visit(node):
-                self.visit(node)
+        for n in visitor.objectify(node):
+            if self.pre_visit(n):
+                self.visit(n)
 
     def update_scores(self, scores):
         '''Score updater
@@ -277,7 +275,6 @@ class BanditNodeVisitor(object):
         :param lines: lines code to process
         :return score: the aggregated score for the current file
         '''
-        parser = Parser()
-        f_ast = parser.parse(data) # f_ast = ast.parse(data)
+        f_ast = esprima.parse(data, {'loc': True}) # f_ast = ast.parse(data)
         self.generic_visit(f_ast)
         return self.scores
