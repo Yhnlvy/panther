@@ -32,6 +32,7 @@ class Metrics(object):
     def __init__(self):
         self.data = dict()
         self.data['_totals'] = {'loc': 0, 'nosec': 0}
+        self.nosec_lines = set()
 
         # initialize 0 totals for criteria and rank; this will be reset later
         for rank in constants.RANKING:
@@ -48,14 +49,15 @@ class Metrics(object):
         self.data[fname] = {'loc': 0, 'nosec': 0}
         self.current = self.data[fname]
 
-    def note_nosec(self, num=1):
+    def note_nosec(self, lineno):
         """Note a "nosec" commnet.
 
         Increment the currently active metrics nosec count.
 
-        :param num: number of nosecs seen, defaults to 1
+        :param lineno: line number of the nosec line
         """
-        self.current['nosec'] += num
+        self.nosec_lines.add(lineno)
+        self.current['nosec'] = len(self.nosec_lines)
 
     def count_locs(self, lines):
         """Count lines of code.

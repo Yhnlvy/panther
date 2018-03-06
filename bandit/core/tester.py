@@ -66,7 +66,7 @@ class BanditTester(object):
                 # if we have a result, record it and update scores
                 if (result is not None and
                         result.lineno not in self.nosec_lines and
-                        True): #temp_context['lineno'] not in self.nosec_lines):
+                        temp_context['lineno'] not in self.nosec_lines):
 
                     if isinstance(temp_context['filename'], bytes):
                         result.fname = temp_context['filename'].decode('utf-8')

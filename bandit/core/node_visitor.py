@@ -188,11 +188,11 @@ class BanditNodeVisitor(object):
             self.metaast.add_node(node, '', self.depth)
 
         if hasattr(node, 'loc'):
-            self.context['lineno'] = node.loc['start']['line']
-
-            if self.context['lineno'] in self.nosec_lines:
+            lineno = node.loc['start']['line']
+            self.context['lineno'] = lineno
+            if lineno in self.nosec_lines:
                 LOG.debug("skipped, nosec")
-                self.metrics.note_nosec()
+                self.metrics.note_nosec(lineno)
                 return False
 
         self.context['node'] = node
