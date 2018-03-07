@@ -62,7 +62,7 @@ class BanditConfig(object):
         else:
             # use sane defaults
             self._config['plugin_name_pattern'] = '*.py'
-            self._config['include'] = ['*.py', '*.pyw']
+            self._config['include'] = ['*.js']
 
         self._init_settings()
 
