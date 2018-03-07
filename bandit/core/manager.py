@@ -181,6 +181,7 @@ class BanditManager(object):
         excluded_files = set()
 
         excluded_path_strings = self.b_conf.get_option('exclude_dirs') or []
+        excluded_path_strings.append('node_modules')
         included_globs = self.b_conf.get_option('include') or ['*.py']
 
         # if there are command line provided exclusions add them to the list
