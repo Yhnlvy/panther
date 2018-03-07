@@ -19,6 +19,7 @@ class Node(abc.ABC):
         """Sets one attribute in the Node for each field (e.g. self.body)."""
         for field in self.fields:
             setattr(self, field, objectify(data.get(field)))
+        setattr(self, 'loc', objectify(data.get('loc')))
 
     def dict(self) -> Dict[str, Any]:
         """Transform the Node back into an Esprima-compatible AST dictionary."""
@@ -77,17 +78,17 @@ def objectify(data: Union[None, Dict[str, Any], List[Dict[str, Any]]]) -> Union[
 
 class Identifier(Node):
     @property
-    def fields(self): return ['name', 'loc']
+    def fields(self): return ['name']
 
 
 class Literal(Node):
     @property
-    def fields(self): return ['raw', 'value', 'regex', 'loc']
+    def fields(self): return ['raw', 'value', 'regex']
 
 
 class Program(Node):
     @property
-    def fields(self): return ['body', 'sourceType', 'loc']
+    def fields(self): return ['body', 'sourceType']
 
 
 # ========== Statements ==========
@@ -95,27 +96,27 @@ class Program(Node):
 
 class ExpressionStatement(Node):
     @property
-    def fields(self): return ['expression', 'loc']
+    def fields(self): return ['expression']
 
 
 class BlockStatement(Node):
     @property
-    def fields(self): return ['body', 'loc']
+    def fields(self): return ['body']
 
 
 class EmptyStatement(Node):
     @property
-    def fields(self): return ['loc']
+    def fields(self): return []
 
 
 class DebuggerStatement(Node):
     @property
-    def fields(self): return ['loc']
+    def fields(self): return []
 
 
 class WithStatement(Node):
     @property
-    def fields(self): return ['object', 'body', 'loc']
+    def fields(self): return ['object', 'body']
 
 
 # ----- Control Flow -----
@@ -123,22 +124,22 @@ class WithStatement(Node):
 
 class ReturnStatement(Node):
     @property
-    def fields(self): return ['argument', 'loc']
+    def fields(self): return ['argument']
 
 
 class LabeledStatement(Node):
     @property
-    def fields(self): return ['label', 'body', 'loc']
+    def fields(self): return ['label', 'body']
 
 
 class BreakStatement(Node):
     @property
-    def fields(self): return ['label', 'loc']
+    def fields(self): return ['label']
 
 
 class ContinueStatement(Node):
     @property
-    def fields(self): return ['label', 'loc']
+    def fields(self): return ['label']
 
 
 # ----- Choice -----
@@ -146,17 +147,17 @@ class ContinueStatement(Node):
 
 class IfStatement(Node):
     @property
-    def fields(self): return ['test', 'consequent', 'alternate', 'loc']
+    def fields(self): return ['test', 'consequent', 'alternate']
 
 
 class SwitchStatement(Node):
     @property
-    def fields(self): return ['discriminant', 'cases', 'loc']
+    def fields(self): return ['discriminant', 'cases']
 
 
 class SwitchCase(Node):
     @property
-    def fields(self): return ['test', 'consequent', 'loc']
+    def fields(self): return ['test', 'consequent']
 
 
 # ----- Exceptions -----
@@ -164,17 +165,17 @@ class SwitchCase(Node):
 
 class ThrowStatement(Node):
     @property
-    def fields(self): return ['argument', 'loc']
+    def fields(self): return ['argument']
 
 
 class TryStatement(Node):
     @property
-    def fields(self): return ['block', 'handler', 'finalizer', 'loc']
+    def fields(self): return ['block', 'handler', 'finalizer']
 
 
 class CatchClause(Node):
     @property
-    def fields(self): return ['param', 'body', 'loc']
+    def fields(self): return ['param', 'body']
 
 
 # ----- Loops -----
@@ -182,27 +183,27 @@ class CatchClause(Node):
 
 class WhileStatement(Node):
     @property
-    def fields(self): return ['test', 'body', 'loc']
+    def fields(self): return ['test', 'body']
 
 
 class DoWhileStatement(Node):
     @property
-    def fields(self): return ['body', 'test', 'loc']
+    def fields(self): return ['body', 'test']
 
 
 class ForStatement(Node):
     @property
-    def fields(self): return ['init', 'test', 'update', 'body', 'loc']
+    def fields(self): return ['init', 'test', 'update', 'body']
 
 
 class ForInStatement(Node):
     @property
-    def fields(self): return ['left', 'right', 'body', 'loc']
+    def fields(self): return ['left', 'right', 'body']
 
 
 class ForOfStatement(Node):
     @property
-    def fields(self): return ['left', 'right', 'body', 'loc']
+    def fields(self): return ['left', 'right', 'body']
 
 
 # ========== Declarations ==========
@@ -210,22 +211,22 @@ class ForOfStatement(Node):
 
 class FunctionDeclaration(Node):
     @property
-    def fields(self): return ['id', 'params', 'body', 'loc']
+    def fields(self): return ['id', 'params', 'body']
 
 
 class VariableDeclaration(Node):
     @property
-    def fields(self): return ['declarations', 'kind', 'loc']
+    def fields(self): return ['declarations', 'kind']
 
 
 class VariableDeclarator(Node):
     @property
-    def fields(self): return ['id', 'init', 'loc']
+    def fields(self): return ['id', 'init']
 
 
 class ClassDeclaration(Node):
     @property
-    def fields(self): return ['id', 'superClass', 'body', 'loc']
+    def fields(self): return ['id', 'superClass', 'body']
 
 
 # ========== Expressions ==========
@@ -233,137 +234,137 @@ class ClassDeclaration(Node):
 
 class ThisExpression(Node):
     @property
-    def fields(self): return ['loc']
+    def fields(self): return []
 
 
 class ArrayExpression(Node):
     @property
-    def fields(self): return ['elements', 'loc']
+    def fields(self): return ['elements']
 
 
 class ObjectExpression(Node):
     @property
-    def fields(self): return ['properties', 'loc']
+    def fields(self): return ['properties']
 
 
 class ClassExpression(Node):
     @property
-    def fields(self): return ['id', 'superClass', 'body', 'loc']
+    def fields(self): return ['id', 'superClass', 'body']
 
 
 class ClassBody(Node):
     @property
-    def fields(self): return ['body', 'loc']
+    def fields(self): return ['body']
 
 
 class MethodDefinition(Node):
     @property
-    def fields(self): return ['key', 'value', 'kind', 'loc']
+    def fields(self): return ['key', 'value', 'kind']
 
 
 class Property(Node):
     @property
-    def fields(self): return ['key', 'value', 'kind', 'shorthand', 'loc']
+    def fields(self): return ['key', 'value', 'kind', 'shorthand']
 
 
 class MetaProperty(Node):
     @property
-    def fields(self): return ['meta', 'property', 'loc']
+    def fields(self): return ['meta', 'property']
 
 
 class FunctionExpression(Node):
     @property
-    def fields(self): return ['id', 'params', 'body', 'loc']
+    def fields(self): return ['id', 'params', 'body']
 
 
 class ArrowFunctionExpression(Node):
     @property
-    def fields(self): return ['id', 'params', 'body', 'loc']
+    def fields(self): return ['id', 'params', 'body']
 
 
 class AwaitExpression(Node):
     @property
-    def fields(self): return ['argument', 'loc']
+    def fields(self): return ['argument']
 
 
 class UnaryExpression(Node):
     @property
-    def fields(self): return ['operator', 'prefix', 'argument', 'loc']
+    def fields(self): return ['operator', 'prefix', 'argument']
 
 
 class UpdateExpression(Node):
     @property
-    def fields(self): return ['operator', 'argument', 'prefix', 'loc']
+    def fields(self): return ['operator', 'argument', 'prefix']
 
 
 class BinaryExpression(Node):
     @property
-    def fields(self): return ['operator', 'left', 'right', 'loc']
+    def fields(self): return ['operator', 'left', 'right']
 
 
 class AssignmentExpression(Node):
     @property
-    def fields(self): return ['operator', 'left', 'right', 'loc']
+    def fields(self): return ['operator', 'left', 'right']
 
 
 class LogicalExpression(Node):
     @property
-    def fields(self): return ['operator', 'left', 'right', 'loc']
+    def fields(self): return ['operator', 'left', 'right']
 
 
 class MemberExpression(Node):
     @property
-    def fields(self): return ['object', 'property', 'computed', 'loc']
+    def fields(self): return ['object', 'property', 'computed']
 
 
 class ConditionalExpression(Node):
     @property
-    def fields(self): return ['test', 'consequent', 'alternate', 'loc']
+    def fields(self): return ['test', 'consequent', 'alternate']
 
 
 class YieldExpression(Node):
     @property
-    def fields(self): return ['argument', 'delegate', 'loc']
+    def fields(self): return ['argument', 'delegate']
 
 
 class CallExpression(Node):
     @property
-    def fields(self): return ['callee', 'arguments', 'loc']
+    def fields(self): return ['callee', 'arguments']
 
 
 class NewExpression(Node):
     @property
-    def fields(self): return ['callee', 'arguments', 'loc']
+    def fields(self): return ['callee', 'arguments']
 
 
 class SequenceExpression(Node):
     @property
-    def fields(self): return ['expressions', 'loc']
+    def fields(self): return ['expressions']
 
 
 class TaggedTemplateExpression(Node):
     @property
-    def fields(self): return ['tag', 'quasi', 'loc']
+    def fields(self): return ['tag', 'quasi']
 
 
 class TemplateElement(Node):
     @property
-    def fields(self): return ['value', 'tail', 'loc']
+    def fields(self): return ['value', 'tail']
 
 
 class TemplateLiteral(Node):
     @property
-    def fields(self): return ['quasis', 'expressions', 'loc']
+    def fields(self): return ['quasis', 'expressions']
 
 
 class Super(Node):
     @property
-    def fields(self): return ['loc']
+    def fields(self): return []
 
 
 class SpreadElement(Node):
     @property
-    def fields(self): return ['argument', 'loc']
+    def fields(self): return ['argument']
 
 
 # ========== Patterns ==========
@@ -371,22 +372,22 @@ class SpreadElement(Node):
 
 class ArrayPattern(Node):
     @property
-    def fields(self): return ['elements', 'loc']
+    def fields(self): return ['elements']
 
 
 class RestElement(Node):
     @property
-    def fields(self): return ['argument', 'loc']
+    def fields(self): return ['argument']
 
 
 class AssignmentPattern(Node):
     @property
-    def fields(self): return ['left', 'right', 'loc']
+    def fields(self): return ['left', 'right']
 
 
 class ObjectPattern(Node):
     @property
-    def fields(self): return ['properties', 'loc']
+    def fields(self): return ['properties']
 
 
 # ========== Import/Export ==========
@@ -394,34 +395,34 @@ class ObjectPattern(Node):
 
 class Import(Node):
     @property
-    def fields(self): return ['loc']
+    def fields(self): return []
 
 
 class ImportDeclaration(Node):
     @property
-    def fields(self): return ['source', 'specifiers', 'loc']
+    def fields(self): return ['source', 'specifiers']
 
 
 class ImportSpecifier(Node):
     @property
-    def fields(self): return ['local', 'imported', 'loc']
+    def fields(self): return ['local', 'imported']
 
 
 class ExportAllDeclaration(Node):
     @property
-    def fields(self): return ['source', 'loc']
+    def fields(self): return ['source']
 
 
 class ExportDefaultDeclaration(Node):
     @property
-    def fields(self): return ['declaration', 'loc']
+    def fields(self): return ['declaration']
 
 
 class ExportNamedDeclaration(Node):
     @property
-    def fields(self): return ['declaration', 'specifiers', 'source', 'loc']
+    def fields(self): return ['declaration', 'specifiers', 'source']
 
 
 class ExportSpecifier(Node):
     @property
-    def fields(self): return ['exported', 'local', 'loc']
+    def fields(self): return ['exported', 'local']
