@@ -1,4 +1,4 @@
-"""Trasnforms AST dictionary into a tree of Node objects."""
+"""Transforms AST dictionary into a tree of Node objects."""
 import abc
 from collections import OrderedDict
 from typing import Any, Dict, Generator, List, Union
@@ -82,12 +82,12 @@ class Identifier(Node):
 
 class Literal(Node):
     @property
-    def fields(self): return ['value', 'regex', 'loc']
+    def fields(self): return ['raw', 'value', 'regex', 'loc']
 
 
 class Program(Node):
     @property
-    def fields(self): return ['body', 'loc']
+    def fields(self): return ['body', 'sourceType', 'loc']
 
 
 # ========== Statements ==========
@@ -169,7 +169,7 @@ class ThrowStatement(Node):
 
 class TryStatement(Node):
     @property
-    def fields(self): return ['block', 'guardedHandlers', 'handlers', 'handler', 'finalizer', 'loc']
+    def fields(self): return ['block', 'handler', 'finalizer', 'loc']
 
 
 class CatchClause(Node):
@@ -200,6 +200,11 @@ class ForInStatement(Node):
     def fields(self): return ['left', 'right', 'body', 'loc']
 
 
+class ForOfStatement(Node):
+    @property
+    def fields(self): return ['left', 'right', 'body', 'loc']
+
+
 # ========== Declarations ==========
 
 
@@ -210,13 +215,17 @@ class FunctionDeclaration(Node):
 
 class VariableDeclaration(Node):
     @property
-    def fields(self): return ['declarations', 'loc']
+    def fields(self): return ['declarations', 'kind', 'loc']
 
 
 class VariableDeclarator(Node):
     @property
     def fields(self): return ['id', 'init', 'loc']
 
+
+class ClassDeclaration(Node):
+    @property
+    def fields(self): return ['id', 'superClass', 'body', 'loc']
 
 
 # ========== Expressions ==========
@@ -237,14 +246,44 @@ class ObjectExpression(Node):
     def fields(self): return ['properties', 'loc']
 
 
-class Property(Node):
+class ClassExpression(Node):
+    @property
+    def fields(self): return ['id', 'superClass', 'body', 'loc']
+
+
+class ClassBody(Node):
+    @property
+    def fields(self): return ['body', 'loc']
+
+
+class MethodDefinition(Node):
     @property
     def fields(self): return ['key', 'value', 'kind', 'loc']
+
+
+class Property(Node):
+    @property
+    def fields(self): return ['key', 'value', 'kind', 'shorthand', 'loc']
+
+
+class MetaProperty(Node):
+    @property
+    def fields(self): return ['meta', 'property', 'loc']
 
 
 class FunctionExpression(Node):
     @property
     def fields(self): return ['id', 'params', 'body', 'loc']
+
+
+class ArrowFunctionExpression(Node):
+    @property
+    def fields(self): return ['id', 'params', 'body', 'loc']
+
+
+class AwaitExpression(Node):
+    @property
+    def fields(self): return ['argument', 'loc']
 
 
 class UnaryExpression(Node):
@@ -282,6 +321,11 @@ class ConditionalExpression(Node):
     def fields(self): return ['test', 'consequent', 'alternate', 'loc']
 
 
+class YieldExpression(Node):
+    @property
+    def fields(self): return ['argument', 'delegate', 'loc']
+
+
 class CallExpression(Node):
     @property
     def fields(self): return ['callee', 'arguments', 'loc']
@@ -295,3 +339,89 @@ class NewExpression(Node):
 class SequenceExpression(Node):
     @property
     def fields(self): return ['expressions', 'loc']
+
+
+class TaggedTemplateExpression(Node):
+    @property
+    def fields(self): return ['tag', 'quasi', 'loc']
+
+
+class TemplateElement(Node):
+    @property
+    def fields(self): return ['value', 'tail', 'loc']
+
+
+class TemplateLiteral(Node):
+    @property
+    def fields(self): return ['quasis', 'expressions', 'loc']
+
+
+class Super(Node):
+    @property
+    def fields(self): return ['loc']
+
+
+class SpreadElement(Node):
+    @property
+    def fields(self): return ['argument', 'loc']
+
+
+# ========== Patterns ==========
+
+
+class ArrayPattern(Node):
+    @property
+    def fields(self): return ['elements', 'loc']
+
+
+class RestElement(Node):
+    @property
+    def fields(self): return ['argument', 'loc']
+
+
+class AssignmentPattern(Node):
+    @property
+    def fields(self): return ['left', 'right', 'loc']
+
+
+class ObjectPattern(Node):
+    @property
+    def fields(self): return ['properties', 'loc']
+
+
+# ========== Import/Export ==========
+
+
+class Import(Node):
+    @property
+    def fields(self): return ['loc']
+
+
+class ImportDeclaration(Node):
+    @property
+    def fields(self): return ['source', 'specifiers', 'loc']
+
+
+class ImportSpecifier(Node):
+    @property
+    def fields(self): return ['local', 'imported', 'loc']
+
+
+class ExportAllDeclaration(Node):
+    @property
+    def fields(self): return ['source', 'loc']
+
+
+class ExportDefaultDeclaration(Node):
+    @property
+    def fields(self): return ['declaration', 'loc']
+
+
+class ExportNamedDeclaration(Node):
+    @property
+    def fields(self): return ['declaration', 'specifiers', 'source', 'loc']
+
+
+class ExportSpecifier(Node):
+    @property
+    def fields(self): return ['exported', 'local', 'loc']
