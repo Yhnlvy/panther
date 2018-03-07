@@ -14,6 +14,12 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
+# python recursion limit
+RECURSION_LIMIT = 4000
+
+# excluded path by default
+NODE_MODULES = 'node_modules'
+
 # default plugin name pattern
 plugin_name_pattern = '*.py'
 

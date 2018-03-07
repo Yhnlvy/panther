@@ -398,4 +398,6 @@ def main():
 
 
 if __name__ == '__main__':
+    # HACK: [Js2Py known issue](https://github.com/PiotrDabkowski/Js2Py/issues/53)
+    sys.setrecursionlimit(constants.RECURSION_LIMIT)
     main()
