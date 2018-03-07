@@ -275,6 +275,7 @@ class BanditNodeVisitor(object):
         :param lines: lines code to process
         :return score: the aggregated score for the current file
         '''
+        data = b_utils.clean_code(data)
         f_ast = esprima.parse(data, {'loc': True}) # f_ast = ast.parse(data)
         self.generic_visit(f_ast.to_dict())
         return self.scores

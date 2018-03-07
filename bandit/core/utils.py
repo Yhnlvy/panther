@@ -18,6 +18,7 @@ import _ast
 import ast
 import logging
 import os.path
+import re
 import sys
 
 from bandit.core import visitor
@@ -337,3 +338,11 @@ def check_ast_node(name):
     #     pass
 
     # raise TypeError("Error: %s is not a valid node type in AST" % name)
+
+
+def clean_code(buffer):
+    """
+    - Trims the shebang at the beginning of JS file
+    Example: #!/usr/bin/env node
+    """
+    return re.sub(r'^#!([^\r\n]+)', '', buffer)
