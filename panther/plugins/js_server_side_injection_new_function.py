@@ -31,6 +31,7 @@ new Function ([arg1[, arg2[, ...argN]],] code);
 
 import bandit
 from bandit.core import test_properties as test
+from bandit.core.visitor import Identifier
 
 
 def _report(value):
@@ -53,7 +54,9 @@ def new_function_used(context):
         pass
 
     try:
-        if context.node.callee.property.name == 'Function':
+        callee_object = context.node.callee.object
+
+        if context.node.callee.property.name == 'Function' and isinstance(callee_object, Identifier) and callee_object.name == 'global':
             return _report("Use of global.Function(...)")
     except:
         pass
