@@ -2,4 +2,4 @@
 B608: hardcoded_sql_expressions
 -------------------------------
 
-.. automodule:: bandit.plugins.injection_sql
+.. automodule:: panther.plugins.injection_sql

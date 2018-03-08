@@ -18,10 +18,10 @@ import mock
 from stevedore import extension
 import testtools
 
-from bandit.blacklists import utils
-from bandit.core import extension_loader
-from bandit.core import test_properties as test
-from bandit.core import test_set
+from panther.blacklists import utils
+from panther.core import extension_loader
+from panther.core import test_properties as test
+from panther.core import test_set
 
 
 @test.checks('Str')
@@ -43,13 +43,13 @@ def test_plugin():
     return {'Import': sets, 'ImportFrom': sets, 'Call': sets}
 
 
-class BanditTestSetTests(testtools.TestCase):
+class PantherTestSetTests(testtools.TestCase):
     def _make_test_manager(self, plugin):
         return extension.ExtensionManager.make_test_instance(
             [extension.Extension('test_plugin', None, test_plugin, None)])
 
     def setUp(self):
-        super(BanditTestSetTests, self).setUp()
+        super(PantherTestSetTests, self).setUp()
         mngr = self._make_test_manager(mock.Mock)
         self.patchExtMan = mock.patch('stevedore.extension.ExtensionManager')
         self.mockExtMan = self.patchExtMan.start()
@@ -61,55 +61,55 @@ class BanditTestSetTests(testtools.TestCase):
 
     def tearDown(self):
         self.patchExtMan.stop()
-        super(BanditTestSetTests, self).tearDown()
+        super(PantherTestSetTests, self).tearDown()
         extension_loader.MANAGER = self.old_ext_man
 
     def test_has_defaults(self):
-        ts = test_set.BanditTestSet(self.config)
+        ts = test_set.PantherTestSet(self.config)
         self.assertEqual(1, len(ts.get_tests('Str')))
 
     def test_profile_include_id(self):
         profile = {'include': ['B000']}
-        ts = test_set.BanditTestSet(self.config, profile)
+        ts = test_set.PantherTestSet(self.config, profile)
         self.assertEqual(1, len(ts.get_tests('Str')))
 
     def test_profile_exclude_id(self):
         profile = {'exclude': ['B000']}
-        ts = test_set.BanditTestSet(self.config, profile)
+        ts = test_set.PantherTestSet(self.config, profile)
         self.assertEqual(0, len(ts.get_tests('Str')))
 
     def test_profile_include_none(self):
         profile = {'include': []}  # same as no include
-        ts = test_set.BanditTestSet(self.config, profile)
+        ts = test_set.PantherTestSet(self.config, profile)
         self.assertEqual(1, len(ts.get_tests('Str')))
 
     def test_profile_exclude_none(self):
         profile = {'exclude': []}  # same as no exclude
-        ts = test_set.BanditTestSet(self.config, profile)
+        ts = test_set.PantherTestSet(self.config, profile)
         self.assertEqual(1, len(ts.get_tests('Str')))
 
     def test_profile_has_builtin_blacklist(self):
-        ts = test_set.BanditTestSet(self.config)
+        ts = test_set.PantherTestSet(self.config)
         self.assertEqual(1, len(ts.get_tests('Import')))
         self.assertEqual(1, len(ts.get_tests('ImportFrom')))
         self.assertEqual(1, len(ts.get_tests('Call')))
 
     def test_profile_exclude_builtin_blacklist(self):
         profile = {'exclude': ['B001']}
-        ts = test_set.BanditTestSet(self.config, profile)
+        ts = test_set.PantherTestSet(self.config, profile)
         self.assertEqual(0, len(ts.get_tests('Import')))
         self.assertEqual(0, len(ts.get_tests('ImportFrom')))
         self.assertEqual(0, len(ts.get_tests('Call')))
 
     def test_profile_exclude_builtin_blacklist_specific(self):
         profile = {'exclude': ['B302', 'B401']}
-        ts = test_set.BanditTestSet(self.config, profile)
+        ts = test_set.PantherTestSet(self.config, profile)
         self.assertEqual(0, len(ts.get_tests('Import')))
         self.assertEqual(0, len(ts.get_tests('ImportFrom')))
         self.assertEqual(0, len(ts.get_tests('Call')))
 
     def test_profile_filter_blacklist_none(self):
-        ts = test_set.BanditTestSet(self.config)
+        ts = test_set.PantherTestSet(self.config)
         blacklist = ts.get_tests('Import')[0]
 
         self.assertEqual(2, len(blacklist._config['Import']))
@@ -118,7 +118,7 @@ class BanditTestSetTests(testtools.TestCase):
 
     def test_profile_filter_blacklist_one(self):
         profile = {'exclude': ['B401']}
-        ts = test_set.BanditTestSet(self.config, profile)
+        ts = test_set.PantherTestSet(self.config, profile)
         blacklist = ts.get_tests('Import')[0]
 
         self.assertEqual(1, len(blacklist._config['Import']))
@@ -127,7 +127,7 @@ class BanditTestSetTests(testtools.TestCase):
 
     def test_profile_filter_blacklist_include(self):
         profile = {'include': ['B001', 'B401']}
-        ts = test_set.BanditTestSet(self.config, profile)
+        ts = test_set.PantherTestSet(self.config, profile)
         blacklist = ts.get_tests('Import')[0]
 
         self.assertEqual(1, len(blacklist._config['Import']))
@@ -136,7 +136,7 @@ class BanditTestSetTests(testtools.TestCase):
 
     def test_profile_filter_blacklist_all(self):
         profile = {'exclude': ['B401', 'B302']}
-        ts = test_set.BanditTestSet(self.config, profile)
+        ts = test_set.PantherTestSet(self.config, profile)
 
         # if there is no blacklist data for a node type then we wont add a
         # blacklist test to it, as this would be pointless.
@@ -152,7 +152,7 @@ class BanditTestSetTests(testtools.TestCase):
 
         profile = {'include': ['B001'], 'blacklist': {'Call': data}}
 
-        ts = test_set.BanditTestSet(self.config, profile)
+        ts = test_set.PantherTestSet(self.config, profile)
         blacklist = ts.get_tests('Call')[0]
 
         self.assertNotIn('Import', blacklist._config)

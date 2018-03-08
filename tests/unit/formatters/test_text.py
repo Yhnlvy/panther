@@ -19,11 +19,11 @@ import tempfile
 import mock
 import testtools
 
-import bandit
-from bandit.core import config
-from bandit.core import issue
-from bandit.core import manager
-from bandit.formatters import text as b_text
+import panther
+from panther.core import config
+from panther.core import issue
+from panther.core import manager
+from panther.formatters import text as p_text
 
 
 class TextFormatterTests(testtools.TestCase):
@@ -31,7 +31,7 @@ class TextFormatterTests(testtools.TestCase):
     def setUp(self):
         super(TextFormatterTests, self).setUp()
 
-    @mock.patch('bandit.core.issue.Issue.get_code')
+    @mock.patch('panther.core.issue.Issue.get_code')
     def test_output_issue(self, get_code):
         issue = _get_issue_instance()
         get_code.return_value = 'DDDDDDD'
@@ -50,41 +50,41 @@ class TextFormatterTests(testtools.TestCase):
                 return_val.append("{}{}".format(_indent_val, _code))
             return '\n'.join(return_val)
 
-        issue_text = b_text._output_issue_str(issue, indent_val)
+        issue_text = p_text._output_issue_str(issue, indent_val)
         expected_return = _template(issue, indent_val, 'DDDDDDD')
         self.assertEqual(expected_return, issue_text)
 
-        issue_text = b_text._output_issue_str(issue, indent_val,
+        issue_text = p_text._output_issue_str(issue, indent_val,
                                               show_code=False)
         expected_return = _template(issue, indent_val, '')
         self.assertEqual(expected_return, issue_text)
 
         issue.lineno = ''
-        issue_text = b_text._output_issue_str(issue, indent_val,
+        issue_text = p_text._output_issue_str(issue, indent_val,
                                               show_lineno=False)
         expected_return = _template(issue, indent_val, 'DDDDDDD')
         self.assertEqual(expected_return, issue_text)
 
-    @mock.patch('bandit.core.manager.BanditManager.get_issue_list')
+    @mock.patch('panther.core.manager.PantherManager.get_issue_list')
     def test_no_issues(self, get_issue_list):
-        conf = config.BanditConfig()
-        self.manager = manager.BanditManager(conf, 'file')
+        conf = config.PantherConfig()
+        self.manager = manager.PantherManager(conf, 'file')
 
         (tmp_fd, self.tmp_fname) = tempfile.mkstemp()
         self.manager.out_file = self.tmp_fname
 
         get_issue_list.return_value = collections.OrderedDict()
         tmp_file = open(self.tmp_fname, 'w')
-        b_text.report(self.manager, tmp_file, bandit.LOW, bandit.LOW, lines=5)
+        p_text.report(self.manager, tmp_file, panther.LOW, panther.LOW, lines=5)
 
         with open(self.tmp_fname) as f:
             data = f.read()
             self.assertIn('No issues identified.', data)
 
-    @mock.patch('bandit.core.manager.BanditManager.get_issue_list')
+    @mock.patch('panther.core.manager.PantherManager.get_issue_list')
     def test_report_nobaseline(self, get_issue_list):
-        conf = config.BanditConfig()
-        self.manager = manager.BanditManager(conf, 'file')
+        conf = config.PantherConfig()
+        self.manager = manager.PantherManager(conf, 'file')
 
         (tmp_fd, self.tmp_fname) = tempfile.mkstemp()
         self.manager.out_file = self.tmp_fname
@@ -110,12 +110,12 @@ class TextFormatterTests(testtools.TestCase):
                                                      (category, level)] = 1
 
         # Validate that we're outputting the correct issues
-        output_str_fn = 'bandit.formatters.text._output_issue_str'
+        output_str_fn = 'panther.formatters.text._output_issue_str'
         with mock.patch(output_str_fn) as output_str:
             output_str.return_value = 'ISSUE_OUTPUT_TEXT'
 
             tmp_file = open(self.tmp_fname, 'w')
-            b_text.report(self.manager, tmp_file, bandit.LOW, bandit.LOW,
+            p_text.report(self.manager, tmp_file, panther.LOW, panther.LOW,
                           lines=5)
 
             calls = [mock.call(issue_a, '', lines=5),
@@ -126,7 +126,7 @@ class TextFormatterTests(testtools.TestCase):
         # Validate that we're outputting all of the expected fields and the
         # correct values
         tmp_file = open(self.tmp_fname, 'w')
-        b_text.report(self.manager, tmp_file, bandit.LOW, bandit.LOW,
+        p_text.report(self.manager, tmp_file, panther.LOW, panther.LOW,
                       lines=5)
         with open(self.tmp_fname) as f:
             data = f.read()
@@ -152,10 +152,10 @@ class TextFormatterTests(testtools.TestCase):
             for item in expected_items:
                 self.assertIn(item, data)
 
-    @mock.patch('bandit.core.manager.BanditManager.get_issue_list')
+    @mock.patch('panther.core.manager.PantherManager.get_issue_list')
     def test_report_baseline(self, get_issue_list):
-        conf = config.BanditConfig()
-        self.manager = manager.BanditManager(conf, 'file')
+        conf = config.PantherConfig()
+        self.manager = manager.PantherManager(conf, 'file')
 
         (tmp_fd, self.tmp_fname) = tempfile.mkstemp()
         self.manager.out_file = self.tmp_fname
@@ -175,12 +175,12 @@ class TextFormatterTests(testtools.TestCase):
 
         # Validate that we're outputting the correct issues
         indent_val = ' ' * 10
-        output_str_fn = 'bandit.formatters.text._output_issue_str'
+        output_str_fn = 'panther.formatters.text._output_issue_str'
         with mock.patch(output_str_fn) as output_str:
             output_str.return_value = 'ISSUE_OUTPUT_TEXT'
 
             tmp_file = open(self.tmp_fname, 'w')
-            b_text.report(self.manager, tmp_file, bandit.LOW, bandit.LOW,
+            p_text.report(self.manager, tmp_file, panther.LOW, panther.LOW,
                           lines=5)
 
             calls = [mock.call(issue_a, '', lines=5),
@@ -192,9 +192,9 @@ class TextFormatterTests(testtools.TestCase):
             output_str.assert_has_calls(calls, any_order=True)
 
 
-def _get_issue_instance(severity=bandit.MEDIUM, confidence=bandit.MEDIUM):
+def _get_issue_instance(severity=panther.MEDIUM, confidence=panther.MEDIUM):
     new_issue = issue.Issue(severity, confidence, 'Test issue')
     new_issue.fname = 'code.py'
-    new_issue.test = 'bandit_plugin'
+    new_issue.test = 'panther_plugin'
     new_issue.lineno = 1
     return new_issue

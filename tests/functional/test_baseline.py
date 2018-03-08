@@ -38,7 +38,7 @@ candidate_example_six = "xml.sax.make_parser() # nosec"
 
 class BaselineFunctionalTests(testtools.TestCase):
 
-    '''Functional tests for Bandit baseline.
+    '''Functional tests for Panther baseline.
 
     This set of tests is used to verify that the baseline comparison handles
     finding and comparing results appropriately. The only comparison is the
@@ -50,13 +50,13 @@ class BaselineFunctionalTests(testtools.TestCase):
     def setUp(self):
         super(BaselineFunctionalTests, self).setUp()
         self.examples_path = 'examples'
-        self.baseline_commands = ['bandit', '-r']
+        self.baseline_commands = ['panther', '-r']
         self.baseline_report_file = "baseline_report.json"
 
-    def _run_bandit_baseline(self, target_directory, baseline_file):
-        '''A helper method to run bandit baseline
+    def _run_panther_baseline(self, target_directory, baseline_file):
+        '''A helper method to run panther baseline
 
-        This method will run the bandit baseline test provided an existing
+        This method will run the panther baseline test provided an existing
         baseline report and the target directory containing the content to be
         tested.
         :param target_directory: Directory containing content to be compared
@@ -73,8 +73,8 @@ class BaselineFunctionalTests(testtools.TestCase):
     def _create_baseline(self, baseline_paired_files):
         '''A helper method to create a baseline to use during baseline test
 
-        This method will run bandit to create an initial baseline that can
-        then be used during the bandit baseline test. Since the file contents
+        This method will run panther to create an initial baseline that can
+        then be used during the panther baseline test. Since the file contents
         of the baseline report can be extremely dynamic and difficult to create
         ahead of time, we do this at runtime to reduce the risk of missing
         something. To do this, we must temporary replace the file contents
@@ -85,7 +85,7 @@ class BaselineFunctionalTests(testtools.TestCase):
         is provided, which contains content to use in place of the key file
         when the baseline report is created initially.
         :return The target directory for the baseline test and the return code
-        of the bandit run to help determine whether the baseline report was
+        of the panther run to help determine whether the baseline report was
         populated
         '''
         target_directory = self.useFixture(fixtures.TempDir()).path
@@ -109,7 +109,7 @@ class BaselineFunctionalTests(testtools.TestCase):
     def test_no_new_candidates(self):
         '''Tests when there are no new candidates
 
-        Test that bandit returns no issues found, as there are no new
+        Test that panther returns no issues found, as there are no new
         candidates found compared with those found from the baseline.
         '''
         baseline_report_files = {"new_candidates-all.py":
@@ -120,7 +120,7 @@ class BaselineFunctionalTests(testtools.TestCase):
         self.assertEqual(1, baseline_code)
         baseline_report = os.path.join(target_directory,
                                        self.baseline_report_file)
-        return_value, return_code = (self._run_bandit_baseline(
+        return_value, return_code = (self._run_panther_baseline(
                                      target_directory, baseline_report))
         # assert there were no results (no candidates found)
         self.assertEqual(0, return_code)
@@ -142,7 +142,7 @@ class BaselineFunctionalTests(testtools.TestCase):
         self.assertEqual(0, baseline_code)
         baseline_report = os.path.join(target_directory,
                                        self.baseline_report_file)
-        return_value, return_code = (self._run_bandit_baseline(
+        return_value, return_code = (self._run_panther_baseline(
                                      target_directory, baseline_report))
         # assert there were no results (no candidates found)
         self.assertEqual(0, return_code)
@@ -154,7 +154,7 @@ class BaselineFunctionalTests(testtools.TestCase):
     def test_no_existing_with_new_candidates(self):
         '''Tests when there are new candidates and no existing candidates
 
-        Test that bandit returns issues found in file that had no existing
+        Test that panther returns issues found in file that had no existing
         candidates from baseline but now contain candidates.
         '''
         baseline_report_files = {"new_candidates-all.py":
@@ -165,7 +165,7 @@ class BaselineFunctionalTests(testtools.TestCase):
         self.assertEqual(0, baseline_code)
         baseline_report = os.path.join(target_directory,
                                        self.baseline_report_file)
-        return_value, return_code = (self._run_bandit_baseline(
+        return_value, return_code = (self._run_panther_baseline(
                                      target_directory, baseline_report))
         # assert there were results (candidates found)
         self.assertEqual(1, return_code)
@@ -185,7 +185,7 @@ class BaselineFunctionalTests(testtools.TestCase):
     def test_existing_and_new_candidates(self):
         '''Tests when tere are new candidates and existing candidates
 
-        Test that bandit returns issues found in file with existing
+        Test that panther returns issues found in file with existing
         candidates. The new candidates should be returned in this case.
         '''
         baseline_report_files = {"new_candidates-all.py":
@@ -196,7 +196,7 @@ class BaselineFunctionalTests(testtools.TestCase):
         self.assertEqual(1, baseline_code)
         baseline_report = os.path.join(target_directory,
                                        self.baseline_report_file)
-        return_value, return_code = (self._run_bandit_baseline(
+        return_value, return_code = (self._run_panther_baseline(
                                      target_directory, baseline_report))
         # assert there were results (candidates found)
         self.assertEqual(1, return_code)
@@ -226,7 +226,7 @@ class BaselineFunctionalTests(testtools.TestCase):
         self.assertEqual(1, baseline_code)
         baseline_report = os.path.join(target_directory,
                                        self.baseline_report_file)
-        return_value, return_code = (self._run_bandit_baseline(
+        return_value, return_code = (self._run_panther_baseline(
                                      target_directory, baseline_report))
         # assert there were no results (candidates found)
         self.assertEqual(0, return_code)
@@ -251,7 +251,7 @@ class BaselineFunctionalTests(testtools.TestCase):
         self.assertEqual(0, baseline_code)
         baseline_report = os.path.join(target_directory,
                                        self.baseline_report_file)
-        return_value, return_code = (self._run_bandit_baseline(
+        return_value, return_code = (self._run_panther_baseline(
                                      target_directory, baseline_report))
         # assert there were results (candidates found)
         self.assertEqual(1, return_code)
@@ -284,7 +284,7 @@ class BaselineFunctionalTests(testtools.TestCase):
         self.assertEqual(0, baseline_code)
         baseline_report = os.path.join(target_directory,
                                        self.baseline_report_file)
-        return_value, return_code = (self._run_bandit_baseline(
+        return_value, return_code = (self._run_panther_baseline(
                                      target_directory, baseline_report))
         # assert there were results (candidates found)
         self.assertEqual(1, return_code)

@@ -18,25 +18,25 @@ import tempfile
 import six
 import testtools
 
-import bandit
-from bandit.core import config
-from bandit.core import issue
-from bandit.core import manager
-from bandit.formatters import csv as b_csv
+import panther
+from panther.core import config
+from panther.core import issue
+from panther.core import manager
+from panther.formatters import csv as p_csv
 
 
 class CsvFormatterTests(testtools.TestCase):
 
     def setUp(self):
         super(CsvFormatterTests, self).setUp()
-        conf = config.BanditConfig()
-        self.manager = manager.BanditManager(conf, 'file')
+        conf = config.PantherConfig()
+        self.manager = manager.PantherManager(conf, 'file')
         (tmp_fd, self.tmp_fname) = tempfile.mkstemp()
         self.context = {'filename': self.tmp_fname,
                         'lineno': 4,
                         'linerange': [4]}
         self.check_name = 'hardcoded_bind_all_interfaces'
-        self.issue = issue.Issue(bandit.MEDIUM, bandit.MEDIUM,
+        self.issue = issue.Issue(panther.MEDIUM, panther.MEDIUM,
                                  'Possible binding to all interfaces.')
         self.manager.out_file = self.tmp_fname
 
@@ -49,7 +49,7 @@ class CsvFormatterTests(testtools.TestCase):
 
     def test_report(self):
         tmp_file = open(self.tmp_fname, 'w')
-        b_csv.report(self.manager, tmp_file, self.issue.severity,
+        p_csv.report(self.manager, tmp_file, self.issue.severity,
                      self.issue.confidence)
 
         with open(self.tmp_fname) as f:

@@ -2,4 +2,4 @@
 xml
 ---
 
-.. automodule:: bandit.formatters.xml
+.. automodule:: panther.formatters.xml

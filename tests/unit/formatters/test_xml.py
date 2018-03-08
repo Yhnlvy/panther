@@ -18,25 +18,25 @@ from xml.etree import cElementTree as ET
 
 import testtools
 
-import bandit
-from bandit.core import config
-from bandit.core import issue
-from bandit.core import manager
-from bandit.formatters import xml as b_xml
+import panther
+from panther.core import config
+from panther.core import issue
+from panther.core import manager
+from panther.formatters import xml as p_xml
 
 
 class XmlFormatterTests(testtools.TestCase):
 
     def setUp(self):
         super(XmlFormatterTests, self).setUp()
-        conf = config.BanditConfig()
-        self.manager = manager.BanditManager(conf, 'file')
+        conf = config.PantherConfig()
+        self.manager = manager.PantherManager(conf, 'file')
         (tmp_fd, self.tmp_fname) = tempfile.mkstemp()
         self.context = {'filename': self.tmp_fname,
                         'lineno': 4,
                         'linerange': [4]}
         self.check_name = 'hardcoded_bind_all_interfaces'
-        self.issue = issue.Issue(bandit.MEDIUM, bandit.MEDIUM,
+        self.issue = issue.Issue(panther.MEDIUM, panther.MEDIUM,
                                  'Possible binding to all interfaces.')
         self.manager.out_file = self.tmp_fname
 
@@ -70,7 +70,7 @@ class XmlFormatterTests(testtools.TestCase):
 
     def test_report(self):
         tmp_file = open(self.tmp_fname, 'wb')
-        b_xml.report(self.manager, tmp_file, self.issue.severity,
+        p_xml.report(self.manager, tmp_file, self.issue.severity,
                      self.issue.confidence)
 
         with open(self.tmp_fname) as f:

@@ -21,9 +21,9 @@ import mock
 import testtools
 import yaml
 
-from bandit.cli import config_generator
-from bandit.core import extension_loader
-from bandit.core import test_properties as test
+from panther.cli import config_generator
+from panther.core import extension_loader
+from panther.core import test_properties as test
 
 
 def gen_config(name):
@@ -36,17 +36,17 @@ def _test_plugin(context, conf):
     pass
 
 
-class BanditConfigGeneratorLoggerTests(testtools.TestCase):
+class PantherConfigGeneratorLoggerTests(testtools.TestCase):
 
     def setUp(self):
-        super(BanditConfigGeneratorLoggerTests, self).setUp()
+        super(PantherConfigGeneratorLoggerTests, self).setUp()
         self.logger = logging.getLogger(config_generator.__name__)
         self.original_logger_handlers = self.logger.handlers
         self.original_logger_level = self.logger.level
         self.logger.handlers = []
 
     def tearDown(self):
-        super(BanditConfigGeneratorLoggerTests, self).tearDown()
+        super(PantherConfigGeneratorLoggerTests, self).tearDown()
         self.logger.handlers = self.original_logger_handlers
         self.logger.level = self.original_logger_level
 
@@ -58,19 +58,19 @@ class BanditConfigGeneratorLoggerTests(testtools.TestCase):
         self.assertEqual(logging.INFO, self.logger.level)
 
 
-class BanditConfigGeneratorTests(testtools.TestCase):
-    @mock.patch('sys.argv', ['bandit-config-generator'])
+class PantherConfigGeneratorTests(testtools.TestCase):
+    @mock.patch('sys.argv', ['panther-config-generator'])
     def test_parse_args_no_defaults(self):
         # Without arguments, the generator should just show help and exit
         self.assertRaises(SystemExit, config_generator.parse_args)
 
-    @mock.patch('sys.argv', ['bandit-config-generator', '--show-defaults'])
+    @mock.patch('sys.argv', ['panther-config-generator', '--show-defaults'])
     def test_parse_args_show_defaults(self):
         # Test that the config generator does show default plugin settings
         return_value = config_generator.parse_args()
         self.assertTrue(return_value.show_defaults)
 
-    @mock.patch('sys.argv', ['bandit-config-generator', '--out', 'dummyfile'])
+    @mock.patch('sys.argv', ['panther-config-generator', '--out', 'dummyfile'])
     def test_parse_args_out_file(self):
         # Test config generator get proper output file when specified
         return_value = config_generator.parse_args()
@@ -88,10 +88,10 @@ class BanditConfigGeneratorTests(testtools.TestCase):
         self.assertEqual(yaml.safe_dump(config, default_flow_style=False),
                          settings)
 
-    @mock.patch('sys.argv', ['bandit-config-generator', '--show-defaults'])
+    @mock.patch('sys.argv', ['panther-config-generator', '--show-defaults'])
     def test_main_show_defaults(self):
         # Test that the config generator does show defaults and returns 0
-        with mock.patch('bandit.cli.config_generator.get_config_settings'
+        with mock.patch('panther.cli.config_generator.get_config_settings'
                         ) as mock_config_settings:
             return_value = config_generator.main()
             # The get_config_settings function should have been called

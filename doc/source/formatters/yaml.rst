@@ -2,4 +2,4 @@
 yaml
 ----
 
-.. automodule:: bandit.formatters.yaml
+.. automodule:: panther.formatters.yaml

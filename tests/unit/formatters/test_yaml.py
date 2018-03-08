@@ -19,32 +19,32 @@ import mock
 import testtools
 import yaml
 
-import bandit
-from bandit.core import config
-from bandit.core import constants
-from bandit.core import issue
-from bandit.core import manager
-from bandit.core import metrics
-from bandit.formatters import json as b_json
+import panther
+from panther.core import config
+from panther.core import constants
+from panther.core import issue
+from panther.core import manager
+from panther.core import metrics
+from panther.formatters import json as p_json
 
 
 class JsonFormatterTests(testtools.TestCase):
 
     def setUp(self):
         super(JsonFormatterTests, self).setUp()
-        conf = config.BanditConfig()
-        self.manager = manager.BanditManager(conf, 'file')
+        conf = config.PantherConfig()
+        self.manager = manager.PantherManager(conf, 'file')
         (tmp_fd, self.tmp_fname) = tempfile.mkstemp()
         self.context = {'filename': self.tmp_fname,
                         'lineno': 4,
                         'linerange': [4]}
         self.check_name = 'hardcoded_bind_all_interfaces'
-        self.issue = issue.Issue(bandit.MEDIUM, bandit.MEDIUM,
+        self.issue = issue.Issue(panther.MEDIUM, panther.MEDIUM,
                                  'Possible binding to all interfaces.')
 
-        self.candidates = [issue.Issue(bandit.LOW, bandit.LOW, 'Candidate A',
+        self.candidates = [issue.Issue(panther.LOW, panther.LOW, 'Candidate A',
                                        lineno=1),
-                           issue.Issue(bandit.HIGH, bandit.HIGH, 'Candiate B',
+                           issue.Issue(panther.HIGH, panther.HIGH, 'Candiate B',
                                        lineno=2)]
 
         self.manager.out_file = self.tmp_fname
@@ -66,7 +66,7 @@ class JsonFormatterTests(testtools.TestCase):
                         criteria, rank
                     )] = 0
 
-    @mock.patch('bandit.core.manager.BanditManager.get_issue_list')
+    @mock.patch('panther.core.manager.PantherManager.get_issue_list')
     def test_report(self, get_issue_list):
         self.manager.files_list = ['binding.py']
         self.manager.scores = [{'SEVERITY': [0] * len(constants.RANKING),
@@ -76,7 +76,7 @@ class JsonFormatterTests(testtools.TestCase):
             [(self.issue, self.candidates)])
 
         tmp_file = open(self.tmp_fname, 'w')
-        b_json.report(self.manager, tmp_file, self.issue.severity,
+        p_json.report(self.manager, tmp_file, self.issue.severity,
                       self.issue.confidence)
 
         with open(self.tmp_fname) as f:

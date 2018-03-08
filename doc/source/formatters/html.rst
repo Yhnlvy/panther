@@ -2,4 +2,4 @@
 html
 ----
 
-.. automodule:: bandit.formatters.html
+.. automodule:: panther.formatters.html

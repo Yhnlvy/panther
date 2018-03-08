@@ -1,12 +1,12 @@
 Configuration
 =============
-Bandit is designed to be configurable and cover a wide range of needs, it may
+Panther is designed to be configurable and cover a wide range of needs, it may
 be used as either a local developer utility or as part of a full CI/CD
-pipeline. To provide for these various usage scenarios bandit can be configured
+pipeline. To provide for these various usage scenarios panther can be configured
 via a `YAML <http://yaml.org/>`_ file. This file is completely optional and in
 many cases not needed, it may be specified on the command line by using `-c`.
 
-A bandit configuration file may choose the specific test plugins to run and
+A panther configuration file may choose the specific test plugins to run and
 override the default configurations of those tests. An example config might
 look like the following:
 
@@ -40,12 +40,12 @@ the specific tests that are to be run (and not their parameters) then using
 
 Skipping Tests
 --------------
-The bandit config may contain optional lists of test IDs to either include
+The panther config may contain optional lists of test IDs to either include
 (`tests`) or exclude (`skips`). These lists are equivalent to using `-t` and
-`-s` on the command line. If only `tests` is given then bandit will include
+`-s` on the command line. If only `tests` is given then panther will include
 only those tests, effectively excluding all other tests. If only `skips`
-is given then bandit will include all tests not in the skips list. If both are
-given then bandit will include only tests in `tests` and then remove `skips`
+is given then panther will include all tests not in the skips list. If both are
+given then panther will include only tests in `tests` and then remove `skips`
 from that set. It is an error to include the same test ID in both `tests` and
 `skips`.
 
@@ -55,7 +55,7 @@ Note that command line options `-t`/`-s` can still be used in conjunction with
 
 Generating a Config
 -------------------
-Bandit ships the tool `bandit-config-generator` designed to take the leg work
+Panther ships the tool `panther-config-generator` designed to take the leg work
 out of configuration. This tool can generate a configuration file
 automatically. The generated configuration will include default config blocks
 for all detected test and blacklist plugins. This data can then be deleted or
@@ -67,7 +67,7 @@ a complete list of all test IDs for reference when editing).
 
 Configuring Test Plugins
 ------------------------
-Bandit's configuration file is written in `YAML <http://yaml.org/>`_ and options
+Panther's configuration file is written in `YAML <http://yaml.org/>`_ and options
 for each plugin test are provided under a section named to match the test
 method. For example, given a test plugin called 'try_except_pass' its
 configuration section might look like the following:

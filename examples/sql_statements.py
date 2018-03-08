@@ -26,7 +26,7 @@ cur.execute("INSERT INTO foo VALUES ('a', 'b', '%s')", value)
 cur.execute("DELETE FROM foo WHERE id = '%s'", identifier)
 cur.execute("UPDATE foo SET value = 'b' WHERE id = '%s'", identifier)
 
-# bug: https://bugs.launchpad.net/bandit/+bug/1479625
+# bug: https://bugs.launchpad.net/panther/+bug/1479625
 def a():
     def b():
         pass

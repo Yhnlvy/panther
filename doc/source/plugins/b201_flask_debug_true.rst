@@ -2,4 +2,4 @@
 B201: flask_debug_true
 ----------------------
 
-.. automodule:: bandit.plugins.app_debug
+.. automodule:: panther.plugins.app_debug

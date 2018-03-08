@@ -2,4 +2,4 @@
 B601: paramiko_calls
 --------------------
 
-.. automodule:: bandit.plugins.injection_paramiko
+.. automodule:: panther.plugins.injection_paramiko

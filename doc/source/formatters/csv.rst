@@ -2,4 +2,4 @@
 csv
 ---
 
-.. automodule:: bandit.formatters.csv
+.. automodule:: panther.formatters.csv

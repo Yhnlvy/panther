@@ -2,4 +2,4 @@
 json
 ----
 
-.. automodule:: bandit.formatters.json
+.. automodule:: panther.formatters.json
