@@ -50,13 +50,13 @@ class TestInit(testtools.TestCase):
         example_value = self.getUniqueString()
         contents = '%s: %s' % (example_key, example_value)
         f = self.useFixture(TempFile(contents))
-        b_config = config.PantherConfig(f.name)
+        p_config = config.PantherConfig(f.name)
 
         # After initialization, can get settings.
-        self.assertEqual('*.py', b_config.get_setting('plugin_name_pattern'))
+        self.assertEqual('*.py', p_config.get_setting('plugin_name_pattern'))
 
-        self.assertEqual({example_key: example_value}, b_config.config)
-        self.assertEqual(example_value, b_config.get_option(example_key))
+        self.assertEqual({example_key: example_value}, p_config.config)
+        self.assertEqual(example_value, p_config.get_option(example_key))
 
     def test_file_does_not_exist(self):
         # When the config file doesn't exist, ConfigFileUnopenable is raised.
@@ -91,20 +91,20 @@ class TestGetOption(testtools.TestCase):
 
         f = self.useFixture(TempFile(sample_yaml))
 
-        self.b_config = config.PantherConfig(f.name)
+        self.p_config = config.PantherConfig(f.name)
 
     def test_levels(self):
         # get_option with .-separated string.
 
         sample_option_name = '%s.%s' % (self.example_key, self.example_subkey)
         self.assertEqual(self.example_subvalue,
-                         self.b_config.get_option(sample_option_name))
+                         self.p_config.get_option(sample_option_name))
 
     def test_levels_not_exist(self):
         # get_option when option name doesn't exist returns None.
 
         sample_option_name = '%s.%s' % (uuid.uuid4().hex, uuid.uuid4().hex)
-        self.assertIsNone(self.b_config.get_option(sample_option_name))
+        self.assertIsNone(self.p_config.get_option(sample_option_name))
 
 
 class TestGetSetting(testtools.TestCase):
@@ -112,13 +112,13 @@ class TestGetSetting(testtools.TestCase):
         super(TestGetSetting, self).setUp()
         test_yaml = 'key: value'
         f = self.useFixture(TempFile(test_yaml))
-        self.b_config = config.PantherConfig(f.name)
+        self.p_config = config.PantherConfig(f.name)
 
     def test_not_exist(self):
         # get_setting() when the name doesn't exist returns None
 
         sample_setting_name = uuid.uuid4().hex
-        self.assertIsNone(self.b_config.get_setting(sample_setting_name))
+        self.assertIsNone(self.p_config.get_setting(sample_setting_name))
 
 
 class TestConfigCompat(testtools.TestCase):

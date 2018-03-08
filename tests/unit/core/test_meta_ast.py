@@ -22,20 +22,20 @@ class PantherMetaAstTests(testtools.TestCase):
 
     def setUp(self):
         super(PantherMetaAstTests, self).setUp()
-        self.b_meta_ast = meta_ast.PantherMetaAst()
+        self.p_meta_ast = meta_ast.PantherMetaAst()
         self.node = 'fake_node'
         self.parent_id = 'fake_parent_id'
         self.depth = 1
-        self.b_meta_ast.add_node(self.node, self.parent_id, self.depth)
+        self.p_meta_ast.add_node(self.node, self.parent_id, self.depth)
         self.node_id = hex(id(self.node))
 
     def test_add_node(self):
         expected = {'raw': self.node,
                     'parent_id': self.parent_id,
                     'depth': self.depth}
-        self.assertEqual(expected, self.b_meta_ast.nodes[self.node_id])
+        self.assertEqual(expected, self.p_meta_ast.nodes[self.node_id])
 
     def test_str(self):
-        node = self.b_meta_ast.nodes[self.node_id]
+        node = self.p_meta_ast.nodes[self.node_id]
         expected = 'Node: %s\n\t%s\nLength: 1\n' % (self.node_id, node)
-        self.assertEqual(expected, six.text_type(self.b_meta_ast))
+        self.assertEqual(expected, six.text_type(self.p_meta_ast))

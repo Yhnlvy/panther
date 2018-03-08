@@ -22,9 +22,9 @@ import textwrap
 
 
 import panther
-from panther.core import config as b_config
+from panther.core import config as p_config
 from panther.core import constants
-from panther.core import manager as b_manager
+from panther.core import manager as p_manager
 from panther.core import utils
 
 
@@ -294,7 +294,7 @@ def main():
         parser.error("--msg-template can only be used with --format=custom")
 
     try:
-        b_conf = b_config.PantherConfig(config_file=args.config_file)
+        p_conf = p_config.PantherConfig(config_file=args.config_file)
     except utils.ConfigError as e:
         LOG.error(e)
         sys.exit(2)
@@ -323,12 +323,12 @@ def main():
         LOG.error("No targets found in CLI or ini files, exiting.")
         sys.exit(2)
     # if the log format string was set in the options, reinitialize
-    if b_conf.get_option('log_format'):
-        log_format = b_conf.get_option('log_format')
+    if p_conf.get_option('log_format'):
+        log_format = p_conf.get_option('log_format')
         _init_logger(debug, log_format=log_format)
 
     try:
-        profile = _get_profile(b_conf, args.profile, args.config_file)
+        profile = _get_profile(p_conf, args.profile, args.config_file)
         _log_info(args, profile)
 
         profile['include'].update(args.tests.split(',') if args.tests else [])
@@ -339,7 +339,7 @@ def main():
         LOG.error(e)
         sys.exit(2)
 
-    b_mgr = b_manager.PantherManager(b_conf, args.agg_type, args.debug,
+    p_mgr = p_manager.PantherManager(p_conf, args.agg_type, args.debug,
                                     profile=profile, verbose=args.verbose,
                                     ignore_nosec=args.ignore_nosec)
 
@@ -347,7 +347,7 @@ def main():
         try:
             with open(args.baseline) as bl:
                 data = bl.read()
-                b_mgr.populate_baseline(data)
+                p_mgr.populate_baseline(data)
         except IOError:
             LOG.warning("Could not open baseline report: %s", args.baseline)
             sys.exit(2)
@@ -365,21 +365,21 @@ def main():
                  sys.version_info.minor, sys.version_info.micro)
 
     # initiate file discovery step within Panther Manager
-    b_mgr.discover_files(args.targets, args.recursive, args.excluded_paths)
+    p_mgr.discover_files(args.targets, args.recursive, args.excluded_paths)
 
-    if not b_mgr.b_ts.tests:
+    if not p_mgr.p_ts.tests:
         LOG.error('No tests would be run, please check the profile.')
         sys.exit(2)
 
     # initiate execution of tests within Panther Manager
-    b_mgr.run_tests()
-    LOG.debug(b_mgr.b_ma)
-    LOG.debug(b_mgr.metrics)
+    p_mgr.run_tests()
+    LOG.debug(p_mgr.p_ma)
+    LOG.debug(p_mgr.metrics)
 
     # trigger output of results by Panther Manager
     sev_level = constants.RANKING[args.severity - 1]
     conf_level = constants.RANKING[args.confidence - 1]
-    b_mgr.output_results(args.context_lines,
+    p_mgr.output_results(args.context_lines,
                          sev_level,
                          conf_level,
                          args.output_file,
@@ -387,7 +387,7 @@ def main():
                          args.msg_template)
 
     # return an exit code of 1 if there are results, 0 otherwise
-    if b_mgr.results_count(sev_filter=sev_level, conf_filter=conf_level) > 0:
+    if p_mgr.results_count(sev_filter=sev_level, conf_filter=conf_level) > 0:
         sys.exit(1)
     else:
         sys.exit(0)

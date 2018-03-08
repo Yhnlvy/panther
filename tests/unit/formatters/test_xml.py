@@ -22,7 +22,7 @@ import panther
 from panther.core import config
 from panther.core import issue
 from panther.core import manager
-from panther.formatters import xml as b_xml
+from panther.formatters import xml as p_xml
 
 
 class XmlFormatterTests(testtools.TestCase):
@@ -70,7 +70,7 @@ class XmlFormatterTests(testtools.TestCase):
 
     def test_report(self):
         tmp_file = open(self.tmp_fname, 'wb')
-        b_xml.report(self.manager, tmp_file, self.issue.severity,
+        p_xml.report(self.manager, tmp_file, self.issue.severity,
                      self.issue.confidence)
 
         with open(self.tmp_fname) as f:

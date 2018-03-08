@@ -24,7 +24,7 @@ import panther
 from panther.core import config
 from panther.core import issue
 from panther.core import manager
-from panther.formatters import html as b_html
+from panther.formatters import html as p_html
 
 
 class HtmlFormatterTests(testtools.TestCase):
@@ -42,7 +42,7 @@ class HtmlFormatterTests(testtools.TestCase):
         self.manager.skipped = [('abc.py', 'File is bad')]
 
         tmp_file = open(self.tmp_fname, 'w')
-        b_html.report(
+        p_html.report(
             self.manager, tmp_file, panther.LOW, panther.LOW)
 
         with open(self.tmp_fname) as f:
@@ -79,7 +79,7 @@ class HtmlFormatterTests(testtools.TestCase):
              (issue_b, [issue_x]), (issue_c, [issue_y])])
 
         tmp_file = open(self.tmp_fname, 'w')
-        b_html.report(
+        p_html.report(
             self.manager, tmp_file, panther.LOW, panther.LOW)
 
         with open(self.tmp_fname) as f:
@@ -144,7 +144,7 @@ class HtmlFormatterTests(testtools.TestCase):
         get_issue_list.return_value = {issue_a: [issue_x]}
 
         tmp_file = open(self.tmp_fname, 'w')
-        b_html.report(
+        p_html.report(
             self.manager, tmp_file, panther.LOW, panther.LOW)
 
         with open(self.tmp_fname) as f:

@@ -22,13 +22,13 @@ import os
 import sys
 import traceback
 
-from panther.core import constants as b_constants
+from panther.core import constants as p_constants
 from panther.core import extension_loader
 from panther.core import issue
-from panther.core import meta_ast as b_meta_ast
+from panther.core import meta_ast as p_meta_ast
 from panther.core import metrics
-from panther.core import node_visitor as b_node_visitor
-from panther.core import test_set as b_test_set
+from panther.core import node_visitor as p_node_visitor
+from panther.core import test_set as p_test_set
 
 
 LOG = logging.getLogger(__name__)
@@ -55,19 +55,19 @@ class PantherManager(object):
         if not profile:
             profile = {}
         self.ignore_nosec = ignore_nosec
-        self.b_conf = config
+        self.p_conf = config
         self.files_list = []
         self.excluded_files = []
-        self.b_ma = b_meta_ast.PantherMetaAst()
+        self.p_ma = p_meta_ast.PantherMetaAst()
         self.skipped = []
         self.results = []
         self.baseline = []
         self.agg_type = agg_type
         self.metrics = metrics.Metrics()
-        self.b_ts = b_test_set.PantherTestSet(config, profile)
+        self.p_ts = p_test_set.PantherTestSet(config, profile)
 
         # set the increment of after how many files to show progress
-        self.progress = b_constants.progress_increment
+        self.progress = p_constants.progress_increment
         self.scores = []
 
     def get_skipped(self):
@@ -81,8 +81,8 @@ class PantherManager(object):
         return ret
 
     def get_issue_list(self,
-                       sev_level=b_constants.LOW,
-                       conf_level=b_constants.LOW):
+                       sev_level=p_constants.LOW,
+                       conf_level=p_constants.LOW):
         return self.filter_results(sev_level, conf_level)
 
     def populate_baseline(self, data):
@@ -124,8 +124,8 @@ class PantherManager(object):
         # candidate issues
         return _find_candidate_matches(unmatched, results)
 
-    def results_count(self, sev_filter=b_constants.LOW,
-                      conf_filter=b_constants.LOW):
+    def results_count(self, sev_filter=p_constants.LOW,
+                      conf_filter=p_constants.LOW):
         '''Return the count of results
 
         :param sev_filter: Severity level to filter lower
@@ -179,9 +179,9 @@ class PantherManager(object):
         files_list = set()
         excluded_files = set()
 
-        excluded_path_strings = self.b_conf.get_option('exclude_dirs') or []
-        excluded_path_strings.append(b_constants.NODE_MODULES)
-        included_globs = self.b_conf.get_option('include') or ['*.py']
+        excluded_path_strings = self.p_conf.get_option('exclude_dirs') or []
+        excluded_path_strings.append(p_constants.NODE_MODULES)
+        included_globs = self.p_conf.get_option('include') or ['*.py']
 
         # if there are command line provided exclusions add them to the list
         if excluded_paths:
@@ -301,8 +301,8 @@ class PantherManager(object):
         :return: The accumulated test score
         '''
         score = []
-        res = b_node_visitor.PantherNodeVisitor(fname, self.b_ma,
-                                               self.b_ts, self.debug,
+        res = p_node_visitor.PantherNodeVisitor(fname, self.p_ma,
+                                               self.p_ts, self.debug,
                                                nosec_lines, self.metrics)
 
         score = res.process(data)
@@ -349,15 +349,15 @@ def _is_file_included(path, included_globs, excluded_path_strings,
 
     # if this is matches a glob of files we look at, and it isn't in an
     # excluded path
-    if _matches_glob_list(path, included_globs) or not enforce_glob:
+    if _matches_glop_list(path, included_globs) or not enforce_glob:
         if not any(x in path for x in excluded_path_strings):
             return_value = True
 
     return return_value
 
 
-def _matches_glob_list(filename, glob_list):
-    for glob in glob_list:
+def _matches_glop_list(filename, glop_list):
+    for glob in glop_list:
         if fnmatch.fnmatch(filename, glob):
             return True
     return False

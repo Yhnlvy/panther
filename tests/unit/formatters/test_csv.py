@@ -22,7 +22,7 @@ import panther
 from panther.core import config
 from panther.core import issue
 from panther.core import manager
-from panther.formatters import csv as b_csv
+from panther.formatters import csv as p_csv
 
 
 class CsvFormatterTests(testtools.TestCase):
@@ -49,7 +49,7 @@ class CsvFormatterTests(testtools.TestCase):
 
     def test_report(self):
         tmp_file = open(self.tmp_fname, 'w')
-        b_csv.report(self.manager, tmp_file, self.issue.severity,
+        p_csv.report(self.manager, tmp_file, self.issue.severity,
                      self.issue.confidence)
 
         with open(self.tmp_fname) as f:

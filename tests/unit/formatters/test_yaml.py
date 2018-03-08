@@ -25,7 +25,7 @@ from panther.core import constants
 from panther.core import issue
 from panther.core import manager
 from panther.core import metrics
-from panther.formatters import json as b_json
+from panther.formatters import json as p_json
 
 
 class JsonFormatterTests(testtools.TestCase):
@@ -76,7 +76,7 @@ class JsonFormatterTests(testtools.TestCase):
             [(self.issue, self.candidates)])
 
         tmp_file = open(self.tmp_fname, 'w')
-        b_json.report(self.manager, tmp_file, self.issue.severity,
+        p_json.report(self.manager, tmp_file, self.issue.severity,
                       self.issue.confidence)
 
         with open(self.tmp_fname) as f:

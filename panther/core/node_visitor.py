@@ -19,8 +19,8 @@ import logging
 import operator
 
 from panther.core import constants
-from panther.core import tester as b_tester
-from panther.core import utils as b_utils
+from panther.core import tester as p_tester
+from panther.core import utils as p_utils
 from panther.core.pyesprima import esprima
 from panther.core import visitor
 
@@ -44,12 +44,12 @@ class PantherNodeVisitor(object):
         self.testset = testset
         self.imports = set()
         self.import_aliases = {}
-        self.tester = b_tester.PantherTester(
+        self.tester = p_tester.PantherTester(
             self.testset, self.debug, nosec_lines)
         # in some cases we can't determine a qualified name
         try:
-            self.namespace = b_utils.get_module_qualname_from_path(fname)
-        except b_utils.InvalidModulePath:
+            self.namespace = p_utils.get_module_qualname_from_path(fname)
+        except p_utils.InvalidModulePath:
             LOG.info('Unable to find qualified name for module: %s',
                      self.fname)
             self.namespace = ""
@@ -64,7 +64,7 @@ class PantherNodeVisitor(object):
         :return: -
         '''
         # For all child nodes, add this class name to current namespace
-        self.namespace = b_utils.namespace_path_join(self.namespace, node.name)
+        self.namespace = p_utils.namespace_path_join(self.namespace, node.name)
 
     def visit_FunctionDef(self, node):
         '''Visitor for AST FunctionDef nodes
@@ -77,7 +77,7 @@ class PantherNodeVisitor(object):
         '''
 
         self.context['function'] = node
-        qualname = self.namespace + '.' + b_utils.get_func_name(node)
+        qualname = self.namespace + '.' + p_utils.get_func_name(node)
         name = qualname.split('.')[-1]
 
         self.context['qualname'] = qualname
@@ -85,7 +85,7 @@ class PantherNodeVisitor(object):
 
         # For all child nodes and any tests run, add this function name to
         # current namespace
-        self.namespace = b_utils.namespace_path_join(self.namespace, name)
+        self.namespace = p_utils.namespace_path_join(self.namespace, name)
         self.update_scores(self.tester.run_tests(self.context, 'FunctionDef'))
 
     def visit_Call(self, node):
@@ -98,7 +98,7 @@ class PantherNodeVisitor(object):
         '''
 
         self.context['call'] = node
-        qualname = b_utils.get_call_name(node, self.import_aliases)
+        qualname = p_utils.get_call_name(node, self.import_aliases)
         name = qualname.split('.')[-1]
 
         self.context['qualname'] = qualname
@@ -163,7 +163,7 @@ class PantherNodeVisitor(object):
         '''
         self.context['str'] = node.s
         if not isinstance(node.parent, ast.Expr):  # docstring
-            self.context['linerange'] = b_utils.linerange_fix(node.parent)
+            self.context['linerange'] = p_utils.linerange_fix(node.parent)
             self.update_scores(self.tester.run_tests(self.context, 'Str'))
 
     def visit_Bytes(self, node):
@@ -176,7 +176,7 @@ class PantherNodeVisitor(object):
         '''
         self.context['bytes'] = node.s
         if not isinstance(node.parent, ast.Expr):  # docstring
-            self.context['linerange'] = b_utils.linerange_fix(node.parent)
+            self.context['linerange'] = p_utils.linerange_fix(node.parent)
             self.update_scores(self.tester.run_tests(self.context, 'Bytes'))
 
     def pre_visit(self, node):
@@ -196,7 +196,7 @@ class PantherNodeVisitor(object):
                 return False
 
         self.context['node'] = node
-        self.context['linerange'] = b_utils.linerange_fix(node)
+        self.context['linerange'] = p_utils.linerange_fix(node)
         self.context['filename'] = self.fname
 
         self.seen += 1
@@ -222,7 +222,7 @@ class PantherNodeVisitor(object):
         # HACK(tkelsey): this is needed to clean up post-recursion stuff that
         # gets setup in the visit methods for these node types.
         if isinstance(node, ast.FunctionDef) or isinstance(node, ast.ClassDef):
-            self.namespace = b_utils.namespace_path_split(self.namespace)[0]
+            self.namespace = p_utils.namespace_path_split(self.namespace)[0]
 
     def generic_visit(self, node):
         """Drive the visitor."""
@@ -275,7 +275,7 @@ class PantherNodeVisitor(object):
         :param lines: lines code to process
         :return score: the aggregated score for the current file
         '''
-        data = b_utils.clean_code(data)
+        data = p_utils.clean_code(data)
         f_ast = esprima.parse(data, {'loc': True}) # f_ast = ast.parse(data)
         self.generic_visit(f_ast.to_dict())
         return self.scores

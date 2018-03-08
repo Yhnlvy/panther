@@ -23,7 +23,7 @@ import panther
 from panther.core import config
 from panther.core import issue
 from panther.core import manager
-from panther.formatters import text as b_text
+from panther.formatters import text as p_text
 
 
 class TextFormatterTests(testtools.TestCase):
@@ -50,17 +50,17 @@ class TextFormatterTests(testtools.TestCase):
                 return_val.append("{}{}".format(_indent_val, _code))
             return '\n'.join(return_val)
 
-        issue_text = b_text._output_issue_str(issue, indent_val)
+        issue_text = p_text._output_issue_str(issue, indent_val)
         expected_return = _template(issue, indent_val, 'DDDDDDD')
         self.assertEqual(expected_return, issue_text)
 
-        issue_text = b_text._output_issue_str(issue, indent_val,
+        issue_text = p_text._output_issue_str(issue, indent_val,
                                               show_code=False)
         expected_return = _template(issue, indent_val, '')
         self.assertEqual(expected_return, issue_text)
 
         issue.lineno = ''
-        issue_text = b_text._output_issue_str(issue, indent_val,
+        issue_text = p_text._output_issue_str(issue, indent_val,
                                               show_lineno=False)
         expected_return = _template(issue, indent_val, 'DDDDDDD')
         self.assertEqual(expected_return, issue_text)
@@ -75,7 +75,7 @@ class TextFormatterTests(testtools.TestCase):
 
         get_issue_list.return_value = collections.OrderedDict()
         tmp_file = open(self.tmp_fname, 'w')
-        b_text.report(self.manager, tmp_file, panther.LOW, panther.LOW, lines=5)
+        p_text.report(self.manager, tmp_file, panther.LOW, panther.LOW, lines=5)
 
         with open(self.tmp_fname) as f:
             data = f.read()
@@ -115,7 +115,7 @@ class TextFormatterTests(testtools.TestCase):
             output_str.return_value = 'ISSUE_OUTPUT_TEXT'
 
             tmp_file = open(self.tmp_fname, 'w')
-            b_text.report(self.manager, tmp_file, panther.LOW, panther.LOW,
+            p_text.report(self.manager, tmp_file, panther.LOW, panther.LOW,
                           lines=5)
 
             calls = [mock.call(issue_a, '', lines=5),
@@ -126,7 +126,7 @@ class TextFormatterTests(testtools.TestCase):
         # Validate that we're outputting all of the expected fields and the
         # correct values
         tmp_file = open(self.tmp_fname, 'w')
-        b_text.report(self.manager, tmp_file, panther.LOW, panther.LOW,
+        p_text.report(self.manager, tmp_file, panther.LOW, panther.LOW,
                       lines=5)
         with open(self.tmp_fname) as f:
             data = f.read()
@@ -180,7 +180,7 @@ class TextFormatterTests(testtools.TestCase):
             output_str.return_value = 'ISSUE_OUTPUT_TEXT'
 
             tmp_file = open(self.tmp_fname, 'w')
-            b_text.report(self.manager, tmp_file, panther.LOW, panther.LOW,
+            p_text.report(self.manager, tmp_file, panther.LOW, panther.LOW,
                           lines=5)
 
             calls = [mock.call(issue_a, '', lines=5),

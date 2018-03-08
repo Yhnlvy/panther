@@ -19,7 +19,7 @@ import logging
 import warnings
 
 from panther.core import constants
-from panther.core import context as b_context
+from panther.core import context as p_context
 from panther.core import utils
 
 warnings.formatwarning = utils.warnings_formatter
@@ -56,7 +56,7 @@ class PantherTester(object):
             name = test.__name__
             # execute test with the an instance of the context class
             temp_context = copy.copy(raw_context)
-            context = b_context.Context(temp_context)
+            context = p_context.Context(temp_context)
             try:
                 if hasattr(test, '_config'):
                     result = test(context, test._config)

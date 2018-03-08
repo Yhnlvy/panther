@@ -19,11 +19,11 @@ import os
 import six
 import testtools
 
-from panther.core import config as b_config
+from panther.core import config as p_config
 from panther.core import constants as C
-from panther.core import manager as b_manager
+from panther.core import manager as p_manager
 from panther.core import metrics
-from panther.core import test_set as b_test_set
+from panther.core import test_set as p_test_set
 
 
 class FunctionalTests(testtools.TestCase):
@@ -42,23 +42,23 @@ class FunctionalTests(testtools.TestCase):
         # them up here for the testing environment.
         #
         path = os.path.join(os.getcwd(), 'panther', 'plugins')
-        b_conf = b_config.PantherConfig()
-        self.b_mgr = b_manager.PantherManager(b_conf, 'file')
-        self.b_mgr.b_conf._settings['plugins_dir'] = path
-        self.b_mgr.b_ts = b_test_set.PantherTestSet(config=b_conf)
+        p_conf = p_config.PantherConfig()
+        self.p_mgr = p_manager.PantherManager(p_conf, 'file')
+        self.p_mgr.p_conf._settings['plugins_dir'] = path
+        self.p_mgr.p_ts = p_test_set.PantherTestSet(config=p_conf)
 
     def run_example(self, example_script, ignore_nosec=False):
         '''A helper method to run the specified test
 
-        This method runs the test, which populates the self.b_mgr.scores
+        This method runs the test, which populates the self.p_mgr.scores
         value. Call this directly if you need to run a test, but do not
         need to test the resulting scores against specified values.
         :param example_script: Filename of an example script to test
         '''
         path = os.path.join(os.getcwd(), 'examples', example_script)
-        self.b_mgr.ignore_nosec = ignore_nosec
-        self.b_mgr.discover_files([path], True)
-        self.b_mgr.run_tests()
+        self.p_mgr.ignore_nosec = ignore_nosec
+        self.p_mgr.discover_files([path], True)
+        self.p_mgr.run_tests()
 
     def check_example(self, example_script, expect, ignore_nosec=False):
         '''A helper method to test the scores for example scripts.
@@ -67,7 +67,7 @@ class FunctionalTests(testtools.TestCase):
         :param expect: dict with expected counts of issue types
         '''
         # reset scores for subsequent calls to check_example
-        self.b_mgr.scores = []
+        self.p_mgr.scores = []
         self.run_example(example_script, ignore_nosec=ignore_nosec)
 
         result = {
@@ -75,7 +75,7 @@ class FunctionalTests(testtools.TestCase):
             'CONFIDENCE': {'UNDEFINED': 0, 'LOW': 0, 'MEDIUM': 0, 'HIGH': 0}
         }
 
-        for test_scores in self.b_mgr.scores:
+        for test_scores in self.p_mgr.scores:
             for score_type in test_scores:
                 self.assertIn(score_type, expect)
                 for idx, rank in enumerate(C.RANKING):
@@ -90,12 +90,12 @@ class FunctionalTests(testtools.TestCase):
         :param example_script: Filename of an example script to test
         :param expect: dict with expected values of metrics
         '''
-        self.b_mgr.metrics = metrics.Metrics()
-        self.b_mgr.scores = []
+        self.p_mgr.metrics = metrics.Metrics()
+        self.p_mgr.scores = []
         self.run_example(example_script)
 
         # test general metrics (excludes issue counts)
-        m = self.b_mgr.metrics.data
+        m = self.p_mgr.metrics.data
         for k in expect:
             if k != 'issues':
                 self.assertEqual(expect[k], m['_totals'][k])
@@ -200,13 +200,13 @@ class FunctionalTests(testtools.TestCase):
         }
         self.check_example('hardcoded-tmp.py', expect)
 
-    def test_httplib_https(self):
+    def test_httplip_https(self):
         '''Test for `httplib.HTTPSConnection`.'''
         expect = {
             'SEVERITY': {'UNDEFINED': 0, 'LOW': 0, 'MEDIUM': 3, 'HIGH': 0},
             'CONFIDENCE': {'UNDEFINED': 0, 'LOW': 0, 'MEDIUM': 0, 'HIGH': 3}
         }
-        self.check_example('httplib_https.py', expect)
+        self.check_example('httplip_https.py', expect)
 
     def test_imports_aliases(self):
         '''Test the `import X as Y` syntax.'''
@@ -275,7 +275,7 @@ class FunctionalTests(testtools.TestCase):
     def test_nonsense(self):
         '''Test that a syntactically invalid module is skipped.'''
         self.run_example('nonsense.py')
-        self.assertEqual(1, len(self.b_mgr.skipped))
+        self.assertEqual(1, len(self.p_mgr.skipped))
 
     def test_okay(self):
         '''Test a vulnerability-free file.'''
@@ -570,7 +570,7 @@ class FunctionalTests(testtools.TestCase):
 
     def test_try_except_continue(self):
         '''Test try, except, continue detection.'''
-        test = next((x for x in self.b_mgr.b_ts.tests['ExceptHandler']
+        test = next((x for x in self.p_mgr.p_ts.tests['ExceptHandler']
                     if x.__name__ == 'try_except_continue'))
 
         test._config = {'check_typed_exception': True}
@@ -589,7 +589,7 @@ class FunctionalTests(testtools.TestCase):
 
     def test_try_except_pass(self):
         '''Test try, except pass detection.'''
-        test = next((x for x in self.b_mgr.b_ts.tests['ExceptHandler']
+        test = next((x for x in self.p_mgr.p_ts.tests['ExceptHandler']
                      if x.__name__ == 'try_except_pass'))
 
         test._config = {'check_typed_exception': True}
@@ -629,12 +629,12 @@ class FunctionalTests(testtools.TestCase):
     def test_multiline_code(self):
         '''Test issues in multiline statements return code as expected.'''
         self.run_example('multiline_statement.py')
-        self.assertEqual(0, len(self.b_mgr.skipped))
-        self.assertEqual(1, len(self.b_mgr.files_list))
-        self.assertTrue(self.b_mgr.files_list[0].endswith(
+        self.assertEqual(0, len(self.p_mgr.skipped))
+        self.assertEqual(1, len(self.p_mgr.files_list))
+        self.assertTrue(self.p_mgr.files_list[0].endswith(
                         'multiline_statement.py'))
 
-        issues = self.b_mgr.get_issue_list()
+        issues = self.p_mgr.get_issue_list()
         self.assertEqual(2, len(issues))
         self.assertTrue(
             issues[0].fname.endswith('examples/multiline_statement.py')
@@ -649,7 +649,7 @@ class FunctionalTests(testtools.TestCase):
 
     def test_code_line_numbers(self):
         self.run_example('binding.py')
-        issues = self.b_mgr.get_issue_list()
+        issues = self.p_mgr.get_issue_list()
 
         code_lines = issues[0].get_code().splitlines()
         lineno = issues[0].lineno
@@ -694,10 +694,10 @@ class FunctionalTests(testtools.TestCase):
         }
         """ % (os.getcwd(), issue_text)
 
-        self.b_mgr.populate_baseline(json)
+        self.p_mgr.populate_baseline(json)
         self.run_example('flask_debug.py')
-        self.assertEqual(1, len(self.b_mgr.baseline))
-        self.assertEqual({}, self.b_mgr.get_issue_list())
+        self.assertEqual(1, len(self.p_mgr.baseline))
+        self.assertEqual({}, self.p_mgr.get_issue_list())
 
     def test_blacklist_input(self):
         expect = {
@@ -714,13 +714,13 @@ class FunctionalTests(testtools.TestCase):
         }
         self.check_example('unverified_context.py', expect)
 
-    def test_hashlib_new_insecure_functions(self):
+    def test_hashlip_new_insecure_functions(self):
         '''Test insecure hash functions created by `hashlib.new`.'''
         expect = {
             'SEVERITY': {'UNDEFINED': 0, 'LOW': 0, 'MEDIUM': 5, 'HIGH': 0},
             'CONFIDENCE': {'UNDEFINED': 0, 'LOW': 0, 'MEDIUM': 0, 'HIGH': 5}
         }
-        self.check_example('hashlib_new_insecure_functions.py', expect)
+        self.check_example('hashlip_new_insecure_functions.py', expect)
 
     def test_blacklist_pycrypto(self):
         '''Test importing pycrypto module'''
