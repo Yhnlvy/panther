@@ -118,23 +118,6 @@ class PantherConfig(object):
             plugin_name_pattern = self.get_option('plugin_name_pattern')
         self._settings['plugin_name_pattern'] = plugin_name_pattern
 
-    def convert_names_to_ids(self):
-        '''Convert test names to IDs, unknown names are left unchanged.'''
-        extman = extension_loader.MANAGER
-
-        updated_profiles = {}
-        for name, profile in (self.get_option('profiles') or {}).items():
-            # NOTE(tkelsey): can't use default of get() because value is
-            # sometimes explicity 'None', for example when the list if given in
-            # yaml but not populated with any values.
-            include = set((extman.get_plugin_id(i) or i)
-                          for i in (profile.get('include') or []))
-            exclude = set((extman.get_plugin_id(i) or i)
-                          for i in (profile.get('exclude') or []))
-            updated_profiles[name] = {'include': include, 'exclude': exclude}
-        return updated_profiles
-
-
     def validate(self, path):
         '''Validate the config data.'''
         legacy = False

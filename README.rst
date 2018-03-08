@@ -1,36 +1,9 @@
 Panther
 ======
 
-.. image:: https://governance.openstack.org/badges/panther.svg
-    :target: https://governance.openstack.org/reference/tags/index.html
-    :alt: Panther team and repository tags
-
-.. image:: https://img.shields.io/pypi/v/panther.svg
-    :target: https://pypi.python.org/pypi/panther/
-    :alt: Latest Version
-
-.. image:: https://img.shields.io/pypi/pyversions/panther.svg
-    :target: https://pypi.python.org/pypi/panther/
-    :alt: Python Versions
-
-.. image:: https://img.shields.io/pypi/format/panther.svg
-    :target: https://pypi.python.org/pypi/panther/
-    :alt: Format
-
-.. image:: https://img.shields.io/badge/license-Apache%202-blue.svg
-    :target: https://git.openstack.org/cgit/openstack/panther/plain/LICENSE
-    :alt: License
-
-A security linter from OpenStack Security
-
-* Free software: Apache license
-* Documentation: https://wiki.openstack.org/wiki/Security/Projects/Panther
-* Source: https://git.openstack.org/cgit/openstack/panther
-* Bugs: https://bugs.launchpad.net/panther
-
 Overview
 --------
-Panther is a tool designed to find common security issues in Python code. To do
+Panther is a tool designed to find common security issues in Node.js code. To do
 this Panther processes each file, builds an AST from it, and runs appropriate
 plugins against the AST nodes. Once Panther has finished scanning all the files
 it generates a report.
@@ -65,7 +38,7 @@ Usage
 -----
 Example usage across a code tree::
 
-    panther -r ~/openstack-repo/keystone
+    panther -r ~/itc-repo/keystone
 
 Example usage across the ``examples/`` directory, showing three lines of
 context and only reporting on the high-severity issues::
@@ -170,72 +143,6 @@ Usage::
     -----------------------------------------------
 
       B101  assert_used
-      B102  exec_used
-      B103  set_bad_file_permissions
-      B104  hardcoded_bind_all_interfaces
-      B105  hardcoded_password_string
-      B106  never_ever_ever_use_eval
-      B107  hardcoded_password_default
-      B108  hardcoded_tmp_directory
-      B109  password_config_option_not_marked_secret
-      B110  try_except_pass
-      B111  execute_with_run_as_root_equals_true
-      B112  try_except_continue
-      B201  flask_debug_true
-      B301  pickle
-      B302  marshal
-      B303  md5
-      B304  ciphers
-      B305  cipher_modes
-      B306  mktemp_q
-      B307  eval
-      B308  mark_safe
-      B309  httpsconnection
-      B310  urllib_urlopen
-      B311  random
-      B312  telnetlib
-      B313  xml_bad_cElementTree
-      B314  xml_bad_ElementTree
-      B315  xml_bad_expatreader
-      B316  xml_bad_expatbuilder
-      B317  xml_bad_sax
-      B318  xml_bad_minidom
-      B319  xml_bad_pulldom
-      B320  xml_bad_etree
-      B321  ftplib
-      B322  input
-      B323  unverified_context
-      B324  hashlib_new_insecure_functions
-      B401  import_telnetlib
-      B402  import_ftplib
-      B403  import_pickle
-      B404  import_subprocess
-      B405  import_xml_etree
-      B406  import_xml_sax
-      B407  import_xml_expat
-      B408  import_xml_minidom
-      B409  import_xml_pulldom
-      B410  import_lxml
-      B411  import_xmlrpclib
-      B412  import_httpoxy
-      B501  request_with_no_cert_validation
-      B502  ssl_with_bad_version
-      B503  ssl_with_bad_defaults
-      B504  ssl_with_no_version
-      B505  weak_cryptographic_key
-      B506  yaml_load
-      B601  paramiko_calls
-      B602  subprocess_popen_with_shell_equals_true
-      B603  subprocess_without_shell_equals_true
-      B604  any_other_function_with_shell_equals_true
-      B605  start_process_with_a_shell
-      B606  start_process_with_no_shell
-      B607  start_process_with_partial_path
-      B608  hardcoded_sql_expressions
-      B609  linux_commands_wildcard_injection
-      B701  jinja2_autoescape_false
-      B702  use_of_mako_templates
-
 
 Configuration
 -------------
@@ -374,12 +281,6 @@ To register your plugin, you have two options:
 
 Contributing
 ------------
-Contributions to Panther are always welcome! We can be found on
-#openstack-security on Freenode IRC.
-
-The best way to get started with Panther is to grab the source::
-
-    git clone https://git.openstack.org/openstack/panther.git
 
 You can test any changes with tox::
 
@@ -389,40 +290,3 @@ You can test any changes with tox::
     tox -e py35
     tox -e docs
     tox -e cover
-
-Reporting Bugs
---------------
-Bugs should be reported on Launchpad. To file a bug against Panther, visit:
-https://bugs.launchpad.net/panther/+filebug
-
-Under Which Version of Python Should I Install Panther?
-------------------------------------------------------
-The answer to this question depends on the project(s) you will be running
-Panther against. If your project is only compatible with Python 2.7, you
-should install Panther to run under Python 2.7. If your project is only
-compatible with Python 3.5, then use 3.5 respectively. If your project supports
-both, you *could* run Panther with both versions but you don't have to.
-
-Panther uses the `ast` module from Python's standard library in order to
-analyze your Python code. The `ast` module is only able to parse Python code
-that is valid in the version of the interpreter from which it is imported. In
-other words, if you try to use Python 2.7's `ast` module to parse code written
-for 3.5 that uses, for example, `yield from` with asyncio, then you'll have
-syntax errors that will prevent Panther from working properly. Alternatively,
-if you are relying on 2.7's octal notation of `0777` then you'll have a syntax
-error if you run Panther on 3.x.
-
-
-References
-==========
-
-Panther wiki: https://wiki.openstack.org/wiki/Security/Projects/Panther
-
-Python AST module documentation: https://docs.python.org/2/library/ast.html
-
-Green Tree Snakes - the missing Python AST docs:
-https://greentreesnakes.readthedocs.org/en/latest/
-
-Documentation of the various types of AST nodes that Panther currently covers
-or could be extended to cover:
-https://greentreesnakes.readthedocs.org/en/latest/nodes.html
