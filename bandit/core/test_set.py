@@ -42,30 +42,10 @@ class BanditTestSet(object):
         inc = set(profile.get('include', []))
         exc = set(profile.get('exclude', []))
 
-        all_blacklist_tests = set()
-        for _node, tests in extman.blacklist.items():
-            all_blacklist_tests.update(t['id'] for t in tests)
-
-        # this block is purely for backwards compatibility, the rules are as
-        # follows:
-        # B001,B401 means B401
-        # B401 means B401
-        # B001 means all blacklist tests
-        if 'B001' in inc:
-            if not inc.intersection(all_blacklist_tests):
-                inc.update(all_blacklist_tests)
-            inc.discard('B001')
-        if 'B001' in exc:
-            if not exc.intersection(all_blacklist_tests):
-                exc.update(all_blacklist_tests)
-            exc.discard('B001')
-
         if inc:
             filtered = inc
         else:
             filtered = set(extman.plugins_by_id.keys())
-            filtered.update(extman.builtin)
-            filtered.update(all_blacklist_tests)
         return filtered - exc
 
 

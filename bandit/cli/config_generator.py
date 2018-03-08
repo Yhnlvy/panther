@@ -156,10 +156,6 @@ def main():
                 tpl = "# {0} : {1}"
                 test_list = [tpl.format(t.plugin._test_id, t.name)
                              for t in extension_loader.MANAGER.plugins]
-
-                others = [tpl.format(k, v['name']) for k, v in (
-                    extension_loader.MANAGER.blacklist_by_id.items())]
-                test_list.extend(others)
                 test_list.sort()
 
                 contents = template.format(
