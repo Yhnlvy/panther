@@ -21,8 +21,8 @@ import fixtures
 import mock
 import testtools
 
-from bandit.core import config
-from bandit.core import utils
+from panther.core import config
+from panther.core import utils
 
 
 class TempFile(fixtures.Fixture):
@@ -44,13 +44,13 @@ class TempFile(fixtures.Fixture):
 
 class TestInit(testtools.TestCase):
     def test_settings(self):
-        # Can initialize a BanditConfig.
+        # Can initialize a PantherConfig.
 
         example_key = uuid.uuid4().hex
         example_value = self.getUniqueString()
         contents = '%s: %s' % (example_key, example_value)
         f = self.useFixture(TempFile(contents))
-        b_config = config.BanditConfig(f.name)
+        b_config = config.PantherConfig(f.name)
 
         # After initialization, can get settings.
         self.assertEqual('*.py', b_config.get_setting('plugin_name_pattern'))
@@ -63,7 +63,7 @@ class TestInit(testtools.TestCase):
 
         cfg_file = os.path.join(os.getcwd(), 'notafile')
         self.assertRaisesRegex(utils.ConfigError, cfg_file,
-                               config.BanditConfig, cfg_file)
+                               config.PantherConfig, cfg_file)
 
     def test_yaml_invalid(self):
         # When the config yaml file isn't valid, sys.exit(2) is called.
@@ -73,7 +73,7 @@ class TestInit(testtools.TestCase):
         invalid_yaml = '- [ something'
         f = self.useFixture(TempFile(invalid_yaml))
         self.assertRaisesRegex(
-            utils.ConfigError, f.name, config.BanditConfig, f.name)
+            utils.ConfigError, f.name, config.PantherConfig, f.name)
 
 
 class TestGetOption(testtools.TestCase):
@@ -91,7 +91,7 @@ class TestGetOption(testtools.TestCase):
 
         f = self.useFixture(TempFile(sample_yaml))
 
-        self.b_config = config.BanditConfig(f.name)
+        self.b_config = config.PantherConfig(f.name)
 
     def test_levels(self):
         # get_option with .-separated string.
@@ -112,7 +112,7 @@ class TestGetSetting(testtools.TestCase):
         super(TestGetSetting, self).setUp()
         test_yaml = 'key: value'
         f = self.useFixture(TempFile(test_yaml))
-        self.b_config = config.BanditConfig(f.name)
+        self.b_config = config.PantherConfig(f.name)
 
     def test_not_exist(self):
         # get_setting() when the name doesn't exist returns None
@@ -171,7 +171,7 @@ class TestConfigCompat(testtools.TestCase):
     def setUp(self):
         super(TestConfigCompat, self).setUp()
         f = self.useFixture(TempFile(self.sample_yaml))
-        self.config = config.BanditConfig(f.name)
+        self.config = config.PantherConfig(f.name)
 
     def test_converted_include(self):
         profiles = self.config.get_option('profiles')
@@ -230,10 +230,10 @@ class TestConfigCompat(testtools.TestCase):
     def test_deprecation_message(self):
         msg = ("Config file '%s' contains deprecated legacy config data. "
                "Please consider upgrading to the new config format. The tool "
-               "'bandit-config-generator' can help you with this. Support for "
-               "legacy configs will be removed in a future bandit version.")
+               "'panther-config-generator' can help you with this. Support for "
+               "legacy configs will be removed in a future panther version.")
 
-        with mock.patch('bandit.core.config.LOG.warning') as m:
+        with mock.patch('panther.core.config.LOG.warning') as m:
             self.config._config = {"profiles": {}}
             self.config.validate('')
             self.assertEqual((msg, ''), m.call_args_list[0][0])
@@ -243,7 +243,7 @@ class TestConfigCompat(testtools.TestCase):
                "test '%s' but no configuration data for it. Configuration "
                "data is required for this test. Please consider switching to "
                "the new config file format, the tool "
-               "'bandit-config-generator' can help you with this.")
+               "'panther-config-generator' can help you with this.")
 
         for name in ["blacklist_call",
                      "blacklist_imports",
@@ -259,6 +259,6 @@ class TestConfigCompat(testtools.TestCase):
     def test_bad_yaml(self):
         f = self.useFixture(TempFile("[]"))
         try:
-            self.config = config.BanditConfig(f.name)
+            self.config = config.PantherConfig(f.name)
         except utils.ConfigError as e:
             self.assertIn("Error parsing file.", e.message)

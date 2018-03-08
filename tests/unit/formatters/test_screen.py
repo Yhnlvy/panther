@@ -19,11 +19,11 @@ import tempfile
 import mock
 import testtools
 
-import bandit
-from bandit.core import config
-from bandit.core import issue
-from bandit.core import manager
-from bandit.formatters import screen
+import panther
+from panther.core import config
+from panther.core import issue
+from panther.core import manager
+from panther.formatters import screen
 
 
 class ScreenFormatterTests(testtools.TestCase):
@@ -31,7 +31,7 @@ class ScreenFormatterTests(testtools.TestCase):
     def setUp(self):
         super(ScreenFormatterTests, self).setUp()
 
-    @mock.patch('bandit.core.issue.Issue.get_code')
+    @mock.patch('panther.core.issue.Issue.get_code')
     def test_output_issue(self, get_code):
         issue = _get_issue_instance()
         get_code.return_value = 'DDDDDDD'
@@ -69,26 +69,26 @@ class ScreenFormatterTests(testtools.TestCase):
                                     screen.COLOR['MEDIUM'])
         self.assertEqual(expected_return, issue_text)
 
-    @mock.patch('bandit.core.manager.BanditManager.get_issue_list')
+    @mock.patch('panther.core.manager.PantherManager.get_issue_list')
     def test_no_issues(self, get_issue_list):
-        conf = config.BanditConfig()
-        self.manager = manager.BanditManager(conf, 'file')
+        conf = config.PantherConfig()
+        self.manager = manager.PantherManager(conf, 'file')
 
         (tmp_fd, self.tmp_fname) = tempfile.mkstemp()
         self.manager.out_file = self.tmp_fname
 
         get_issue_list.return_value = collections.OrderedDict()
-        with mock.patch('bandit.formatters.screen.do_print') as m:
+        with mock.patch('panther.formatters.screen.do_print') as m:
             tmp_file = open(self.tmp_fname, 'w')
-            screen.report(self.manager, tmp_file, bandit.LOW, bandit.LOW,
+            screen.report(self.manager, tmp_file, panther.LOW, panther.LOW,
                           lines=5)
             self.assertIn('No issues identified.',
                           '\n'.join([str(a) for a in m.call_args]))
 
-    @mock.patch('bandit.core.manager.BanditManager.get_issue_list')
+    @mock.patch('panther.core.manager.PantherManager.get_issue_list')
     def test_report_nobaseline(self, get_issue_list):
-        conf = config.BanditConfig()
-        self.manager = manager.BanditManager(conf, 'file')
+        conf = config.PantherConfig()
+        self.manager = manager.PantherManager(conf, 'file')
 
         (tmp_fd, self.tmp_fname) = tempfile.mkstemp()
         self.manager.out_file = self.tmp_fname
@@ -114,12 +114,12 @@ class ScreenFormatterTests(testtools.TestCase):
                                                      (category, level)] = 1
 
         # Validate that we're outputting the correct issues
-        output_str_fn = 'bandit.formatters.screen._output_issue_str'
+        output_str_fn = 'panther.formatters.screen._output_issue_str'
         with mock.patch(output_str_fn) as output_str:
             output_str.return_value = 'ISSUE_OUTPUT_TEXT'
 
             tmp_file = open(self.tmp_fname, 'w')
-            screen.report(self.manager, tmp_file, bandit.LOW, bandit.LOW,
+            screen.report(self.manager, tmp_file, panther.LOW, panther.LOW,
                           lines=5)
 
             calls = [mock.call(issue_a, '', lines=5),
@@ -129,9 +129,9 @@ class ScreenFormatterTests(testtools.TestCase):
 
         # Validate that we're outputting all of the expected fields and the
         # correct values
-        with mock.patch('bandit.formatters.screen.do_print') as m:
+        with mock.patch('panther.formatters.screen.do_print') as m:
             tmp_file = open(self.tmp_fname, 'w')
-            screen.report(self.manager, tmp_file, bandit.LOW, bandit.LOW,
+            screen.report(self.manager, tmp_file, panther.LOW, panther.LOW,
                           lines=5)
 
             data = '\n'.join([str(a) for a in m.call_args[0][0]])
@@ -165,10 +165,10 @@ class ScreenFormatterTests(testtools.TestCase):
                         '\n\tabc.py (File is bad)')
             self.assertIn(expected, data)
 
-    @mock.patch('bandit.core.manager.BanditManager.get_issue_list')
+    @mock.patch('panther.core.manager.PantherManager.get_issue_list')
     def test_report_baseline(self, get_issue_list):
-        conf = config.BanditConfig()
-        self.manager = manager.BanditManager(conf, 'file')
+        conf = config.PantherConfig()
+        self.manager = manager.PantherManager(conf, 'file')
 
         (tmp_fd, self.tmp_fname) = tempfile.mkstemp()
         self.manager.out_file = self.tmp_fname
@@ -188,12 +188,12 @@ class ScreenFormatterTests(testtools.TestCase):
 
         # Validate that we're outputting the correct issues
         indent_val = ' ' * 10
-        output_str_fn = 'bandit.formatters.screen._output_issue_str'
+        output_str_fn = 'panther.formatters.screen._output_issue_str'
         with mock.patch(output_str_fn) as output_str:
             output_str.return_value = 'ISSUE_OUTPUT_TEXT'
 
             tmp_file = open(self.tmp_fname, 'w')
-            screen.report(self.manager, tmp_file, bandit.LOW, bandit.LOW,
+            screen.report(self.manager, tmp_file, panther.LOW, panther.LOW,
                           lines=5)
 
             calls = [mock.call(issue_a, '', lines=5),
@@ -205,9 +205,9 @@ class ScreenFormatterTests(testtools.TestCase):
             output_str.assert_has_calls(calls, any_order=True)
 
 
-def _get_issue_instance(severity=bandit.MEDIUM, confidence=bandit.MEDIUM):
+def _get_issue_instance(severity=panther.MEDIUM, confidence=panther.MEDIUM):
     new_issue = issue.Issue(severity, confidence, 'Test issue')
     new_issue.fname = 'code.py'
-    new_issue.test = 'bandit_plugin'
+    new_issue.test = 'panther_plugin'
     new_issue.lineno = 1
     return new_issue

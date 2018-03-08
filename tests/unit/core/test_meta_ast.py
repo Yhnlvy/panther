@@ -15,14 +15,14 @@
 import six
 import testtools
 
-from bandit.core import meta_ast
+from panther.core import meta_ast
 
 
-class BanditMetaAstTests(testtools.TestCase):
+class PantherMetaAstTests(testtools.TestCase):
 
     def setUp(self):
-        super(BanditMetaAstTests, self).setUp()
-        self.b_meta_ast = meta_ast.BanditMetaAst()
+        super(PantherMetaAstTests, self).setUp()
+        self.b_meta_ast = meta_ast.PantherMetaAst()
         self.node = 'fake_node'
         self.parent_id = 'fake_parent_id'
         self.depth = 1

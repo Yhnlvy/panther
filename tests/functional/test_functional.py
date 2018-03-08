@@ -19,18 +19,18 @@ import os
 import six
 import testtools
 
-from bandit.core import config as b_config
-from bandit.core import constants as C
-from bandit.core import manager as b_manager
-from bandit.core import metrics
-from bandit.core import test_set as b_test_set
+from panther.core import config as b_config
+from panther.core import constants as C
+from panther.core import manager as b_manager
+from panther.core import metrics
+from panther.core import test_set as b_test_set
 
 
 class FunctionalTests(testtools.TestCase):
 
-    '''Functional tests for bandit test plugins.
+    '''Functional tests for panther test plugins.
 
-    This set of tests runs bandit against each example file in turn
+    This set of tests runs panther against each example file in turn
     and records the score returned. This is compared to a known good value.
     When new tests are added to an example the expected result should be
     adjusted to match.
@@ -38,14 +38,14 @@ class FunctionalTests(testtools.TestCase):
 
     def setUp(self):
         super(FunctionalTests, self).setUp()
-        # NOTE(tkelsey): bandit is very sensitive to paths, so stitch
+        # NOTE(tkelsey): panther is very sensitive to paths, so stitch
         # them up here for the testing environment.
         #
-        path = os.path.join(os.getcwd(), 'bandit', 'plugins')
-        b_conf = b_config.BanditConfig()
-        self.b_mgr = b_manager.BanditManager(b_conf, 'file')
+        path = os.path.join(os.getcwd(), 'panther', 'plugins')
+        b_conf = b_config.PantherConfig()
+        self.b_mgr = b_manager.PantherManager(b_conf, 'file')
         self.b_mgr.b_conf._settings['plugins_dir'] = path
-        self.b_mgr.b_ts = b_test_set.BanditTestSet(config=b_conf)
+        self.b_mgr.b_ts = b_test_set.PantherTestSet(config=b_conf)
 
     def run_example(self, example_script, ignore_nosec=False):
         '''A helper method to run the specified test

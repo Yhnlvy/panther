@@ -21,10 +21,10 @@ import fixtures
 import mock
 import testtools
 
-from bandit.core import config
-from bandit.core import constants
-from bandit.core import issue
-from bandit.core import manager
+from panther.core import config
+from panther.core import constants
+from panther.core import issue
+from panther.core import manager
 
 
 class ManagerTests(testtools.TestCase):
@@ -32,7 +32,7 @@ class ManagerTests(testtools.TestCase):
     def _get_issue_instance(self, sev=constants.MEDIUM, conf=constants.MEDIUM):
         new_issue = issue.Issue(sev, conf, 'Test issue')
         new_issue.fname = 'code.py'
-        new_issue.test = 'bandit_plugin'
+        new_issue.test = 'panther_plugin'
         new_issue.lineno = 1
         return new_issue
 
@@ -43,8 +43,8 @@ class ManagerTests(testtools.TestCase):
             'any_other_function_with_shell_equals_true',
             'assert_used'}
 
-        self.config = config.BanditConfig()
-        self.manager = manager.BanditManager(config=self.config,
+        self.config = config.PantherConfig()
+        self.manager = manager.PantherManager(config=self.config,
                                              agg_type='file',
                                              debug=False,
                                              verbose=False)
@@ -57,7 +57,7 @@ class ManagerTests(testtools.TestCase):
 
     def test_create_manager_with_profile(self):
         # make sure we can create a manager
-        m = manager.BanditManager(config=self.config, agg_type='file',
+        m = manager.PantherManager(config=self.config, agg_type='file',
                                   debug=False, verbose=False,
                                   profile=self.profile)
 
@@ -223,13 +223,13 @@ class ManagerTests(testtools.TestCase):
             self.assertEqual([], self.manager.excluded_files)
 
     def test_run_tests_keyboardinterrupt(self):
-        # Test that bandit manager exits when there is a keyboard interrupt
+        # Test that panther manager exits when there is a keyboard interrupt
         temp_directory = self.useFixture(fixtures.TempDir()).path
         some_file = os.path.join(temp_directory, 'some_code_file.py')
         with open(some_file, 'wt') as fd:
             fd.write('some_code = x + 1')
         self.manager.files_list = [some_file]
-        with mock.patch('bandit.core.metrics.Metrics.count_issues'
+        with mock.patch('panther.core.metrics.Metrics.count_issues'
                         ) as mock_count_issues:
             mock_count_issues.side_effect = KeyboardInterrupt
             # assert a SystemExit with code 2

@@ -2,4 +2,4 @@
 text
 ----
 
-.. automodule:: bandit.formatters.text
+.. automodule:: panther.formatters.text

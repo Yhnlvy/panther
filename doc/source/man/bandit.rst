@@ -1,11 +1,11 @@
 ======
-bandit
+panther
 ======
 
 SYNOPSIS
 ========
 
-bandit [-h] [-r] [-a {file,vuln}] [-n CONTEXT_LINES] [-c CONFIG_FILE]
+panther [-h] [-r] [-a {file,vuln}] [-n CONTEXT_LINES] [-c CONFIG_FILE]
             [-p PROFILE] [-t TESTS] [-s SKIPS] [-l] [-i]
             [-f {csv,custom,html,json,screen,txt,xml,yaml}]
             [--msg-template MSG_TEMPLATE] [-o OUTPUT_FILE] [-v] [-d]
@@ -16,9 +16,9 @@ bandit [-h] [-r] [-a {file,vuln}] [-n CONTEXT_LINES] [-c CONFIG_FILE]
 DESCRIPTION
 ===========
 
-``bandit`` is a tool designed to find common security issues in Python code. To
-do this Bandit processes each file, builds an AST from it, and runs appropriate
-plugins against the AST nodes.  Once Bandit has finished scanning all the files
+``panther`` is a tool designed to find common security issues in Python code. To
+do this Panther processes each file, builds an AST from it, and runs appropriate
+plugins against the AST nodes.  Once Panther has finished scanning all the files
 it generates a report.
 
 OPTIONS
@@ -63,7 +63,7 @@ OPTIONS
   -b BASELINE, --baseline BASELINE
                         path of a baseline report to compare against (only
                         JSON-formatted files are accepted)
-  --ini INI_PATH        path to a .bandit file that supplies command line
+  --ini INI_PATH        path to a .panther file that supplies command line
                         arguments
   --version             show program's version number and exit
 
@@ -78,14 +78,14 @@ Available tags:
 Example usage:
 
     Default template:
-    bandit -r examples/ --format custom --msg-template \
-    "{abspath}:{line}: {test_id}[bandit]: {severity}: {msg}"
+    panther -r examples/ --format custom --msg-template \
+    "{abspath}:{line}: {test_id}[panther]: {severity}: {msg}"
 
     Provides same output as:
-    bandit -r examples/ --format custom
+    panther -r examples/ --format custom
 
     Tags can also be formatted in python string.format() style:
-    bandit -r examples/ --format custom --msg-template \
+    panther -r examples/ --format custom --msg-template \
     "{relpath:20.20s}: {line:03}: {test_id:^8}: DEFECT: {msg:>20}"
 
     See python documentation for more information about formatting style:
@@ -94,33 +94,33 @@ Example usage:
 FILES
 =====
 
-.bandit
+.panther
   file that supplies command line arguments
 
-/etc/bandit/bandit.yaml
-  legacy bandit configuration file
+/etc/panther/panther.yaml
+  legacy panther configuration file
 
 EXAMPLES
 ========
 
 Example usage across a code tree::
 
-    bandit -r ~/openstack-repo/keystone
+    panther -r ~/openstack-repo/keystone
 
 Example usage across the ``examples/`` directory, showing three lines of
 context and only reporting on the high-severity issues::
 
-    bandit examples/*.py -n 3 -lll
+    panther examples/*.py -n 3 -lll
 
-Bandit can be run with profiles.  To run Bandit against the examples directory
+Panther can be run with profiles.  To run Panther against the examples directory
 using only the plugins listed in the ShellInjection profile::
 
-    bandit examples/*.py -p ShellInjection
+    panther examples/*.py -p ShellInjection
 
-Bandit also supports passing lines of code to scan using standard input. To
-run Bandit with standard input::
+Panther also supports passing lines of code to scan using standard input. To
+run Panther with standard input::
 
-    cat examples/imports.py | bandit -
+    cat examples/imports.py | panther -
 
 SEE ALSO
 ========

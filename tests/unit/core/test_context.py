@@ -20,7 +20,7 @@ import mock
 import six
 import testtools
 
-from bandit.core import context
+from panther.core import context
 
 
 class ContextTests(testtools.TestCase):
@@ -39,7 +39,7 @@ class ContextTests(testtools.TestCase):
         new_context = context.Context(context_object=ref_object)
         self.assertEqual(expected_repr, repr(new_context))
 
-    @mock.patch('bandit.core.context.Context._get_literal_value')
+    @mock.patch('panther.core.context.Context._get_literal_value')
     def test_call_args(self, get_literal_value):
         get_literal_value.return_value = 'eggs'
         ref_call = mock.Mock()
@@ -81,7 +81,7 @@ class ContextTests(testtools.TestCase):
         new_context = context.Context()
         self.assertIsNone(new_context.call_function_name_qual)
 
-    @mock.patch('bandit.core.context.Context._get_literal_value')
+    @mock.patch('panther.core.context.Context._get_literal_value')
     def test_call_keywords(self, get_literal_value):
         get_literal_value.return_value = 'eggs'
         ref_keyword1 = mock.Mock(arg='arg1', value=mock.Mock(attr='spam'))
@@ -127,7 +127,7 @@ class ContextTests(testtools.TestCase):
         new_context = context.Context()
         self.assertIsNone(new_context.statement)
 
-    @mock.patch('bandit.core.utils.get_qual_attr')
+    @mock.patch('panther.core.utils.get_qual_attr')
     def test_function_def_defaults_qual(self, get_qual_attr):
         get_qual_attr.return_value = 'spam'
         ref_node = mock.Mock(args=mock.Mock(defaults=['spam']))
@@ -189,7 +189,7 @@ class ContextTests(testtools.TestCase):
 
         self.assertIsNone(new_context._get_literal_value(None))
 
-    @mock.patch('bandit.core.context.Context.call_keywords',
+    @mock.patch('panther.core.context.Context.call_keywords',
                 new_callable=mock.PropertyMock)
     def test_check_call_arg_value(self, call_keywords):
         new_context = context.Context()
@@ -204,7 +204,7 @@ class ContextTests(testtools.TestCase):
         new_context = context.Context()
         self.assertIsNone(new_context.check_call_arg_value(None))
 
-    @mock.patch('bandit.core.context.Context.node',
+    @mock.patch('panther.core.context.Context.node',
                 new_callable=mock.PropertyMock)
     def test_get_lineno_for_call_arg(self, node):
         expected_lineno = 42

@@ -23,7 +23,7 @@ import tempfile
 
 import testtools
 
-from bandit.core import utils as b_utils
+from panther.core import utils as b_utils
 
 
 def _touch(path):
@@ -33,7 +33,7 @@ def _touch(path):
 
 
 class UtilTests(testtools.TestCase):
-    '''This set of tests exercises bandit.core.util functions.'''
+    '''This set of tests exercises panther.core.util functions.'''
 
     def setUp(self):
         super(UtilTests, self).setUp()
@@ -279,7 +279,7 @@ class UtilTests(testtools.TestCase):
 
     def test_parse_ini_file(self):
 
-        tests = [{'content': "[bandit]\nexclude=/abc,/def",
+        tests = [{'content': "[panther]\nexclude=/abc,/def",
                   'expected': {'exclude': '/abc,/def'}},
 
                  {'content': '[Blabla]\nsomething=something',

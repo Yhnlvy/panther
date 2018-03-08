@@ -22,7 +22,7 @@ import git
 import mock
 import testtools
 
-import bandit.cli.baseline as baseline
+import panther.cli.baseline as baseline
 
 
 config = """
@@ -43,7 +43,7 @@ shell_injection:
 """
 
 
-class BanditBaselineToolTests(testtools.TestCase):
+class PantherBaselineToolTests(testtools.TestCase):
 
     @classmethod
     def setUpClass(cls):
@@ -54,16 +54,16 @@ class BanditBaselineToolTests(testtools.TestCase):
 
     def setUp(self):
         # Set up prior to run each test case
-        super(BanditBaselineToolTests, self).setUp()
+        super(PantherBaselineToolTests, self).setUp()
         self.current_directory = os.getcwd()
 
     def tearDown(self):
         # Tear down after running each test case
-        super(BanditBaselineToolTests, self).tearDown()
+        super(PantherBaselineToolTests, self).tearDown()
         os.chdir(self.current_directory)
 
-    def test_bandit_baseline(self):
-        # Tests running bandit via the CLI (baseline) with benign and malicious
+    def test_panther_baseline(self):
+        # Tests running panther via the CLI (baseline) with benign and malicious
         # content
         repo_directory = self.useFixture(fixtures.TempDir()).path
 
@@ -83,7 +83,7 @@ class BanditBaselineToolTests(testtools.TestCase):
         git_repo.index.commit('Initial commit')
         os.chdir(repo_directory)
 
-        with open('bandit.yaml', 'wt') as fd:
+        with open('panther.yaml', 'wt') as fd:
             fd.write(config)
 
         # create three branches, first has only benign, second adds malicious,
@@ -102,7 +102,7 @@ class BanditBaselineToolTests(testtools.TestCase):
                                'benign_two.py'],
                      'expected_return': 0}]
 
-        baseline_command = ['bandit-baseline', '-c', 'bandit.yaml', '-r', '.',
+        baseline_command = ['panther-baseline', '-c', 'panther.yaml', '-r', '.',
                             '-p', 'test']
 
         for branch in branches:
@@ -121,7 +121,7 @@ class BanditBaselineToolTests(testtools.TestCase):
                              subprocess.call(baseline_command))
 
     def test_main_non_repo(self):
-        # Test that bandit gracefully exits when there is no git repository
+        # Test that panther gracefully exits when there is no git repository
         # when calling main
         repo_dir = self.useFixture(fixtures.TempDir()).path
         os.chdir(repo_dir)
@@ -130,7 +130,7 @@ class BanditBaselineToolTests(testtools.TestCase):
         self.assertRaisesRegex(SystemExit, '2', baseline.main)
 
     def test_main_git_command_failure(self):
-        # Test that bandit does not run when the Git command fails
+        # Test that panther does not run when the Git command fails
         repo_directory = self.useFixture(fixtures.TempDir()).path
         git_repo = git.Repo.init(repo_directory)
         git_repo.index.commit('Initial Commit')
@@ -150,7 +150,7 @@ class BanditBaselineToolTests(testtools.TestCase):
             self.assertRaisesRegex(SystemExit, '2', baseline.main)
 
     def test_main_no_parent_commit(self):
-        # Test that bandit exits when there is no parent commit detected when
+        # Test that panther exits when there is no parent commit detected when
         # calling main
         repo_directory = self.useFixture(fixtures.TempDir()).path
 
@@ -162,8 +162,8 @@ class BanditBaselineToolTests(testtools.TestCase):
         self.assertRaisesRegex(SystemExit, '2', baseline.main)
 
     def test_main_subprocess_error(self):
-        # Test that bandit handles a CalledProcessError when attempting to run
-        # bandit baseline via a subprocess
+        # Test that panther handles a CalledProcessError when attempting to run
+        # panther baseline via a subprocess
         repo_directory = self.useFixture(fixtures.TempDir()).path
 
         git_repo = git.Repo.init(repo_directory)
@@ -177,9 +177,9 @@ class BanditBaselineToolTests(testtools.TestCase):
         git_repo.index.commit('Additional Content')
 
         with mock.patch('subprocess.check_output') as mock_check_output:
-            mock_bandit_cmd = 'bandit_mock -b temp_file.txt'
+            mock_panther_cmd = 'panther_mock -b temp_file.txt'
             mock_check_output.side_effect = (
-                subprocess.CalledProcessError('3', mock_bandit_cmd)
+                subprocess.CalledProcessError('3', mock_panther_cmd)
             )
 
             # assert the system exits with code 3 (returned from
@@ -195,18 +195,18 @@ class BanditBaselineToolTests(testtools.TestCase):
         self.assertIsNotNone(logger)
 
     def test_initialize_no_repo(self):
-        # Test that bandit does not run when there is no current git
+        # Test that panther does not run when there is no current git
         # repository when calling initialize
         repo_directory = self.useFixture(fixtures.TempDir()).path
         os.chdir(repo_directory)
 
         return_value = baseline.initialize()
 
-        # assert bandit did not run due to no git repo
+        # assert panther did not run due to no git repo
         self.assertEqual((None, None, None), return_value)
 
     def test_initialize_git_command_failure(self):
-        # Test that bandit does not run when the Git command fails
+        # Test that panther does not run when the Git command fails
         repo_directory = self.useFixture(fixtures.TempDir()).path
         git_repo = git.Repo.init(repo_directory)
         git_repo.index.commit('Initial Commit')
@@ -223,11 +223,11 @@ class BanditBaselineToolTests(testtools.TestCase):
 
             return_value = baseline.initialize()
 
-            # assert bandit did not run due to git command failure
+            # assert panther did not run due to git command failure
             self.assertEqual((None, None, None), return_value)
 
     def test_initialize_dirty_repo(self):
-        # Test that bandit does not run when the current git repository is
+        # Test that panther does not run when the current git repository is
         # 'dirty' when calling the initialize method
         repo_directory = self.useFixture(fixtures.TempDir()).path
         git_repo = git.Repo.init(repo_directory)
@@ -241,12 +241,12 @@ class BanditBaselineToolTests(testtools.TestCase):
 
         return_value = baseline.initialize()
 
-        # assert bandit did not run due to dirty repo
+        # assert panther did not run due to dirty repo
         self.assertEqual((None, None, None), return_value)
 
-    @mock.patch('sys.argv', ['bandit', '-f', 'txt', 'test'])
+    @mock.patch('sys.argv', ['panther', '-f', 'txt', 'test'])
     def test_initialize_existing_report_file(self):
-        # Test that bandit does not run when the output file exists (and the
+        # Test that panther does not run when the output file exists (and the
         # provided output format does not match the default format) when
         # calling the initialize method
         repo_directory = self.useFixture(fixtures.TempDir()).path
@@ -261,13 +261,13 @@ class BanditBaselineToolTests(testtools.TestCase):
 
         return_value = baseline.initialize()
 
-        # assert bandit did not run due to existing report file
+        # assert panther did not run due to existing report file
         self.assertEqual((None, None, None), return_value)
 
-    @mock.patch('bandit.cli.baseline.bandit_args', ['-o',
-                'bandit_baseline_result'])
+    @mock.patch('panther.cli.baseline.panther_args', ['-o',
+                'panther_baseline_result'])
     def test_initialize_with_output_argument(self):
-        # Test that bandit does not run when the '-o' (output) argument is
+        # Test that panther does not run when the '-o' (output) argument is
         # specified
         repo_directory = self.useFixture(fixtures.TempDir()).path
         git_repo = git.Repo.init(repo_directory)
@@ -276,11 +276,11 @@ class BanditBaselineToolTests(testtools.TestCase):
 
         return_value = baseline.initialize()
 
-        # assert bandit did not run due to provided -o (--ouput) argument
+        # assert panther did not run due to provided -o (--ouput) argument
         self.assertEqual((None, None, None), return_value)
 
     def test_initialize_existing_temp_file(self):
-        # Test that bandit does not run when the temporary output file exists
+        # Test that panther does not run when the temporary output file exists
         # when calling the initialize method
         repo_directory = self.useFixture(fixtures.TempDir()).path
         git_repo = git.Repo.init(repo_directory)
@@ -294,5 +294,5 @@ class BanditBaselineToolTests(testtools.TestCase):
 
         return_value = baseline.initialize()
 
-        # assert bandit did not run due to existing temporary report file
+        # assert panther did not run due to existing temporary report file
         self.assertEqual((None, None, None), return_value)

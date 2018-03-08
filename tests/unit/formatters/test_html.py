@@ -20,19 +20,19 @@ import bs4
 import mock
 import testtools
 
-import bandit
-from bandit.core import config
-from bandit.core import issue
-from bandit.core import manager
-from bandit.formatters import html as b_html
+import panther
+from panther.core import config
+from panther.core import issue
+from panther.core import manager
+from panther.formatters import html as b_html
 
 
 class HtmlFormatterTests(testtools.TestCase):
 
     def setUp(self):
         super(HtmlFormatterTests, self).setUp()
-        conf = config.BanditConfig()
-        self.manager = manager.BanditManager(conf, 'file')
+        conf = config.PantherConfig()
+        self.manager = manager.PantherManager(conf, 'file')
 
         (tmp_fd, self.tmp_fname) = tempfile.mkstemp()
 
@@ -43,7 +43,7 @@ class HtmlFormatterTests(testtools.TestCase):
 
         tmp_file = open(self.tmp_fname, 'w')
         b_html.report(
-            self.manager, tmp_file, bandit.LOW, bandit.LOW)
+            self.manager, tmp_file, panther.LOW, panther.LOW)
 
         with open(self.tmp_fname) as f:
             soup = bs4.BeautifulSoup(f.read(), 'html.parser')
@@ -53,12 +53,12 @@ class HtmlFormatterTests(testtools.TestCase):
             self.assertIn('abc.py', skipped.text)
             self.assertIn('File is bad', skipped.text)
 
-    @mock.patch('bandit.core.issue.Issue.get_code')
-    @mock.patch('bandit.core.manager.BanditManager.get_issue_list')
+    @mock.patch('panther.core.issue.Issue.get_code')
+    @mock.patch('panther.core.manager.PantherManager.get_issue_list')
     def test_report_contents(self, get_issue_list, get_code):
         self.manager.metrics.data['_totals'] = {'loc': 1000, 'nosec': 50}
 
-        issue_a = _get_issue_instance(severity=bandit.LOW)
+        issue_a = _get_issue_instance(severity=panther.LOW)
         issue_a.fname = 'abc.py'
         issue_a.test = 'AAAAAAA'
         issue_a.text = 'BBBBBBB'
@@ -66,8 +66,8 @@ class HtmlFormatterTests(testtools.TestCase):
         # don't need to test severity, it determines the color which we're
         # testing separately
 
-        issue_b = _get_issue_instance(severity=bandit.MEDIUM)
-        issue_c = _get_issue_instance(severity=bandit.HIGH)
+        issue_b = _get_issue_instance(severity=panther.MEDIUM)
+        issue_c = _get_issue_instance(severity=panther.HIGH)
 
         issue_x = _get_issue_instance()
         get_code.return_value = 'some code'
@@ -80,7 +80,7 @@ class HtmlFormatterTests(testtools.TestCase):
 
         tmp_file = open(self.tmp_fname, 'w')
         b_html.report(
-            self.manager, tmp_file, bandit.LOW, bandit.LOW)
+            self.manager, tmp_file, panther.LOW, panther.LOW)
 
         with open(self.tmp_fname) as f:
             soup = bs4.BeautifulSoup(f.read(), 'html.parser')
@@ -131,8 +131,8 @@ class HtmlFormatterTests(testtools.TestCase):
             self.assertIn('CCCCCCC', issue1.text)
             self.assertIn('abc.py', issue1.text)
 
-    @mock.patch('bandit.core.issue.Issue.get_code')
-    @mock.patch('bandit.core.manager.BanditManager.get_issue_list')
+    @mock.patch('panther.core.issue.Issue.get_code')
+    @mock.patch('panther.core.manager.PantherManager.get_issue_list')
     def test_escaping(self, get_issue_list, get_code):
         self.manager.metrics.data['_totals'] = {'loc': 1000, 'nosec': 50}
         marker = '<tag in code>'
@@ -145,16 +145,16 @@ class HtmlFormatterTests(testtools.TestCase):
 
         tmp_file = open(self.tmp_fname, 'w')
         b_html.report(
-            self.manager, tmp_file, bandit.LOW, bandit.LOW)
+            self.manager, tmp_file, panther.LOW, panther.LOW)
 
         with open(self.tmp_fname) as f:
             contents = f.read()
         self.assertNotIn(marker, contents)
 
 
-def _get_issue_instance(severity=bandit.MEDIUM, confidence=bandit.MEDIUM):
+def _get_issue_instance(severity=panther.MEDIUM, confidence=panther.MEDIUM):
     new_issue = issue.Issue(severity, confidence, 'Test issue')
     new_issue.fname = 'code.py'
-    new_issue.test = 'bandit_plugin'
+    new_issue.test = 'panther_plugin'
     new_issue.lineno = 1
     return new_issue

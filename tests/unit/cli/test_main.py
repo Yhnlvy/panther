@@ -19,11 +19,11 @@ import fixtures
 import mock
 import testtools
 
-from bandit.cli import main as bandit
-from bandit.core import extension_loader as ext_loader
-from bandit.core import utils
+from panther.cli import main as panther
+from panther.core import extension_loader as ext_loader
+from panther.core import utils
 
-bandit_config_content = """
+panther_config_content = """
 include:
     - '*.py'
     - '*.pyw'
@@ -40,7 +40,7 @@ shell_injection:
         - os.system
 """
 
-bandit_baseline_content = """{
+panther_baseline_content = """{
     "results": [
         {
             "code": "some test code",
@@ -58,23 +58,23 @@ bandit_baseline_content = """{
 """
 
 
-class BanditCLIMainLoggerTests(testtools.TestCase):
+class PantherCLIMainLoggerTests(testtools.TestCase):
 
     def setUp(self):
-        super(BanditCLIMainLoggerTests, self).setUp()
+        super(PantherCLIMainLoggerTests, self).setUp()
         self.logger = logging.getLogger()
         self.original_logger_handlers = self.logger.handlers
         self.original_logger_level = self.logger.level
         self.logger.handlers = []
 
     def tearDown(self):
-        super(BanditCLIMainLoggerTests, self).tearDown()
+        super(PantherCLIMainLoggerTests, self).tearDown()
         self.logger.handlers = self.original_logger_handlers
         self.logger.level = self.original_logger_level
 
     def test_init_logger(self):
         # Test that a logger was properly initialized
-        bandit._init_logger(False)
+        panther._init_logger(False)
 
         self.assertIsNotNone(self.logger)
         self.assertNotEqual(self.logger.handlers, [])
@@ -82,64 +82,64 @@ class BanditCLIMainLoggerTests(testtools.TestCase):
 
     def test_init_logger_debug_mode(self):
         # Test that the logger's level was set at 'DEBUG'
-        bandit._init_logger(True)
+        panther._init_logger(True)
         self.assertEqual(logging.DEBUG, self.logger.level)
 
 
-class BanditCLIMainTests(testtools.TestCase):
+class PantherCLIMainTests(testtools.TestCase):
 
     def setUp(self):
-        super(BanditCLIMainTests, self).setUp()
+        super(PantherCLIMainTests, self).setUp()
         self.current_directory = os.getcwd()
 
     def tearDown(self):
-        super(BanditCLIMainTests, self).tearDown()
+        super(PantherCLIMainTests, self).tearDown()
         os.chdir(self.current_directory)
 
     def test_get_options_from_ini_no_ini_path_no_target(self):
         # Test that no config options are loaded when no ini path or target
         # directory are provided
-        self.assertIsNone(bandit._get_options_from_ini(None, []))
+        self.assertIsNone(panther._get_options_from_ini(None, []))
 
     def test_get_options_from_ini_empty_directory_no_target(self):
         # Test that no config options are loaded when an empty directory is
         # provided as the ini path and no target directory is provided
         ini_directory = self.useFixture(fixtures.TempDir()).path
-        self.assertIsNone(bandit._get_options_from_ini(ini_directory, []))
+        self.assertIsNone(panther._get_options_from_ini(ini_directory, []))
 
-    def test_get_options_from_ini_no_ini_path_no_bandit_files(self):
+    def test_get_options_from_ini_no_ini_path_no_panther_files(self):
         # Test that no config options are loaded when no ini path is provided
-        # and the target directory contains no bandit config files (.bandit)
+        # and the target directory contains no panther config files (.panther)
         target_directory = self.useFixture(fixtures.TempDir()).path
-        self.assertIsNone(bandit._get_options_from_ini(None,
+        self.assertIsNone(panther._get_options_from_ini(None,
                           [target_directory]))
 
-    def test_get_options_from_ini_no_ini_path_multi_bandit_files(self):
-        # Test that bandit exits when no ini path is provided and the target
-        # directory(s) contain multiple bandit config files (.bandit)
+    def test_get_options_from_ini_no_ini_path_multi_panther_files(self):
+        # Test that panther exits when no ini path is provided and the target
+        # directory(s) contain multiple panther config files (.panther)
         target_directory = self.useFixture(fixtures.TempDir()).path
         second_config = 'second_config_directory'
         os.mkdir(os.path.join(target_directory, second_config))
-        bandit_config_one = os.path.join(target_directory, '.bandit')
-        bandit_config_two = os.path.join(target_directory, second_config,
-                                         '.bandit')
-        bandit_files = [bandit_config_one, bandit_config_two]
-        for bandit_file in bandit_files:
-            with open(bandit_file, 'wt') as fd:
-                fd.write(bandit_config_content)
-        self.assertRaisesRegex(SystemExit, '2', bandit._get_options_from_ini,
+        panther_config_one = os.path.join(target_directory, '.panther')
+        panther_config_two = os.path.join(target_directory, second_config,
+                                         '.panther')
+        panther_files = [panther_config_one, panther_config_two]
+        for panther_file in panther_files:
+            with open(panther_file, 'wt') as fd:
+                fd.write(panther_config_content)
+        self.assertRaisesRegex(SystemExit, '2', panther._get_options_from_ini,
                                None, [target_directory])
 
     def test_init_extensions(self):
         # Test that an extension loader manager is returned
-        self.assertEqual(ext_loader.MANAGER, bandit._init_extensions())
+        self.assertEqual(ext_loader.MANAGER, panther._init_extensions())
 
     def test_log_option_source_arg_val(self):
         # Test that the command argument value is returned when provided
         arg_val = 'file'
         ini_val = 'vuln'
         option_name = 'aggregate'
-        self.assertEqual(arg_val, bandit._log_option_source(arg_val, ini_val,
+        self.assertEqual(arg_val, panther._log_option_source(arg_val, ini_val,
                          option_name))
 
     def test_log_option_source_ini_value(self):
@@ -147,143 +147,143 @@ class BanditCLIMainTests(testtools.TestCase):
         # provided
         ini_val = 'vuln'
         option_name = 'aggregate'
-        self.assertEqual(ini_val, bandit._log_option_source(None, ini_val,
+        self.assertEqual(ini_val, panther._log_option_source(None, ini_val,
                          option_name))
 
     def test_log_option_source_no_values(self):
         # Test that None is returned when no command argument or ini value are
         # provided
         option_name = 'aggregate'
-        self.assertIsNone(bandit._log_option_source(None, None, option_name))
+        self.assertIsNone(panther._log_option_source(None, None, option_name))
 
-    @mock.patch('sys.argv', ['bandit', '-c', 'bandit.yaml', 'test'])
+    @mock.patch('sys.argv', ['panther', '-c', 'panther.yaml', 'test'])
     def test_main_config_unopenable(self):
-        # Test that bandit exits when a config file cannot be opened
-        with mock.patch('bandit.core.config.__init__') as mock_bandit_config:
-            mock_bandit_config.side_effect = utils.ConfigError('', '')
+        # Test that panther exits when a config file cannot be opened
+        with mock.patch('panther.core.config.__init__') as mock_panther_config:
+            mock_panther_config.side_effect = utils.ConfigError('', '')
             # assert a SystemExit with code 2
-            self.assertRaisesRegex(SystemExit, '2', bandit.main)
+            self.assertRaisesRegex(SystemExit, '2', panther.main)
 
-    @mock.patch('sys.argv', ['bandit', '-c', 'bandit.yaml', 'test'])
+    @mock.patch('sys.argv', ['panther', '-c', 'panther.yaml', 'test'])
     def test_main_invalid_config(self):
-        # Test that bandit exits when a config file contains invalid YAML
+        # Test that panther exits when a config file contains invalid YAML
         # content
-        with mock.patch('bandit.core.config.BanditConfig.__init__'
-                        ) as mock_bandit_config:
-            mock_bandit_config.side_effect = utils.ConfigError('', '')
+        with mock.patch('panther.core.config.PantherConfig.__init__'
+                        ) as mock_panther_config:
+            mock_panther_config.side_effect = utils.ConfigError('', '')
             # assert a SystemExit with code 2
-            self.assertRaisesRegex(SystemExit, '2', bandit.main)
+            self.assertRaisesRegex(SystemExit, '2', panther.main)
 
-    @mock.patch('sys.argv', ['bandit', '-c', 'bandit.yaml', 'test'])
+    @mock.patch('sys.argv', ['panther', '-c', 'panther.yaml', 'test'])
     def test_main_handle_ini_options(self):
-        # Test that bandit handles cmdline args from a bandit.yaml file
+        # Test that panther handles cmdline args from a panther.yaml file
         temp_directory = self.useFixture(fixtures.TempDir()).path
         os.chdir(temp_directory)
-        with open('bandit.yaml', 'wt') as fd:
-            fd.write(bandit_config_content)
-        with mock.patch('bandit.cli.main._get_options_from_ini'
+        with open('panther.yaml', 'wt') as fd:
+            fd.write(panther_config_content)
+        with mock.patch('panther.cli.main._get_options_from_ini'
                         ) as mock_get_opts:
             mock_get_opts.return_value = {"exclude": "/tmp",
                                           "skips": "skip_test",
                                           "tests": "some_test"}
 
-            with mock.patch('bandit.cli.main.LOG.error') as err_mock:
+            with mock.patch('panther.cli.main.LOG.error') as err_mock:
                 # SystemExit with code 2 when test not found in profile
-                self.assertRaisesRegex(SystemExit, '2', bandit.main)
+                self.assertRaisesRegex(SystemExit, '2', panther.main)
                 self.assertEqual(str(err_mock.call_args[0][0]),
                                  'Unknown test found in profile: some_test')
 
-    @mock.patch('sys.argv', ['bandit', '-c', 'bandit.yaml', '-t', 'badID',
+    @mock.patch('sys.argv', ['panther', '-c', 'panther.yaml', '-t', 'badID',
                              'test'])
     def test_main_unknown_tests(self):
-        # Test that bandit exits when an invalid test ID is provided
+        # Test that panther exits when an invalid test ID is provided
         temp_directory = self.useFixture(fixtures.TempDir()).path
         os.chdir(temp_directory)
-        with open('bandit.yaml', 'wt') as fd:
-            fd.write(bandit_config_content)
+        with open('panther.yaml', 'wt') as fd:
+            fd.write(panther_config_content)
         # assert a SystemExit with code 2
-        self.assertRaisesRegex(SystemExit, '2', bandit.main)
+        self.assertRaisesRegex(SystemExit, '2', panther.main)
 
-    @mock.patch('sys.argv', ['bandit', '-c', 'bandit.yaml', '-s', 'badID',
+    @mock.patch('sys.argv', ['panther', '-c', 'panther.yaml', '-s', 'badID',
                              'test'])
     def test_main_unknown_skip_tests(self):
-        # Test that bandit exits when an invalid test ID is provided to skip
+        # Test that panther exits when an invalid test ID is provided to skip
         temp_directory = self.useFixture(fixtures.TempDir()).path
         os.chdir(temp_directory)
-        with open('bandit.yaml', 'wt') as fd:
-            fd.write(bandit_config_content)
+        with open('panther.yaml', 'wt') as fd:
+            fd.write(panther_config_content)
         # assert a SystemExit with code 2
-        self.assertRaisesRegex(SystemExit, '2', bandit.main)
+        self.assertRaisesRegex(SystemExit, '2', panther.main)
 
-    @mock.patch('sys.argv', ['bandit', '-c', 'bandit.yaml', '-p', 'bad',
+    @mock.patch('sys.argv', ['panther', '-c', 'panther.yaml', '-p', 'bad',
                              'test'])
     def test_main_profile_not_found(self):
-        # Test that bandit exits when an invalid profile name is provided
+        # Test that panther exits when an invalid profile name is provided
         temp_directory = self.useFixture(fixtures.TempDir()).path
         os.chdir(temp_directory)
-        with open('bandit.yaml', 'wt') as fd:
-            fd.write(bandit_config_content)
+        with open('panther.yaml', 'wt') as fd:
+            fd.write(panther_config_content)
         # assert a SystemExit with code 2
-        with mock.patch('bandit.cli.main.LOG.error') as err_mock:
-            self.assertRaisesRegex(SystemExit, '2', bandit.main)
+        with mock.patch('panther.cli.main.LOG.error') as err_mock:
+            self.assertRaisesRegex(SystemExit, '2', panther.main)
             self.assertEqual(
                 str(err_mock.call_args[0][0]),
-                'Unable to find profile (bad) in config file: bandit.yaml')
+                'Unable to find profile (bad) in config file: panther.yaml')
 
-    @mock.patch('sys.argv', ['bandit', '-c', 'bandit.yaml', '-b', 'base.json',
+    @mock.patch('sys.argv', ['panther', '-c', 'panther.yaml', '-b', 'base.json',
                              'test'])
     def test_main_baseline_ioerror(self):
-        # Test that bandit exits when encountering an IOError while reading
+        # Test that panther exits when encountering an IOError while reading
         # baseline data
         temp_directory = self.useFixture(fixtures.TempDir()).path
         os.chdir(temp_directory)
-        with open('bandit.yaml', 'wt') as fd:
-            fd.write(bandit_config_content)
+        with open('panther.yaml', 'wt') as fd:
+            fd.write(panther_config_content)
         with open('base.json', 'wt') as fd:
-            fd.write(bandit_baseline_content)
-        with mock.patch('bandit.core.manager.BanditManager.populate_baseline'
+            fd.write(panther_baseline_content)
+        with mock.patch('panther.core.manager.PantherManager.populate_baseline'
                         ) as mock_mgr_pop_bl:
             mock_mgr_pop_bl.side_effect = IOError
             # assert a SystemExit with code 2
-            self.assertRaisesRegex(SystemExit, '2', bandit.main)
+            self.assertRaisesRegex(SystemExit, '2', panther.main)
 
-    @mock.patch('sys.argv', ['bandit', '-c', 'bandit.yaml', '-b', 'base.json',
+    @mock.patch('sys.argv', ['panther', '-c', 'panther.yaml', '-b', 'base.json',
                              '-f', 'csv', 'test'])
     def test_main_invalid_output_format(self):
-        # Test that bandit exits when an invalid output format is selected
+        # Test that panther exits when an invalid output format is selected
         temp_directory = self.useFixture(fixtures.TempDir()).path
         os.chdir(temp_directory)
-        with open('bandit.yaml', 'wt') as fd:
-            fd.write(bandit_config_content)
+        with open('panther.yaml', 'wt') as fd:
+            fd.write(panther_config_content)
         with open('base.json', 'wt') as fd:
-            fd.write(bandit_baseline_content)
+            fd.write(panther_baseline_content)
         # assert a SystemExit with code 2
-        self.assertRaisesRegex(SystemExit, '2', bandit.main)
+        self.assertRaisesRegex(SystemExit, '2', panther.main)
 
-    @mock.patch('sys.argv', ['bandit', '-c', 'bandit.yaml', 'test', '-o',
+    @mock.patch('sys.argv', ['panther', '-c', 'panther.yaml', 'test', '-o',
                              'output'])
     def test_main_exit_with_results(self):
-        # Test that bandit exits when there are results
+        # Test that panther exits when there are results
         temp_directory = self.useFixture(fixtures.TempDir()).path
         os.chdir(temp_directory)
-        with open('bandit.yaml', 'wt') as fd:
-            fd.write(bandit_config_content)
-        with mock.patch('bandit.core.manager.BanditManager.results_count'
+        with open('panther.yaml', 'wt') as fd:
+            fd.write(panther_config_content)
+        with mock.patch('panther.core.manager.PantherManager.results_count'
                         ) as mock_mgr_results_ct:
             mock_mgr_results_ct.return_value = 1
             # assert a SystemExit with code 1
-            self.assertRaisesRegex(SystemExit, '1', bandit.main)
+            self.assertRaisesRegex(SystemExit, '1', panther.main)
 
-    @mock.patch('sys.argv', ['bandit', '-c', 'bandit.yaml', 'test', '-o',
+    @mock.patch('sys.argv', ['panther', '-c', 'panther.yaml', 'test', '-o',
                              'output'])
     def test_main_exit_with_no_results(self):
-        # Test that bandit exits when there are no results
+        # Test that panther exits when there are no results
         temp_directory = self.useFixture(fixtures.TempDir()).path
         os.chdir(temp_directory)
-        with open('bandit.yaml', 'wt') as fd:
-            fd.write(bandit_config_content)
-        with mock.patch('bandit.core.manager.BanditManager.results_count'
+        with open('panther.yaml', 'wt') as fd:
+            fd.write(panther_config_content)
+        with mock.patch('panther.core.manager.PantherManager.results_count'
                         ) as mock_mgr_results_ct:
             mock_mgr_results_ct.return_value = 0
             # assert a SystemExit with code 0
-            self.assertRaisesRegex(SystemExit, '0', bandit.main)
+            self.assertRaisesRegex(SystemExit, '0', panther.main)

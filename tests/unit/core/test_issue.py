@@ -17,9 +17,9 @@
 import mock
 import testtools
 
-import bandit
-from bandit.core import constants
-from bandit.core import issue
+import panther
+from panther.core import constants
+from panther.core import issue
 
 
 class IssueTests(testtools.TestCase):
@@ -31,7 +31,7 @@ class IssueTests(testtools.TestCase):
     def test_issue_str(self):
         test_issue = _get_issue_instance()
         self.assertEqual(
-            ("Issue: 'Test issue' from B999:bandit_plugin: Severity: MEDIUM "
+            ("Issue: 'Test issue' from B999:panther_plugin: Severity: MEDIUM "
              "Confidence: MEDIUM at code.py:1"),
             str(test_issue)
         )
@@ -41,7 +41,7 @@ class IssueTests(testtools.TestCase):
         test_issue_dict = test_issue.as_dict(with_code=False)
         self.assertIsInstance(test_issue_dict, dict)
         self.assertEqual('code.py', test_issue_dict['filename'])
-        self.assertEqual('bandit_plugin', test_issue_dict['test_name'])
+        self.assertEqual('panther_plugin', test_issue_dict['test_name'])
         self.assertEqual('B999', test_issue_dict['test_id'])
         self.assertEqual('MEDIUM', test_issue_dict['issue_severity'])
         self.assertEqual('MEDIUM', test_issue_dict['issue_confidence'])
@@ -50,33 +50,33 @@ class IssueTests(testtools.TestCase):
         self.assertEqual([], test_issue_dict['line_range'])
 
     def test_issue_filter_severity(self):
-        levels = [bandit.LOW, bandit.MEDIUM, bandit.HIGH]
-        issues = [_get_issue_instance(l, bandit.HIGH) for l in levels]
+        levels = [panther.LOW, panther.MEDIUM, panther.HIGH]
+        issues = [_get_issue_instance(l, panther.HIGH) for l in levels]
 
         for level in levels:
             rank = constants.RANKING.index(level)
             for i in issues:
                 test = constants.RANKING.index(i.severity)
-                result = i.filter(level, bandit.UNDEFINED)
+                result = i.filter(level, panther.UNDEFINED)
                 self.assertTrue((test >= rank) == result)
 
     def test_issue_filter_confidence(self):
-        levels = [bandit.LOW, bandit.MEDIUM, bandit.HIGH]
-        issues = [_get_issue_instance(bandit.HIGH, l) for l in levels]
+        levels = [panther.LOW, panther.MEDIUM, panther.HIGH]
+        issues = [_get_issue_instance(panther.HIGH, l) for l in levels]
 
         for level in levels:
             rank = constants.RANKING.index(level)
             for i in issues:
                 test = constants.RANKING.index(i.confidence)
-                result = i.filter(bandit.UNDEFINED, level)
+                result = i.filter(panther.UNDEFINED, level)
                 self.assertTrue((test >= rank) == result)
 
     def test_matches_issue(self):
         issue_a = _get_issue_instance()
 
-        issue_b = _get_issue_instance(severity=bandit.HIGH)
+        issue_b = _get_issue_instance(severity=panther.HIGH)
 
-        issue_c = _get_issue_instance(confidence=bandit.LOW)
+        issue_c = _get_issue_instance(confidence=panther.LOW)
 
         issue_d = _get_issue_instance()
         issue_d.text = 'ABCD'
@@ -118,7 +118,7 @@ class IssueTests(testtools.TestCase):
     @mock.patch('linecache.getline')
     def test_get_code(self, getline):
         getline.return_value = b'\x08\x30'
-        new_issue = issue.Issue(bandit.MEDIUM, lineno=1)
+        new_issue = issue.Issue(panther.MEDIUM, lineno=1)
 
         try:
             new_issue.get_code()
@@ -126,10 +126,10 @@ class IssueTests(testtools.TestCase):
             self.fail('Bytes not properly decoded in issue.get_code()')
 
 
-def _get_issue_instance(severity=bandit.MEDIUM, confidence=bandit.MEDIUM):
+def _get_issue_instance(severity=panther.MEDIUM, confidence=panther.MEDIUM):
     new_issue = issue.Issue(severity, confidence, 'Test issue')
     new_issue.fname = 'code.py'
-    new_issue.test = 'bandit_plugin'
+    new_issue.test = 'panther_plugin'
     new_issue.test_id = 'B999'
     new_issue.lineno = 1
     return new_issue

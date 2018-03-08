@@ -2,4 +2,4 @@
 screen
 ------
 
-.. automodule:: bandit.formatters.screen
+.. automodule:: panther.formatters.screen

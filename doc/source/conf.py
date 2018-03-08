@@ -37,7 +37,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Bandit'
+project = u'Panther'
 copyright = u'2016, OpenStack Foundation'
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
@@ -50,7 +50,7 @@ add_module_names = True
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
-modindex_common_prefix = ['bandit.']
+modindex_common_prefix = ['panther.']
 
  #-- Options for man page output --------------------------------------------
 
@@ -58,7 +58,7 @@ modindex_common_prefix = ['bandit.']
 # List of tuples 'sourcefile', 'target', u'title', u'Authors name', 'manual'
 
 man_pages = [
-    ('man/bandit', 'bandit', u'Python source code security analyzer',
+    ('man/panther', 'panther', u'Python source code security analyzer',
      [u'OpenStack Security Group'], 1)
 ]
 

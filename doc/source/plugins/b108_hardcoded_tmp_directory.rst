@@ -2,4 +2,4 @@
 B108: hardcoded_tmp_directory
 -----------------------------
 
-.. automodule:: bandit.plugins.general_hardcoded_tmp
+.. automodule:: panther.plugins.general_hardcoded_tmp
