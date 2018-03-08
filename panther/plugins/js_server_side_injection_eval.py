@@ -26,6 +26,7 @@ can inject arbitrary JavaScript code to be executed on the server.
 
 import bandit
 from bandit.core import test_properties as test
+from bandit.core.visitor import Identifier
 
 
 def _report(value):
@@ -49,7 +50,8 @@ def eval_used(context):
         pass
 
     try:
-        if context.node.callee.property.name == 'eval':
+        callee_object = context.node.callee.object
+        if context.node.callee.property.name == 'eval' and isinstance(callee_object, Identifier) and callee_object.name == 'global':
             return _report("Use of global.eval(...)")
     except:
         pass
