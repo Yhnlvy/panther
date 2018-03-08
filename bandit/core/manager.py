@@ -33,7 +33,6 @@ from bandit.core import test_set as b_test_set
 
 LOG = logging.getLogger(__name__)
 
-
 class BanditManager(object):
 
     scope = []
@@ -181,6 +180,7 @@ class BanditManager(object):
         excluded_files = set()
 
         excluded_path_strings = self.b_conf.get_option('exclude_dirs') or []
+        excluded_path_strings.append(b_constants.NODE_MODULES)
         included_globs = self.b_conf.get_option('include') or ['*.py']
 
         # if there are command line provided exclusions add them to the list
@@ -244,7 +244,7 @@ class BanditManager(object):
                     sys.stdin = os.fdopen(sys.stdin.fileno(), 'rb', 0)
                     self._parse_file('<stdin>', sys.stdin, new_files_list)
                 else:
-                    with open(fname, 'rb') as fdata:
+                    with open(fname, 'r') as fdata:
                         self._parse_file(fname, fdata, new_files_list)
             except IOError as e:
                 self.skipped.append((fname, e.strerror))
@@ -273,7 +273,7 @@ class BanditManager(object):
                 nosec_lines = set(
                     lineno + 1 for
                     (lineno, line) in enumerate(lines)
-                    if b'#nosec' in line or b'# nosec' in line)
+                    if '//nosec' in line or '// nosec' in line)
             score = self._execute_ast_visitor(fname, data, nosec_lines)
             self.scores.append(score)
             self.metrics.count_issues([score, ])

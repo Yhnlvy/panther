@@ -174,7 +174,7 @@ Usage::
       B103  set_bad_file_permissions
       B104  hardcoded_bind_all_interfaces
       B105  hardcoded_password_string
-      B106  hardcoded_password_funcarg
+      B106  never_ever_ever_use_eval
       B107  hardcoded_password_default
       B108  hardcoded_tmp_directory
       B109  password_config_option_not_marked_secret
