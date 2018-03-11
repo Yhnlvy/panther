@@ -176,56 +176,10 @@ class TestConfigCompat(testtools.TestCase):
     def test_converted_include(self):
         profiles = self.config.get_option('profiles')
         test = profiles['test_1']
-        data = {'blacklist': {},
-                'exclude': set(),
+        data = {'exclude': set(),
                 'include': set(['B101', 'B604'])}
 
         self.assertEqual(data, test)
-
-    def test_converted_exclude(self):
-        profiles = self.config.get_option('profiles')
-        test = profiles['test_4']
-
-        self.assertEqual(set(['B101']), test['exclude'])
-
-    def test_converted_blacklist_call_data(self):
-        profiles = self.config.get_option('profiles')
-        test = profiles['test_2']
-        data = {'Call': [{'qualnames': ['telnetlib'],
-                          'level': 'HIGH',
-                          'message': '{name} is considered insecure.',
-                          'name': 'telnet'}]}
-
-        self.assertEqual(data, test['blacklist'])
-
-    def test_converted_blacklist_import_data(self):
-        profiles = self.config.get_option('profiles')
-        test = profiles['test_3']
-        data = [{'message': '{name} library appears to be in use.',
-                 'name': 'pickle',
-                 'qualnames': ['pickle.loads']}]
-
-        self.assertEqual(data, test['blacklist']['Call'])
-        self.assertEqual(data, test['blacklist']['Import'])
-        self.assertEqual(data, test['blacklist']['ImportFrom'])
-
-    def test_converted_blacklist_call_test(self):
-        profiles = self.config.get_option('profiles')
-        test = profiles['test_2']
-
-        self.assertEqual(set(['B001']), test['include'])
-
-    def test_converted_blacklist_import_test(self):
-        profiles = self.config.get_option('profiles')
-        test = profiles['test_3']
-
-        self.assertEqual(set(['B001']), test['include'])
-
-    def test_converted_exclude_blacklist(self):
-        profiles = self.config.get_option('profiles')
-        test = profiles['test_5']
-
-        self.assertEqual(set(['B001']), test['exclude'])
 
     def test_deprecation_message(self):
         msg = ("Config file '%s' contains deprecated legacy config data. "

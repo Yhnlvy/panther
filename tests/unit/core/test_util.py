@@ -224,19 +224,6 @@ class UtilTests(testtools.TestCase):
         # TODO(ljfisher) At best we might be able to get:
         # self.assertEqual(name, 'a.list[0]')
 
-    def test_linerange(self):
-        self.test_file = open("./examples/jinja2_templating.py")
-        self.tree = ast.parse(self.test_file.read())
-        # Check linerange returns corrent number of lines
-        line = self.tree.body[8]
-        lrange = p_utils.linerange(line)
-
-        # line 9 should be three lines long
-        self.assertEqual(3, len(lrange))
-
-        # the range should be the correct line numbers
-        self.assertEqual([11, 12, 13], list(lrange))
-
     def test_path_for_function(self):
         path = p_utils.get_path_for_function(p_utils.get_path_for_function)
         self.assertEqual(path, p_utils.__file__)
@@ -294,12 +281,3 @@ class UtilTests(testtools.TestCase):
                 self.assertEqual(p_utils.parse_ini_file(t.name),
                                  test['expected'])
 
-    def test_check_ast_node_good(self):
-        node = p_utils.check_ast_node("Call")
-        self.assertEqual("Call", node)
-
-    def test_check_ast_node_bad_node(self):
-        self.assertRaises(TypeError, p_utils.check_ast_node, 'Derp')
-
-    def test_check_ast_node_bad_type(self):
-        self.assertRaises(TypeError, p_utils.check_ast_node, 'walk')
