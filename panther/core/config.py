@@ -57,8 +57,6 @@ class PantherConfig(object):
             if not isinstance(self._config, dict):
                 raise utils.ConfigError("Error parsing file.", config_file)
 
-            self.convert_legacy_config()
-
         else:
             # use sane defaults
             self._config['plugin_name_pattern'] = '*.py'
