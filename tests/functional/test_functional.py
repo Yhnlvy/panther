@@ -274,7 +274,7 @@ class FunctionalTests(testtools.TestCase):
 
     def test_nonsense(self):
         '''Test that a syntactically invalid module is skipped.'''
-        self.run_example('nonsense.py')
+        self.run_example('nonsense.js')
         self.assertEqual(1, len(self.p_mgr.skipped))
 
     def test_okay(self):

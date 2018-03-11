@@ -241,7 +241,7 @@ class PantherManager(object):
                     sys.stderr.flush()
             try:
                 if fname == '-':
-                    sys.stdin = os.fdopen(sys.stdin.fileno(), 'rb', 0)
+                    sys.stdin = os.fdopen(sys.stdin.fileno(), 'r')
                     self._parse_file('<stdin>', sys.stdin, new_files_list)
                 else:
                     with open(fname, 'r') as fdata:
