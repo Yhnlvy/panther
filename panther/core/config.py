@@ -57,6 +57,8 @@ class PantherConfig(object):
             if not isinstance(self._config, dict):
                 raise utils.ConfigError("Error parsing file.", config_file)
 
+            self.convert_legacy_config()
+
         else:
             # use sane defaults
             self._config['plugin_name_pattern'] = '*.py'
@@ -115,7 +117,29 @@ class PantherConfig(object):
         if self.get_option('plugin_name_pattern'):
             plugin_name_pattern = self.get_option('plugin_name_pattern')
         self._settings['plugin_name_pattern'] = plugin_name_pattern
+    
+    def convert_legacy_config(self):
+        updated_profiles = self.convert_names_to_ids()
 
+        if updated_profiles:
+            self._config['profiles'] = updated_profiles
+
+    def convert_names_to_ids(self):
+        '''Convert test names to IDs, unknown names are left unchanged.'''
+        extman = extension_loader.MANAGER
+
+        updated_profiles = {}
+        for name, profile in (self.get_option('profiles') or {}).items():
+            # NOTE(tkelsey): can't use default of get() because value is
+            # sometimes explicity 'None', for example when the list if given in
+            # yaml but not populated with any values.
+            include = set((extman.get_plugin_id(i) or i)
+                          for i in (profile.get('include') or []))
+            exclude = set((extman.get_plugin_id(i) or i)
+                          for i in (profile.get('exclude') or []))
+            updated_profiles[name] = {'include': include, 'exclude': exclude}
+        return updated_profiles
+    
     def validate(self, path):
         '''Validate the config data.'''
         legacy = False
