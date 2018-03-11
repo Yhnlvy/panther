@@ -33,6 +33,7 @@ from panther.core import test_set as p_test_set
 
 LOG = logging.getLogger(__name__)
 
+
 class PantherManager(object):
 
     scope = []
@@ -241,7 +242,7 @@ class PantherManager(object):
                     sys.stderr.flush()
             try:
                 if fname == '-':
-                    sys.stdin = os.fdopen(sys.stdin.fileno(), 'rb', 0)
+                    sys.stdin = os.fdopen(sys.stdin.fileno(), 'r')
                     self._parse_file('<stdin>', sys.stdin, new_files_list)
                 else:
                     with open(fname, 'r') as fdata:
@@ -302,8 +303,8 @@ class PantherManager(object):
         '''
         score = []
         res = p_node_visitor.PantherNodeVisitor(fname, self.p_ma,
-                                               self.p_ts, self.debug,
-                                               nosec_lines, self.metrics)
+                                                self.p_ts, self.debug,
+                                                nosec_lines, self.metrics)
 
         score = res.process(data)
         self.results.extend(res.tester.results)
@@ -349,14 +350,14 @@ def _is_file_included(path, included_globs, excluded_path_strings,
 
     # if this is matches a glob of files we look at, and it isn't in an
     # excluded path
-    if _matches_glop_list(path, included_globs) or not enforce_glob:
+    if _matches_glob_list(path, included_globs) or not enforce_glob:
         if not any(x in path for x in excluded_path_strings):
             return_value = True
 
     return return_value
 
 
-def _matches_glop_list(filename, glop_list):
+def _matches_glob_list(filename, glop_list):
     for glob in glop_list:
         if fnmatch.fnmatch(filename, glob):
             return True

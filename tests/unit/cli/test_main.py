@@ -122,7 +122,7 @@ class PantherCLIMainTests(testtools.TestCase):
         os.mkdir(os.path.join(target_directory, second_config))
         panther_config_one = os.path.join(target_directory, '.panther')
         panther_config_two = os.path.join(target_directory, second_config,
-                                         '.panther')
+                                          '.panther')
         panther_files = [panther_config_one, panther_config_two]
         for panther_file in panther_files:
             with open(panther_file, 'wt') as fd:

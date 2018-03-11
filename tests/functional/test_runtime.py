@@ -43,16 +43,15 @@ class RuntimeTests(testtools.TestCase):
         self.assertIn("No targets found in CLI or ini files", output)
 
     def test_piped_input(self):
-        with open('examples/imports.py', 'r') as infile:
+        with open('examples/eval.js', 'r') as infile:
             (retcode, output) = self._test_runtime(['panther', '-'], infile)
             self.assertEqual(1, retcode)
-            self.assertIn("Total lines of code: 4", output)
-            self.assertIn("Low: 2", output)
-            self.assertIn("High: 2", output)
+            self.assertIn("Total lines of code: 2", output)
+            self.assertIn("Low: 1", output)
+            self.assertIn("High: 0", output)
             self.assertIn("Files skipped (0):", output)
-            self.assertIn("Issue: [B403:blacklist] Consider possible", output)
-            self.assertIn("<stdin>:2", output)
-            self.assertIn("<stdin>:4", output)
+            self.assertIn("Issue: [B106:never_ever_ever_use_eval]", output)
+            self.assertIn("<stdin>:3", output)
 
     def test_nonexistent_config(self):
         (retcode, output) = self._test_runtime([
@@ -72,18 +71,6 @@ class RuntimeTests(testtools.TestCase):
         self.assertIn("optional arguments:", output)
         self.assertIn("tests were discovered and loaded:", output)
 
-    def test_help_in_readme(self):
-        replace_list = [' ', '\t', '\n']
-        (retcode, output) = self._test_runtime(['panther', '-h'])
-        for i in replace_list:
-            output = output.replace(i, '')
-        output = output.replace("'", "\'")
-        with open('README.rst') as f:
-            readme = f.read()
-            for i in replace_list:
-                readme = readme.replace(i, '')
-            self.assertIn(output, readme)
-
     # test examples (use _test_example() to wrap in config location argument
     def test_example_nonexistent(self):
         (retcode, output) = self._test_example(
@@ -94,37 +81,14 @@ class RuntimeTests(testtools.TestCase):
         self.assertIn("nonexistent.py (No such file or directory", output)
 
     def test_example_okay(self):
-        (retcode, output) = self._test_example(['panther', ], ['okay.py', ])
+        (retcode, output) = self._test_example(['panther', ], ['okay.js', ])
         self.assertEqual(0, retcode)
         self.assertIn("Total lines of code: 1", output)
         self.assertIn("Files skipped (0):", output)
         self.assertIn("No issues identified.", output)
 
     def test_example_nonsense(self):
-        (retcode, output) = self._test_example(['panther', ], ['nonsense.py', ])
+        (retcode, output) = self._test_example(['panther', ], ['nonsense.js', ])
         self.assertEqual(0, retcode)
         self.assertIn("Files skipped (1):", output)
-        self.assertIn("nonsense.py (syntax error while parsing AST", output)
-
-    def test_example_nonsense2(self):
-        (retcode, output) = self._test_example(
-            ['panther', ], ['nonsense2.py', ]
-        )
-        self.assertEqual(0, retcode)
-        self.assertIn(
-            "Exception occurred when executing tests against", output
-        )
-        self.assertIn("Files skipped (1):", output)
-        self.assertIn("nonsense2.py (exception while scanning file)", output)
-
-    def test_example_imports(self):
-        (retcode, output) = self._test_example(['panther', ], ['imports.py', ])
-        self.assertEqual(1, retcode)
-        self.assertIn("Total lines of code: 4", output)
-        self.assertIn("Low: 2", output)
-        self.assertIn("High: 2", output)
-        self.assertIn("Files skipped (0):", output)
-        self.assertIn("Issue: [B403:blacklist] Consider possible",
-                      output)
-        self.assertIn("imports.py:2", output)
-        self.assertIn("imports.py:4", output)
+        self.assertIn("Exception occurred when executing tests against", output)

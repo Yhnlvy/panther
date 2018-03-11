@@ -39,7 +39,7 @@ class HtmlFormatterTests(testtools.TestCase):
         self.manager.out_file = self.tmp_fname
 
     def test_report_with_skipped(self):
-        self.manager.skipped = [('abc.py', 'File is bad')]
+        self.manager.skipped = [('abc.js', 'File is bad')]
 
         tmp_file = open(self.tmp_fname, 'w')
         p_html.report(
@@ -50,7 +50,7 @@ class HtmlFormatterTests(testtools.TestCase):
             skipped = soup.find_all('div', id='skipped')[0]
 
             self.assertEqual(1, len(soup.find_all('div', id='skipped')))
-            self.assertIn('abc.py', skipped.text)
+            self.assertIn('abc.js', skipped.text)
             self.assertIn('File is bad', skipped.text)
 
     @mock.patch('panther.core.issue.Issue.get_code')
@@ -59,7 +59,7 @@ class HtmlFormatterTests(testtools.TestCase):
         self.manager.metrics.data['_totals'] = {'loc': 1000, 'nosec': 50}
 
         issue_a = _get_issue_instance(severity=panther.LOW)
-        issue_a.fname = 'abc.py'
+        issue_a.fname = 'abc.js'
         issue_a.test = 'AAAAAAA'
         issue_a.text = 'BBBBBBB'
         issue_a.confidence = 'CCCCCCC'
@@ -129,7 +129,7 @@ class HtmlFormatterTests(testtools.TestCase):
             self.assertIn('AAAAAAA:', issue1.text)
             self.assertIn('BBBBBBB', issue1.text)
             self.assertIn('CCCCCCC', issue1.text)
-            self.assertIn('abc.py', issue1.text)
+            self.assertIn('abc.js', issue1.text)
 
     @mock.patch('panther.core.issue.Issue.get_code')
     @mock.patch('panther.core.manager.PantherManager.get_issue_list')
@@ -154,7 +154,7 @@ class HtmlFormatterTests(testtools.TestCase):
 
 def _get_issue_instance(severity=panther.MEDIUM, confidence=panther.MEDIUM):
     new_issue = issue.Issue(severity, confidence, 'Test issue')
-    new_issue.fname = 'code.py'
+    new_issue.fname = 'code.js'
     new_issue.test = 'panther_plugin'
     new_issue.lineno = 1
     return new_issue

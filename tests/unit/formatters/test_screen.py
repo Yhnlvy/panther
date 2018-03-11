@@ -94,13 +94,13 @@ class ScreenFormatterTests(testtools.TestCase):
         self.manager.out_file = self.tmp_fname
 
         self.manager.verbose = True
-        self.manager.files_list = ['binding.py']
+        self.manager.files_list = ['binding.js']
 
         self.manager.scores = [{'SEVERITY': [0, 0, 0, 1],
                                 'CONFIDENCE': [0, 0, 0, 1]}]
 
-        self.manager.skipped = [('abc.py', 'File is bad')]
-        self.manager.excluded_files = ['def.py']
+        self.manager.skipped = [('abc.js', 'File is bad')]
+        self.manager.excluded_files = ['def.js']
 
         issue_a = _get_issue_instance()
         issue_b = _get_issue_instance()
@@ -141,12 +141,12 @@ class ScreenFormatterTests(testtools.TestCase):
 
             expected_items = [
                 screen.header('Files in scope (1):'),
-                '\n\tbinding.py (score: {SEVERITY: 1, CONFIDENCE: 1})']
+                '\n\tbinding.js (score: {SEVERITY: 1, CONFIDENCE: 1})']
 
             for item in expected_items:
                 self.assertIn(item, data)
 
-            expected = screen.header('Files excluded (1):') + '\n\tdef.py'
+            expected = screen.header('Files excluded (1):') + '\n\tdef.js'
             self.assertIn(expected, data)
 
             expected = ('Total lines of code: 1000\n\tTotal lines skipped '
@@ -162,7 +162,7 @@ class ScreenFormatterTests(testtools.TestCase):
             self.assertIn(expected, data)
 
             expected = (screen.header('Files skipped (1):') +
-                        '\n\tabc.py (File is bad)')
+                        '\n\tabc.js (File is bad)')
             self.assertIn(expected, data)
 
     @mock.patch('panther.core.manager.PantherManager.get_issue_list')
@@ -207,7 +207,7 @@ class ScreenFormatterTests(testtools.TestCase):
 
 def _get_issue_instance(severity=panther.MEDIUM, confidence=panther.MEDIUM):
     new_issue = issue.Issue(severity, confidence, 'Test issue')
-    new_issue.fname = 'code.py'
+    new_issue.fname = 'code.js'
     new_issue.test = 'panther_plugin'
     new_issue.lineno = 1
     return new_issue

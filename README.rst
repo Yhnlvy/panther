@@ -1,6 +1,9 @@
 Panther
 ======
 
+.. image:: https://circleci.com/gh/Yhnlvy/panther.svg?style=svg
+    :target: https://circleci.com/gh/Yhnlvy/panther
+
 Overview
 --------
 Panther is a tool designed to find common security issues in Node.js code. To do
@@ -285,8 +288,5 @@ Contributing
 You can test any changes with tox::
 
     pip install tox
+    tox -e debug
     tox -e pep8
-    tox -e py27
-    tox -e py35
-    tox -e docs
-    tox -e cover

@@ -33,13 +33,7 @@ include:
 profiles:
     test:
         include:
-            - start_process_with_a_shell
-
-shell_injection:
-    subprocess: []
-    no_shell: []
-    shell:
-        - os.system
+            - never_ever_ever_use_eval
 """
 
 
@@ -49,7 +43,7 @@ class PantherBaselineToolTests(testtools.TestCase):
     def setUpClass(cls):
         # Set up prior to running test class
         # read in content used for temporary file contents
-        with open('examples/mktemp.py') as fd:
+        with open('examples/eval.js') as fd:
             cls.temp_file_contents = fd.read()
 
     def setUp(self):
@@ -68,10 +62,10 @@ class PantherBaselineToolTests(testtools.TestCase):
         repo_directory = self.useFixture(fixtures.TempDir()).path
 
         # get benign and findings examples
-        with open('examples/okay.py') as fd:
+        with open('examples/okay.js') as fd:
             benign_contents = fd.read()
 
-        with open('examples/os_system.py') as fd:
+        with open('examples/eval.js') as fd:
             malicious_contents = fd.read()
 
         contents = {'benign_one.py': benign_contents,

@@ -18,7 +18,6 @@ import textwrap
 import uuid
 
 import fixtures
-import mock
 import testtools
 
 from panther.core import config
@@ -176,85 +175,10 @@ class TestConfigCompat(testtools.TestCase):
     def test_converted_include(self):
         profiles = self.config.get_option('profiles')
         test = profiles['test_1']
-        data = {'blacklist': {},
-                'exclude': set(),
+        data = {'exclude': set(),
                 'include': set(['B101', 'B604'])}
 
         self.assertEqual(data, test)
-
-    def test_converted_exclude(self):
-        profiles = self.config.get_option('profiles')
-        test = profiles['test_4']
-
-        self.assertEqual(set(['B101']), test['exclude'])
-
-    def test_converted_blacklist_call_data(self):
-        profiles = self.config.get_option('profiles')
-        test = profiles['test_2']
-        data = {'Call': [{'qualnames': ['telnetlib'],
-                          'level': 'HIGH',
-                          'message': '{name} is considered insecure.',
-                          'name': 'telnet'}]}
-
-        self.assertEqual(data, test['blacklist'])
-
-    def test_converted_blacklist_import_data(self):
-        profiles = self.config.get_option('profiles')
-        test = profiles['test_3']
-        data = [{'message': '{name} library appears to be in use.',
-                 'name': 'pickle',
-                 'qualnames': ['pickle.loads']}]
-
-        self.assertEqual(data, test['blacklist']['Call'])
-        self.assertEqual(data, test['blacklist']['Import'])
-        self.assertEqual(data, test['blacklist']['ImportFrom'])
-
-    def test_converted_blacklist_call_test(self):
-        profiles = self.config.get_option('profiles')
-        test = profiles['test_2']
-
-        self.assertEqual(set(['B001']), test['include'])
-
-    def test_converted_blacklist_import_test(self):
-        profiles = self.config.get_option('profiles')
-        test = profiles['test_3']
-
-        self.assertEqual(set(['B001']), test['include'])
-
-    def test_converted_exclude_blacklist(self):
-        profiles = self.config.get_option('profiles')
-        test = profiles['test_5']
-
-        self.assertEqual(set(['B001']), test['exclude'])
-
-    def test_deprecation_message(self):
-        msg = ("Config file '%s' contains deprecated legacy config data. "
-               "Please consider upgrading to the new config format. The tool "
-               "'panther-config-generator' can help you with this. Support for "
-               "legacy configs will be removed in a future panther version.")
-
-        with mock.patch('panther.core.config.LOG.warning') as m:
-            self.config._config = {"profiles": {}}
-            self.config.validate('')
-            self.assertEqual((msg, ''), m.call_args_list[0][0])
-
-    def test_blacklist_error(self):
-        msg = (" : Config file has an include or exclude reference to legacy "
-               "test '%s' but no configuration data for it. Configuration "
-               "data is required for this test. Please consider switching to "
-               "the new config file format, the tool "
-               "'panther-config-generator' can help you with this.")
-
-        for name in ["blacklist_call",
-                     "blacklist_imports",
-                     "blacklist_imports_func"]:
-
-            self.config._config = (
-                {"profiles": {"test": {"include": [name]}}})
-            try:
-                self.config.validate('')
-            except utils.ConfigError as e:
-                self.assertEqual(msg % name, e.message)
 
     def test_bad_yaml(self):
         f = self.useFixture(TempFile("[]"))

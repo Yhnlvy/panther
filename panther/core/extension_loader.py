@@ -16,10 +16,7 @@ from __future__ import print_function
 
 import sys
 
-import six
 from stevedore import extension
-
-from panther.core import utils
 
 
 class Manager(object):

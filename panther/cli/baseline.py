@@ -78,7 +78,7 @@ def main():
         LOG.error("Parent commit not available")
         sys.exit(2)
 
-    # #################### Run Panther against both commits ####################
+    # ################### Run Panther against both commits ###################
     output_type = (['-f', 'txt'] if output_format == default_output_format
                    else ['-o', report_fname])
 

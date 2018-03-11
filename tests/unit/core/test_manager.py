@@ -15,7 +15,6 @@
 # under the License.
 
 import os
-import sys
 
 import fixtures
 import mock
@@ -45,9 +44,9 @@ class ManagerTests(testtools.TestCase):
 
         self.config = config.PantherConfig()
         self.manager = manager.PantherManager(config=self.config,
-                                             agg_type='file',
-                                             debug=False,
-                                             verbose=False)
+                                              agg_type='file',
+                                              debug=False,
+                                              verbose=False)
 
     def test_create_manager(self):
         # make sure we can create a manager
@@ -58,8 +57,8 @@ class ManagerTests(testtools.TestCase):
     def test_create_manager_with_profile(self):
         # make sure we can create a manager
         m = manager.PantherManager(config=self.config, agg_type='file',
-                                  debug=False, verbose=False,
-                                  profile=self.profile)
+                                   debug=False, verbose=False,
+                                   profile=self.profile)
 
         self.assertEqual(False, m.debug)
         self.assertEqual(False, m.verbose)
@@ -150,22 +149,6 @@ class ManagerTests(testtools.TestCase):
 
         self.assertEqual([3, 2, 1], r)
 
-    def test_output_results_invalid_format(self):
-        # Test that output_results succeeds given an invalid format
-        temp_directory = self.useFixture(fixtures.TempDir()).path
-        lines = 5
-        sev_level = constants.LOW
-        conf_level = constants.LOW
-        output_filename = os.path.join(temp_directory, "_temp_output")
-        output_format = "invalid"
-        tmp_file = open(output_filename, 'w')
-        self.manager.output_results(lines, sev_level, conf_level, tmp_file,
-                                    output_format)
-        if sys.stdout.isatty():
-            self.assertFalse(os.path.isfile(output_filename))
-        else:
-            self.assertTrue(os.path.isfile(output_filename))
-
     def test_output_results_valid_format(self):
         # Test that output_results succeeds given a valid format
         temp_directory = self.useFixture(fixtures.TempDir()).path
@@ -210,7 +193,7 @@ class ManagerTests(testtools.TestCase):
         with mock.patch.object(manager, '_is_file_included') as m:
             self.manager.discover_files(['a', 'b', 'c'], True,
                                         excluded_paths='a,b')
-            m.assert_called_with('c', ['*.py', '*.pyw'], ['a', 'b'],
+            m.assert_called_with('c', ['*.js'], ['node_modules', 'a', 'b'],
                                  enforce_glob=False)
 
     @mock.patch('os.path.isdir')

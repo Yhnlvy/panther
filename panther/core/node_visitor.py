@@ -19,9 +19,9 @@ import logging
 import operator
 
 from panther.core import constants
+from panther.core.pyesprima import esprima
 from panther.core import tester as p_tester
 from panther.core import utils as p_utils
-from panther.core.pyesprima import esprima
 from panther.core import visitor
 
 
@@ -276,6 +276,6 @@ class PantherNodeVisitor(object):
         :return score: the aggregated score for the current file
         '''
         data = p_utils.clean_code(data)
-        f_ast = esprima.parse(data, {'loc': True}) # f_ast = ast.parse(data)
+        f_ast = esprima.parse(data, {'loc': True})
         self.generic_visit(f_ast.to_dict())
         return self.scores
