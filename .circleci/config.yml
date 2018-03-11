@@ -33,6 +33,8 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements.txt
+            python3 setup.py install
+            pip install tox
 
       - save_cache:
           paths:
@@ -48,7 +50,7 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            python manage.py test
+            tox -e debug
 
       - store_artifacts:
           path: test-reports
