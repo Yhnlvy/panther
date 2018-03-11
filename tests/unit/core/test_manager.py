@@ -15,7 +15,6 @@
 # under the License.
 
 import os
-import sys
 
 import fixtures
 import mock
@@ -45,9 +44,9 @@ class ManagerTests(testtools.TestCase):
 
         self.config = config.PantherConfig()
         self.manager = manager.PantherManager(config=self.config,
-                                             agg_type='file',
-                                             debug=False,
-                                             verbose=False)
+                                              agg_type='file',
+                                              debug=False,
+                                              verbose=False)
 
     def test_create_manager(self):
         # make sure we can create a manager
@@ -58,8 +57,8 @@ class ManagerTests(testtools.TestCase):
     def test_create_manager_with_profile(self):
         # make sure we can create a manager
         m = manager.PantherManager(config=self.config, agg_type='file',
-                                  debug=False, verbose=False,
-                                  profile=self.profile)
+                                   debug=False, verbose=False,
+                                   profile=self.profile)
 
         self.assertEqual(False, m.debug)
         self.assertEqual(False, m.verbose)

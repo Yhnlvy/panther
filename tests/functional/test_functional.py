@@ -16,7 +16,6 @@
 
 import os
 
-import six
 import testtools
 
 from panther.core import config as p_config
