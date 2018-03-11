@@ -1,7 +1,7 @@
 """Transforms AST dictionary into a tree of Node objects."""
 import abc
 from collections import OrderedDict
-from typing import Any, Dict, Generator, List, Union
+from typing import Any, Dict, Generator, List, Union  # noqa
 
 
 class UnknownNodeTypeError(Exception):

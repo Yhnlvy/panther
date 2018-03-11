@@ -33,6 +33,7 @@ from panther.core import test_set as p_test_set
 
 LOG = logging.getLogger(__name__)
 
+
 class PantherManager(object):
 
     scope = []
@@ -302,8 +303,8 @@ class PantherManager(object):
         '''
         score = []
         res = p_node_visitor.PantherNodeVisitor(fname, self.p_ma,
-                                               self.p_ts, self.debug,
-                                               nosec_lines, self.metrics)
+                                                self.p_ts, self.debug,
+                                                nosec_lines, self.metrics)
 
         score = res.process(data)
         self.results.extend(res.tester.results)
