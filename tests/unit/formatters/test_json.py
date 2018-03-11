@@ -58,7 +58,7 @@ class JsonFormatterTests(testtools.TestCase):
         self.manager.metrics = metrics.Metrics()
 
         # mock up the metrics
-        for key in ['_totals', 'binding.py']:
+        for key in ['_totals', 'binding.js']:
             self.manager.metrics.data[key] = {'loc': 4, 'nosec': 2}
             for (criteria, default) in constants.CRITERIA:
                 for rank in constants.RANKING:
@@ -68,7 +68,7 @@ class JsonFormatterTests(testtools.TestCase):
 
     @mock.patch('panther.core.manager.PantherManager.get_issue_list')
     def test_report(self, get_issue_list):
-        self.manager.files_list = ['binding.py']
+        self.manager.files_list = ['binding.js']
         self.manager.scores = [{'SEVERITY': [0] * len(constants.RANKING),
                                 'CONFIDENCE': [0] * len(constants.RANKING)}]
 
