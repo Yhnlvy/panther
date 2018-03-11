@@ -90,13 +90,13 @@ class TextFormatterTests(testtools.TestCase):
         self.manager.out_file = self.tmp_fname
 
         self.manager.verbose = True
-        self.manager.files_list = ['binding.py']
+        self.manager.files_list = ['binding.js']
 
         self.manager.scores = [{'SEVERITY': [0, 0, 0, 1],
                                 'CONFIDENCE': [0, 0, 0, 1]}]
 
-        self.manager.skipped = [('abc.py', 'File is bad')]
-        self.manager.excluded_files = ['def.py']
+        self.manager.skipped = [('abc.js', 'File is bad')]
+        self.manager.excluded_files = ['def.js']
 
         issue_a = _get_issue_instance()
         issue_b = _get_issue_instance()
@@ -133,11 +133,11 @@ class TextFormatterTests(testtools.TestCase):
 
             expected_items = ['Run started',
                               'Files in scope (1)',
-                              'binding.py (score: ',
+                              'binding.js (score: ',
                               "CONFIDENCE: 1",
                               "SEVERITY: 1",
                               'Files excluded (1):',
-                              'def.py',
+                              'def.js',
                               'Undefined: 1',
                               'Low: 1',
                               'Medium: 1',
@@ -147,7 +147,7 @@ class TextFormatterTests(testtools.TestCase):
                               'Total issues (by severity)',
                               'Total issues (by confidence)',
                               'Files skipped (1)',
-                              'abc.py (File is bad)'
+                              'abc.js (File is bad)'
                               ]
             for item in expected_items:
                 self.assertIn(item, data)
@@ -194,7 +194,7 @@ class TextFormatterTests(testtools.TestCase):
 
 def _get_issue_instance(severity=panther.MEDIUM, confidence=panther.MEDIUM):
     new_issue = issue.Issue(severity, confidence, 'Test issue')
-    new_issue.fname = 'code.py'
+    new_issue.fname = 'code.js'
     new_issue.test = 'panther_plugin'
     new_issue.lineno = 1
     return new_issue
