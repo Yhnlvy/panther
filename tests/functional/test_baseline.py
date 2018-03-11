@@ -135,7 +135,7 @@ class BaselineFunctionalTests(testtools.TestCase):
         Test file with no existing candidates from baseline and no new
         candidates.
         '''
-        baseline_report_files = {"okay.py": "okay.py"}
+        baseline_report_files = {"okay.js": "okay.js"}
         target_directory, baseline_code = (self._create_baseline(
                                            baseline_report_files))
         # assert the initial baseline found nothing

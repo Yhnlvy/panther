@@ -81,7 +81,7 @@ class RuntimeTests(testtools.TestCase):
         self.assertIn("nonexistent.py (No such file or directory", output)
 
     def test_example_okay(self):
-        (retcode, output) = self._test_example(['panther', ], ['okay.py', ])
+        (retcode, output) = self._test_example(['panther', ], ['okay.js', ])
         self.assertEqual(0, retcode)
         self.assertIn("Total lines of code: 1", output)
         self.assertIn("Files skipped (0):", output)

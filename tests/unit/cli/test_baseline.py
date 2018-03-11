@@ -68,7 +68,7 @@ class PantherBaselineToolTests(testtools.TestCase):
         repo_directory = self.useFixture(fixtures.TempDir()).path
 
         # get benign and findings examples
-        with open('examples/okay.py') as fd:
+        with open('examples/okay.js') as fd:
             benign_contents = fd.read()
 
         with open('examples/os_system.py') as fd:
