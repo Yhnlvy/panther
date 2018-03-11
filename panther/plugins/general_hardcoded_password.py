@@ -152,12 +152,8 @@ def never_ever_ever_use_eval(context):
     try:
         if context.node.callee.name == 'eval':
             return _report("eval()")
-    except:
+    except Exception:
         pass
-    # print('CONTEXT.NODE', dir(context.node), context.node.children, context.node.to_ecma())
-    # for kw in context.node.keywords:
-    #     if isinstance(kw.value, ast.Str) and kw.arg in CANDIDATES:
-    #         return _report(kw.value.s)
 
 
 @test.checks('FunctionDef')

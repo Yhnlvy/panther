@@ -117,7 +117,7 @@ class PantherConfig(object):
         if self.get_option('plugin_name_pattern'):
             plugin_name_pattern = self.get_option('plugin_name_pattern')
         self._settings['plugin_name_pattern'] = plugin_name_pattern
-    
+
     def convert_legacy_config(self):
         updated_profiles = self.convert_names_to_ids()
 
@@ -139,7 +139,7 @@ class PantherConfig(object):
                           for i in (profile.get('exclude') or []))
             updated_profiles[name] = {'include': include, 'exclude': exclude}
         return updated_profiles
-    
+
     def validate(self, path):
         '''Validate the config data.'''
         legacy = False
@@ -154,12 +154,6 @@ class PantherConfig(object):
             if key in exclude or key in include:
                 if self._config.get(block) is None:
                     raise utils.ConfigError(message.format(key), path)
-
-        if 'profiles' in self._config:
-            legacy = True
-            for profile in self._config['profiles'].values():
-                inc = profile.get('include') or set()
-                exc = profile.get('exclude') or set()
 
         # show deprecation message
         if legacy:

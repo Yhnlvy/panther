@@ -341,8 +341,8 @@ def check_ast_node(name):
 
 
 def clean_code(buffer):
-    """
-    - Trims the shebang at the beginning of JS file
+    '''Trims the shebang at the beginning of JS file
+
     Example: #!/usr/bin/env node
-    """
+    '''
     return re.sub(r'^#!([^\r\n]+)', '', buffer)

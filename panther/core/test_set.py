@@ -48,7 +48,6 @@ class PantherTestSet(object):
             filtered = set(extman.plugins_by_id.keys())
         return filtered - exc
 
-
     def _load_tests(self, config, plugins):
         '''Builds a dict mapping tests to node types.'''
         self.tests = {}

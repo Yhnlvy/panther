@@ -340,8 +340,8 @@ def main():
         sys.exit(2)
 
     p_mgr = p_manager.PantherManager(p_conf, args.agg_type, args.debug,
-                                    profile=profile, verbose=args.verbose,
-                                    ignore_nosec=args.ignore_nosec)
+                                     profile=profile, verbose=args.verbose,
+                                     ignore_nosec=args.ignore_nosec)
 
     if args.baseline is not None:
         try:
