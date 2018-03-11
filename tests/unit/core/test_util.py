@@ -280,4 +280,3 @@ class UtilTests(testtools.TestCase):
 
                 self.assertEqual(p_utils.parse_ini_file(t.name),
                                  test['expected'])
-
