@@ -1,6 +1,5 @@
 # -*- coding:utf-8 -*-
 
-import ast
 import logging
 import operator
 
@@ -66,7 +65,7 @@ class PantherNodeVisitor(object):
         return True
 
     def visit(self, node):
-        # TODO: customize visitor based on node type
+        # TODO(Yhnlvy): customize visitor based on node type
         name = node.__class__.__name__
         method = 'visit_' + name
         visitor = getattr(self, method, None)
