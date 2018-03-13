@@ -2,7 +2,7 @@ Panther Test Plugins
 ===================
 
 Panther supports many different tests to detect various security issues in
-python code. These tests are created as plugins and new ones can be created to
+JavaScript code. These tests are created as plugins and new ones can be created to
 extend the functionality offered by panther today.
 
 Writing Tests
@@ -26,7 +26,7 @@ To write a test:
    more advanced use cases.  Please see the `context.py` file for more.
  - Extend your Panther configuration file as needed to support your new test.
  - Execute Panther against the test file you defined in `examples/` and ensure
-   that it detects the vulnerability.  Consider variations on how this
+   that it detects the vulnerability. Consider variations on how this
    vulnerability might present itself and extend the example file and the test
    function accordingly.
 

@@ -1,16 +1,4 @@
 # -*- coding: utf-8 -*-
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#    http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-# implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
 
 import os
 import sys
@@ -38,7 +26,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Panther'
-copyright = u'2016, OpenStack Foundation'
+copyright = u'2018, ITC PayPal Project'
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 add_function_parentheses = True
@@ -59,7 +47,7 @@ modindex_common_prefix = ['panther.']
 
 man_pages = [
     ('man/panther', 'panther', u'Python source code security analyzer',
-     [u'OpenStack Security Group'], 1)
+     [u'ITC PayPal Project'], 1)
 ]
 
 # -- Options for HTML output --------------------------------------------------
@@ -81,7 +69,7 @@ latex_documents = [
     ('index',
      '%s.tex' % project,
      u'%s Documentation' % project,
-     u'OpenStack Foundation', 'manual'),
+     u'ITC PayPal Project', 'manual'),
 ]
 
 # Example configuration for intersphinx: refer to the Python standard library.

@@ -16,7 +16,7 @@ panther [-h] [-r] [-a {file,vuln}] [-n CONTEXT_LINES] [-c CONFIG_FILE]
 DESCRIPTION
 ===========
 
-``panther`` is a tool designed to find common security issues in Python code. To
+``panther`` is a tool designed to find common security issues in JavaScript code. To
 do this Panther processes each file, builds an AST from it, and runs appropriate
 plugins against the AST nodes.  Once Panther has finished scanning all the files
 it generates a report.
