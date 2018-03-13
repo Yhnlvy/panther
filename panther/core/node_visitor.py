@@ -74,7 +74,7 @@ class PantherNodeVisitor(object):
             visitor(node)
         else:
             self.update_scores(self.tester.run_tests(self.context, name))
-    
+
     def post_visit(self, node):
         self.depth -= 1
         LOG.debug("%s\texiting : %s", self.depth, hex(id(node)))

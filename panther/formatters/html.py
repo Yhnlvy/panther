@@ -91,7 +91,7 @@ This formatter outputs the issues as HTML.
                 Metrics:<br>
             </div>
             Total lines of code: <span id="loc">9</span><br>
-            Total lines skipped (#nosec): <span id="nosec">0</span>
+            Total lines skipped (//nosec): <span id="nosec">0</span>
         </div>
     </div>
 
@@ -299,7 +299,7 @@ pre {
             Metrics:<br>
         </div>
         Total lines of code: <span id="loc">{loc}</span><br>
-        Total lines skipped (#nosec): <span id="nosec">{nosec}</span>
+        Total lines skipped (//nosec): <span id="nosec">{nosec}</span>
     </div>
 </div>
 

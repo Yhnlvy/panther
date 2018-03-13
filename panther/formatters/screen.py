@@ -155,7 +155,7 @@ def report(manager, fileobj, sev_level, conf_level, lines=-1):
     bits.append('\tTotal lines of code: %i' %
                 (manager.metrics.data['_totals']['loc']))
 
-    bits.append('\tTotal lines skipped (#nosec): %i' %
+    bits.append('\tTotal lines skipped (//nosec): %i' %
                 (manager.metrics.data['_totals']['nosec']))
 
     bits.append(get_metrics(manager))

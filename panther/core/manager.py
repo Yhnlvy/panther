@@ -34,7 +34,7 @@ class PantherManager(object):
         :param debug: Whether to show debug messages or not
         :param verbose: Whether to show verbose output
         :param profile_name: Optional name of profile to use (from cmd line)
-        :param ignore_nosec: Whether to ignore #nosec or not
+        :param ignore_nosec: Whether to ignore //nosec or not
         :return:
         '''
         self.debug = debug
