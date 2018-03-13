@@ -150,7 +150,7 @@ class ScreenFormatterTests(testtools.TestCase):
             self.assertIn(expected, data)
 
             expected = ('Total lines of code: 1000\n\tTotal lines skipped '
-                        '(#nosec): 50')
+                        '(//nosec): 50')
             self.assertIn(expected, data)
 
             expected = ('Total issues (by severity):\n\t\tUndefined: 1\n\t\t'

@@ -1,17 +1,3 @@
-# Copyright (c) 2017 VMware, Inc.
-#
-#  Licensed under the Apache License, Version 2.0 (the "License"); you may
-#  not use this file except in compliance with the License. You may obtain
-#  a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-#  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-#  License for the specific language governing permissions and limitations
-#  under the License.
-
 r"""
 ==============
 YAML Formatter
@@ -60,7 +46,6 @@ This formatter outputs the issues in a yaml format.
       line_number: 6
       line_range:
       - 6
-      more_info: https://docs.openstack.org/panther/latest/
       test_id: B506
       test_name: yaml_load
 
@@ -77,8 +62,6 @@ import operator
 import sys
 
 import yaml
-
-from panther.core import docs_utils
 
 LOG = logging.getLogger(__name__)
 
@@ -101,8 +84,6 @@ def report(manager, fileobj, sev_level, conf_level, lines=-1):
                                      conf_level=conf_level)
 
     collector = [r.as_dict() for r in results]
-    for elem in collector:
-        elem['more_info'] = docs_utils.get_url(elem['test_id'])
 
     itemgetter = operator.itemgetter
     if manager.agg_type == 'vuln':

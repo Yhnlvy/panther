@@ -176,7 +176,7 @@ class TestConfigCompat(testtools.TestCase):
         profiles = self.config.get_option('profiles')
         test = profiles['test_1']
         data = {'exclude': set(),
-                'include': set(['B101', 'B604'])}
+                'include': {'any_other_function_with_shell_equals_true', 'assert_used'}}
 
         self.assertEqual(data, test)
 

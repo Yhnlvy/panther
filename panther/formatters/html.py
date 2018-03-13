@@ -1,18 +1,3 @@
-# Copyright (c) 2015 Rackspace, Inc.
-# Copyright (c) 2015 Hewlett Packard Enterprise
-#
-#  Licensed under the Apache License, Version 2.0 (the "License"); you may
-#  not use this file except in compliance with the License. You may obtain
-#  a copy of the License at
-#
-#       http://www.apache.org/licenses/LICENSE-2.0
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-#  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-#  License for the specific language governing permissions and limitations
-#  under the License.
-
 r"""
 ==============
 HTML formatter
@@ -106,7 +91,7 @@ This formatter outputs the issues as HTML.
                 Metrics:<br>
             </div>
             Total lines of code: <span id="loc">9</span><br>
-            Total lines skipped (#nosec): <span id="nosec">0</span>
+            Total lines skipped (//nosec): <span id="nosec">0</span>
         </div>
     </div>
 
@@ -125,9 +110,6 @@ This formatter outputs the issues as HTML.
         <b>Confidence: </b>HIGH<br>
         <b>File: </b><a href="examples/yaml_load.py"
         target="_blank">examples/yaml_load.py</a> <br>
-        <b>More info: </b><a href="https://docs.openstack.org/panther/latest/
-        plugins/yaml_load.html" target="_blank">
-        https://docs.openstack.org/panther/latest/plugins/yaml_load.html</a>
         <br>
 
     <div class="code">
@@ -155,7 +137,6 @@ import cgi
 import logging
 import sys
 
-from panther.core import docs_utils
 from panther.core import test_properties
 from panther.formatters import utils
 
@@ -271,7 +252,6 @@ pre {
     <b>Severity: </b>{severity}<br>
     <b>Confidence: </b>{confidence}<br>
     <b>File: </b><a href="{path}" target="_blank">{path}</a> <br>
-    <b>More info: </b><a href="{url}" target="_blank">{url}</a><br>
 {code}
 {candidates}
 </div>
@@ -319,7 +299,7 @@ pre {
             Metrics:<br>
         </div>
         Total lines of code: <span id="loc">{loc}</span><br>
-        Total lines skipped (#nosec): <span id="nosec">{nosec}</span>
+        Total lines skipped (//nosec): <span id="nosec">{nosec}</span>
     </div>
 </div>
 
@@ -355,7 +335,6 @@ pre {
 
             candidates = candidate_block.format(candidate_list=candidates_str)
 
-        url = docs_utils.get_url(issue.test_id)
         results_str += issue_block.format(issue_no=index,
                                           issue_class='issue-sev-{}'.
                                           format(issue.severity.lower()),
@@ -365,8 +344,7 @@ pre {
                                           severity=issue.severity,
                                           confidence=issue.confidence,
                                           path=issue.fname, code=code,
-                                          candidates=candidates,
-                                          url=url)
+                                          candidates=candidates)
 
     # build the metrics string to insert in the report
     metrics_summary = metrics_block.format(

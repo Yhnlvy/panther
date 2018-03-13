@@ -69,7 +69,7 @@ Usage::
                   [--ini INI_PATH] [--version]
                   [targets [targets ...]]
 
-    Panther - a Python source code security analyzer
+    Panther - a Node.js source code security analyzer
 
     positional arguments:
       targets               source file(s) or directory(s) to be tested

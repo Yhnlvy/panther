@@ -16,7 +16,7 @@ panther [-h] [-r] [-a {file,vuln}] [-n CONTEXT_LINES] [-c CONFIG_FILE]
 DESCRIPTION
 ===========
 
-``panther`` is a tool designed to find common security issues in Python code. To
+``panther`` is a tool designed to find common security issues in Node.js code. To
 do this Panther processes each file, builds an AST from it, and runs appropriate
 plugins against the AST nodes.  Once Panther has finished scanning all the files
 it generates a report.
@@ -105,7 +105,7 @@ EXAMPLES
 
 Example usage across a code tree::
 
-    panther -r ~/openstack-repo/keystone
+    panther -r ~/itc-repo/keystone
 
 Example usage across the ``examples/`` directory, showing three lines of
 context and only reporting on the high-severity issues::

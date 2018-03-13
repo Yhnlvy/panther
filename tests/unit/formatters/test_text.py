@@ -143,7 +143,7 @@ class TextFormatterTests(testtools.TestCase):
                               'Medium: 1',
                               'High: 1',
                               'Total lines skipped ',
-                              '(#nosec): 50',
+                              '(//nosec): 50',
                               'Total issues (by severity)',
                               'Total issues (by confidence)',
                               'Files skipped (1)',

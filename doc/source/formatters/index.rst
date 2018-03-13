@@ -2,7 +2,7 @@ Panther Report Formatters
 ========================
 
 Panther supports many different formatters to output various security issues in
-python code. These formatters are created as plugins and new ones can be
+Node.js code. These formatters are created as plugins and new ones can be
 created to extend the functionality offered by panther today.
 
 Example Formatter
