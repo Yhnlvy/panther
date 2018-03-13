@@ -14,10 +14,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 
-import ast
-
 import mock
-import six
 import testtools
 
 from panther.core import context

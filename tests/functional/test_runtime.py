@@ -50,7 +50,7 @@ class RuntimeTests(testtools.TestCase):
             self.assertIn("Low: 1", output)
             self.assertIn("High: 0", output)
             self.assertIn("Files skipped (0):", output)
-            self.assertIn("Issue: [B106:never_ever_ever_use_eval]", output)
+            self.assertIn("Issue: [P106:never_ever_ever_use_eval]", output)
             self.assertIn("<stdin>:3", output)
 
     def test_nonexistent_config(self):
