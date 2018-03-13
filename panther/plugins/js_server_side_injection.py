@@ -44,6 +44,21 @@ def _report(value):
         confidence=panther.MEDIUM,
         text=("Potential server side code injection detected: '%s'" % value))
 
+def _check_global_call(context, function_name):
+    try:
+        if context.node.callee.name == function_name:
+            return _report("Use of %s(...)" % function_name)
+    except:
+        pass
+
+    try:
+        callee_object = context.node.callee.object
+        if context.node.callee.property.name == function_name and isinstance(callee_object, Identifier) and callee_object.name == 'global':
+            return _report("Use of global.%s(...)" % function_name)
+    except:
+        pass
+    
+
 @test.test_id('P601')
 @test.checks('CallExpression')
 def eval_used(context):
@@ -52,18 +67,7 @@ def eval_used(context):
         2) global.eval(code)
     '''
 
-    try:
-        if context.node.callee.name == 'eval':
-            return _report("Use of eval(...)")
-    except:
-        pass
-
-    try:
-        callee_object = context.node.callee.object
-        if context.node.callee.property.name == 'eval' and isinstance(callee_object, Identifier) and callee_object.name == 'global':
-            return _report("Use of global.eval(...)")
-    except:
-        pass
+    return _check_global_call(context, 'eval')
 
 @test.checks('NewExpression') 
 @test.test_id('P601')
@@ -72,20 +76,7 @@ def new_function_used(context):
         1) new Function(...)
         2) new global.Function(...)
     '''
-    try:
-        if context.node.callee.name == 'Function':
-            return _report("Use of Function(...)")
-    except:
-        pass
-
-    try:
-        
-        callee_object = context.node.callee.object
-
-        if context.node.callee.property.name == 'Function' and isinstance(callee_object, Identifier) and callee_object.name == 'global':
-            return _report("Use of global.Function(...)")
-    except:
-        pass
+    return _check_global_call(context, 'Function')
     
 
 
