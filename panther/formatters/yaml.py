@@ -64,8 +64,6 @@ import sys
 
 import yaml
 
-from panther.core import docs_utils
-
 LOG = logging.getLogger(__name__)
 
 
@@ -87,8 +85,6 @@ def report(manager, fileobj, sev_level, conf_level, lines=-1):
                                      conf_level=conf_level)
 
     collector = [r.as_dict() for r in results]
-    for elem in collector:
-        elem['more_info'] = docs_utils.get_url(elem['test_id'])
 
     itemgetter = operator.itemgetter
     if manager.agg_type == 'vuln':
