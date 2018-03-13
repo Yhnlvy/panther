@@ -134,7 +134,7 @@ def main():
 
     # now do normal startup
     parser = argparse.ArgumentParser(
-        description='Panther - a Python source code security analyzer',
+        description='Panther - a Node.js source code security analyzer',
         formatter_class=argparse.RawDescriptionHelpFormatter
     )
     parser.add_argument(

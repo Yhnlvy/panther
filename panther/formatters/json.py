@@ -53,7 +53,6 @@ This formatter outputs the issues in JSON.
           "line_range": [
             5
           ],
-          "more_info": "https://docs.openstack.org/panther/latest/",
           "test_name": "blacklist_calls",
           "test_id": "B301"
         }

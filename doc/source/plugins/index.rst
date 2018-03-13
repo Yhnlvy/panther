@@ -2,7 +2,7 @@ Panther Test Plugins
 ===================
 
 Panther supports many different tests to detect various security issues in
-JavaScript code. These tests are created as plugins and new ones can be created to
+Node.js code. These tests are created as plugins and new ones can be created to
 extend the functionality offered by panther today.
 
 Writing Tests

@@ -1,7 +1,7 @@
 Welcome to Panther's developer documentation!
 ============================================
 
-Panther is a tool designed to find common security issues in JavaScript code. To do
+Panther is a tool designed to find common security issues in Node.js code. To do
 this, Panther processes each file, builds an AST from it, and runs appropriate
 plugins against the AST nodes.  Once Panther has finished scanning all the files,
 it generates a report.

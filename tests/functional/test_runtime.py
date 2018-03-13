@@ -64,7 +64,7 @@ class RuntimeTests(testtools.TestCase):
         (retcode, output) = self._test_runtime(['panther', '-h'])
         self.assertEqual(0, retcode)
         self.assertIn(
-            "Panther - a Python source code security analyzer", output
+            "Panther - a Node.js source code security analyzer", output
         )
         self.assertIn("usage: panther [-h]", output)
         self.assertIn("positional arguments:", output)

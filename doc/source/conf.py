@@ -46,7 +46,7 @@ modindex_common_prefix = ['panther.']
 # List of tuples 'sourcefile', 'target', u'title', u'Authors name', 'manual'
 
 man_pages = [
-    ('man/panther', 'panther', u'Python source code security analyzer',
+    ('man/panther', 'panther', u'Node.js source code security analyzer',
      [u'ITC PayPal Project'], 1)
 ]
 
