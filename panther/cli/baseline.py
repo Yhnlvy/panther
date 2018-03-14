@@ -144,7 +144,7 @@ def initialize():
 
     # #################### Parse Args #########################################
     parser = argparse.ArgumentParser(
-        description='Panther Baseline - Generates Panther results compared to "'
+        description='Panther Baseline - Generates Panther results compared to '
                     'a baseline',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='Additional Panther arguments such as severity filtering (-ll) '
@@ -170,7 +170,7 @@ def initialize():
 
     parser.add_argument(
         '--diff-only', dest='diff_only', action='store_true',
-        help='runs analysis on changed files only'
+        help='run analysis on changed files only'
     )
 
     args, unknown = parser.parse_known_args()

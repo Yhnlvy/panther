@@ -148,6 +148,34 @@ Usage::
       P601  server_side_injection
       P602  sql_injection
 
+
+Baseline Usage
+-----
+Example usage across a code tree::
+
+    panther-baseline -r app --diff-only -c 6ce647fd
+
+Usage::
+
+    $ panther-baseline -h
+    usage: panther-baseline [-h] [-f {txt,html,json}] [-c COMMIT_SHA]
+                        [--diff-only]
+                        targets [targets ...]
+
+    Panther Baseline - Generates Panther results compared to a baseline
+
+    positional arguments:
+    targets               source file(s) or directory(s) to be tested
+
+    optional arguments:
+    -h, --help            show this help message and exit
+    -f {txt,html,json}    specify output format
+    -c COMMIT_SHA, --commit COMMIT_SHA
+                            commit sha to be tested
+    --diff-only           run analysis on changed files only
+
+    Additional Panther arguments such as severity filtering (-ll) can be added and will be passed to Panther.
+
 Configuration
 -------------
 An optional config file may be supplied and may include:

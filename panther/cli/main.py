@@ -331,9 +331,13 @@ def main():
                                      ignore_nosec=args.ignore_nosec)
 
     if args.baseline is not None:
-        with open(args.baseline, 'w') as bl:
-            data = bl.read()
-            p_mgr.populate_baseline(data)
+        try:
+            with open(args.baseline) as bl:
+                data = bl.read()
+                p_mgr.populate_baseline(data)
+        except IOError:
+            LOG.warning("Could not open baseline report: %s", args.baseline)
+            sys.exit(2)
 
         if args.output_format not in baseline_formatters:
             LOG.warning('Baseline must be used with one of the following '
