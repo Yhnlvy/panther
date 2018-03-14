@@ -47,10 +47,10 @@ class RuntimeTests(testtools.TestCase):
             (retcode, output) = self._test_runtime(['panther', '-'], infile)
             self.assertEqual(1, retcode)
             self.assertIn("Total lines of code: 2", output)
-            self.assertIn("Low: 1", output)
-            self.assertIn("High: 0", output)
+            self.assertIn("Low: 0", output)
+            self.assertIn("High: 1", output)
             self.assertIn("Files skipped (0):", output)
-            self.assertIn("Issue: [P106:never_ever_ever_use_eval]", output)
+            self.assertIn("Issue: [P601:eval_used]", output)
             self.assertIn("<stdin>:3", output)
 
     def test_nonexistent_config(self):

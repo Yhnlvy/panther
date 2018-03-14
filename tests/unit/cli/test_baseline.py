@@ -33,7 +33,7 @@ include:
 profiles:
     test:
         include:
-            - never_ever_ever_use_eval
+            - eval_used
 """
 
 

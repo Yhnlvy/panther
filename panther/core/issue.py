@@ -100,8 +100,7 @@ class Issue(object):
             'issue_confidence': self.confidence,
             'issue_text': self.text.encode('utf-8').decode('utf-8'),
             'line_number': self.lineno,
-            'line_range': self.linerange,
-            }
+            'line_range': self.linerange}
 
         if with_code:
             out['code'] = self.get_code()
