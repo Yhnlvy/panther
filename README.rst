@@ -145,7 +145,8 @@ Usage::
     The following tests were discovered and loaded:
     -----------------------------------------------
 
-      B101  assert_used
+      P601  server_side_injection
+      P602  sql_injection
 
 Configuration
 -------------
@@ -177,7 +178,7 @@ To use this, put a .panther file in your project's directory. For example:
 ::
 
    [panther]
-   tests: B101,B102,B301
+   tests: P601,P602
 
 
 Exclusions
