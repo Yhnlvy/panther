@@ -21,8 +21,8 @@ import tempfile
 import git
 
 panther_args = sys.argv[1:]
-baseline_tmp_file = '_panther_baseline_run.json_'
-current_commit = None
+baseline_tmp_file = '_panther_baseline_run.json'
+commit_sha = None
 default_output_format = 'terminal'
 LOG = logging.getLogger(__name__)
 repo = None
@@ -32,17 +32,17 @@ valid_baseline_formats = ['txt', 'html', 'json']
 
 def main():
     # our cleanup function needs this and can't be passed arguments
-    global current_commit
+    global commit_sha
     global repo
 
-    parent_commit = None
+    parent_commit_sha = None
     output_format = None
     repo = None
     report_fname = None
 
     init_logger()
 
-    output_format, repo, report_fname, commit_sha = initialize()
+    output_format, repo, report_fname, commit_sha, diff_only = initialize()
 
     if not repo:
         sys.exit(2)
@@ -50,12 +50,12 @@ def main():
     # #################### Find current and parent commits ####################
     try:
         commit = repo.commit(commit_sha)
-        current_commit = commit.hexsha
+        commit_sha = commit.hexsha
         LOG.info('Got current commit: [%s]', commit.name_rev)
 
-        commit = commit.parents[0]
-        parent_commit = commit.hexsha
-        LOG.info('Got parent commit: [%s]', commit.name_rev)
+        parent_commit = commit.parents[0]
+        parent_commit_sha = parent_commit.hexsha
+        LOG.info('Got parent commit: [%s]', parent_commit.name_rev)
 
     except git.BadName:
         LOG.error("Unable to get commit %s", commit_sha)
@@ -71,40 +71,39 @@ def main():
     output_type = (['-f', 'txt'] if output_format == default_output_format
                    else ['-o', report_fname])
 
-    with baseline_setup() as t:
+    if diff_only:
+        repo.head.reset(commit=commit_sha, working_tree=True)
+        changed_files = list(commit.stats.files.keys())
+        if not changed_files:
+            LOG.info("No changes since last commit. Exiting...")
+            sys.exit(2)
 
-        panther_tmpfile = "{}/{}".format(t, baseline_tmp_file)
+        LOG.info("Running analysis on the following files: \n%s", '\n'.join(changed_files))
+        panther_args = _remove_recursive_from_args()
 
-        steps = [{'message': 'Getting Panther baseline results',
-                  'commit': parent_commit,
-                  'args': panther_args + ['-f', 'json', '-o', panther_tmpfile]},
+        panther_command = ['panther'] + changed_files + panther_args + output_type
+        output, return_code = _run_command(panther_command)
+    else:                   
+        with baseline_setup() as t:
 
-                 {'message': 'Comparing Panther results to baseline',
-                  'commit': current_commit,
-                  'args': panther_args + ['-b', panther_tmpfile] + output_type}]
+            panther_tmpfile = "{}/{}".format(t, baseline_tmp_file)
 
-        return_code = None
+            steps = [{'message': 'Getting Panther baseline results',
+                    'commit_sha': parent_commit_sha,
+                    'args': panther_args + ['-f', 'json', '-o', panther_tmpfile]},
 
-        for step in steps:
-            repo.head.reset(commit=step['commit'], working_tree=True)
+                    {'message': 'Comparing Panther results to baseline',
+                    'commit_sha': commit_sha,
+                    'args': panther_args + ['-b', panther_tmpfile] + output_type}]
 
-            LOG.info(step['message'])
+            return_code = None
 
-            panther_command = ['panther'] + step['args']
+            for step in steps:
+                repo.head.reset(commit=step['commit_sha'], working_tree=True)
+                LOG.info(step['message'])
 
-            try:
-                output = subprocess.check_output(panther_command)
-            except subprocess.CalledProcessError as e:
-                output = e.output
-                return_code = e.returncode
-            else:
-                return_code = 0
-                output = output.decode('utf-8')  # subprocess returns bytes
-
-            if return_code not in [0, 1]:
-                LOG.error("Error running command: %s\nOutput: %s\n",
-                          panther_args, output)
-
+                panther_command = ['panther'] + step['args']
+                output, return_code = _run_command(panther_command)
     # #################### Output and exit ####################################
     # print output or display message about written report
     if output_format == default_output_format:
@@ -124,7 +123,7 @@ def baseline_setup():
     shutil.rmtree(d, True)
 
     if repo:
-        repo.head.reset(commit=current_commit, working_tree=True)
+        repo.head.reset(commit=commit_sha, working_tree=True)
 
 
 # #################### Setup logging ##########################################
@@ -169,6 +168,11 @@ def initialize():
         help='commit sha to be tested'
     )
 
+    parser.add_argument(
+        '--diff-only', dest='diff_only', action='store_true',
+        help='runs analysis on changed files only'
+    )
+
     args, unknown = parser.parse_known_args()
     # #################### Setup Output #######################################
     # set the output format, or use a default if not provided
@@ -186,7 +190,7 @@ def initialize():
 
     if commit_sha:
         c_idx = panther_args.index(commit_sha)
-        panther_args[c_idx-1:c_idx] = []
+        panther_args[c_idx - 1:c_idx + 1] = []
 
     # #################### Check Requirements #################################
     try:
@@ -217,6 +221,12 @@ def initialize():
                   baseline_tmp_file)
         valid = False
 
+    # #################### Scan Mode #######################################
+    diff_only = args.diff_only
+
+    if diff_only:
+        panther_args.remove('--diff-only')
+
     # we must validate -o is not provided, as it will mess up Panther baseline
     if '-o' in panther_args:
         LOG.error("Panther baseline must not be called with the -o option")
@@ -226,8 +236,37 @@ def initialize():
         output_format,
         repo,
         report_fname,
-        commit_sha
-    ) if valid else (None, None, None, None)
+        commit_sha,
+        diff_only
+    ) if valid else (None, None, None, None, None)
+
+
+# #################### Run the panther cli commands ########
+def _run_command(cmd):
+    try:
+        output = subprocess.check_output(cmd)
+    except subprocess.CalledProcessError as e:
+        output = e.output
+        return_code = e.returncode
+    else:
+        return_code = 0
+        output = output.decode('utf-8')  # subprocess returns bytes
+
+    if return_code not in [0, 1]:
+        LOG.error("Error running command: %s\nOutput: %s\n",
+                panther_args, output)
+    return output, return_code
+
+
+# #################### Removes the recursive flag for the --diff-only mode ########
+def _remove_recursive_from_args():
+    if '-r' in panther_args:
+        index = panther_args.index('-r')
+    if '--recursive' in panther_args:
+        index = panther_args.index('--recursive')
+    if index is not None:
+        panther_args[index:index + 2] = []
+    return panther_args
 
 
 if __name__ == '__main__':
