@@ -33,10 +33,13 @@ causing same issues as eval().
 
 """
 
+import logging
 import panther
 from panther.core import test_properties as test
 from panther.core.visitor import Identifier
 from panther.core.visitor import MemberExpression
+
+LOG = logging.getLogger(__name__)
 
 
 def _report(value):
@@ -47,11 +50,9 @@ def _report(value):
 
 
 def _check_global_call(context, function_name):
-
     '''Check whether a global call is made using function_name(...)
     or global.function_name(...).
     '''
-
     callee = context.node.callee
 
     try:
@@ -64,7 +65,7 @@ def _check_global_call(context, function_name):
                     if callee.object.name == 'global':
                         return _report("Use of global.%s(...)" % function_name)
     except Exception as e:
-        print(e)
+        LOG.error(e)
 
 
 @test.test_id('P601')

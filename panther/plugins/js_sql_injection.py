@@ -70,6 +70,7 @@ nature are discovered, an issue is reported.
 
 """
 import json
+import logging
 import panther
 from panther.core import test_properties as test
 from panther.core.visitor import ArrayExpression
@@ -78,6 +79,8 @@ from panther.core.visitor import Literal
 from panther.core.visitor import MemberExpression
 from panther.core.visitor import TemplateElement
 import re
+
+LOG = logging.getLogger(__name__)
 
 
 def _report(value):
@@ -108,7 +111,6 @@ CALL_RE = re.compile(
 
 
 def _extract_string_value(node):
-
     '''Tries to extract a string from a node. Supported types
     are TemplateElement and Literal.
     '''
@@ -131,14 +133,12 @@ def _extract_string_value(node):
 
 
 def _contains_escape(node):
-
     '''Checks whether an expression is escaped.'''
 
     return ('escape' in json.dumps(node.dict()))
 
 
 def _is_dangerous_sql(data):
-
     '''Check whether an SQL string is present for SQL injection.
     If the string includes question marks then do not categorize
     as dangerous.
@@ -153,7 +153,6 @@ def _is_dangerous_sql(data):
 
 
 def _is_dangerous_concatenation(node_list):
-
     '''Checks whether a node list contains both SQL strings and expressions.'''
 
     string_list = []
@@ -201,7 +200,6 @@ def _is_dangerous_concatenation(node_list):
 
 
 def _is_dangerous_call(data):
-
     '''Checks whether a function name is suspicious for string concatenation.'''
 
     return CALL_RE.search(data) is not None
@@ -210,7 +208,6 @@ def _is_dangerous_call(data):
 @test.checks('CallExpression')
 @test.test_id('P602')
 def hardcoded_sql_expressions_merge_function(context):
-
     '''Checks whether an sql query is mixed with an expression using a
     function. It looks for the functions that contains the words
     'join', 'append' or 'concat' and if the callee of a function
@@ -256,13 +253,12 @@ def hardcoded_sql_expressions_merge_function(context):
                 return _report(issue_text)
 
     except Exception as e:
-        print(e)
+        LOG.error(e)
 
 
 @test.checks('BinaryExpression')
 @test.test_id('P602')
 def hardcoded_sql_expressions_with_plus(context):
-
     '''Checks whether an sql query is mixed with an expression
     using a plus operator. It scans for (+) operators that
     combines some strings and if there is concatenation
@@ -286,13 +282,12 @@ def hardcoded_sql_expressions_with_plus(context):
                 return _report(issue_text)
 
     except Exception as e:
-        print(e)
+        LOG.error(e)
 
 
 @test.checks('TemplateLiteral')
 @test.test_id('P602')
 def hardcoded_sql_expressions_with_template_literal(context):
-
     '''Checks whether an sql query is mixed with an expression
     in a template literal. It checks {...} literals inside a
     string and if there is concatenation of a dangerous SQL
@@ -318,13 +313,12 @@ def hardcoded_sql_expressions_with_template_literal(context):
             return _report(issue_text)
 
     except Exception as e:
-        print(e)
+        LOG.error(e)
 
 
 @test.checks('AssignmentExpression')
 @test.test_id('P602')
 def hardcoded_sql_expressions_with_plus_equal(context):
-
     '''Checks whether an sql query is mixed with an expression. It tracks (+=)
     signs and if there is an assignment to a variable using a dangerous SQL string,
     an issue is created.
@@ -349,4 +343,4 @@ def hardcoded_sql_expressions_with_plus_equal(context):
                 return _report(issue_text)
 
     except Exception as e:
-        print(e)
+        LOG.error(e)
