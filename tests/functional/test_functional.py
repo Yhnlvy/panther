@@ -111,7 +111,7 @@ class FunctionalTests(testtools.TestCase):
     def test_eval(self):
         '''Test the `eval` example.'''
         expect = {
-            'SEVERITY': {'UNDEFINED': 0, 'LOW': 1, 'MEDIUM': 0, 'HIGH': 0},
+            'SEVERITY': {'UNDEFINED': 0, 'LOW': 0, 'MEDIUM': 0, 'HIGH': 1},
             'CONFIDENCE': {'UNDEFINED': 0, 'LOW': 0, 'MEDIUM': 1, 'HIGH': 0}
         }
         self.check_example('eval.js', expect)
@@ -140,7 +140,7 @@ class FunctionalTests(testtools.TestCase):
     def test_ignore_skip(self):
         '''Test --ignore-nosec flag.'''
         expect = {
-            'SEVERITY': {'UNDEFINED': 0, 'LOW': 1, 'MEDIUM': 0, 'HIGH': 0},
+            'SEVERITY': {'UNDEFINED': 0, 'LOW': 0, 'MEDIUM': 0, 'HIGH': 1},
             'CONFIDENCE': {'UNDEFINED': 0, 'LOW': 0, 'MEDIUM': 1, 'HIGH': 0}
         }
         self.check_example('nosec.js', expect, ignore_nosec=True)

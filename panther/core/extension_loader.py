@@ -30,8 +30,7 @@ class Manager(object):
         self.formatters_mgr = extension.ExtensionManager(
             namespace=formatters_namespace,
             invoke_on_load=False,
-            verify_requirements=False,
-            )
+            verify_requirements=False)
         self.formatters = list(self.formatters_mgr)
         self.formatter_names = self.formatters_mgr.names()
 
@@ -39,8 +38,7 @@ class Manager(object):
         self.plugins_mgr = extension.ExtensionManager(
             namespace=plugins_namespace,
             invoke_on_load=False,
-            verify_requirements=False,
-            )
+            verify_requirements=False)
 
         def test_has_id(plugin):
             if not hasattr(plugin.plugin, "_test_id"):

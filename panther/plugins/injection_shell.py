@@ -81,8 +81,7 @@ def gen_config(name):
              'os.spawnve',
              'os.spawnvp',
              'os.spawnvpe',
-             'os.startfile']
-            }
+             'os.startfile']}
 
 
 @test.takes_config('shell_injection')
@@ -355,8 +354,7 @@ def any_other_function_with_shell_equals_true(context, config):
                 confidence=panther.LOW,
                 text='Function call with shell=True parameter identified, '
                      'possible security issue.',
-                lineno=context.get_lineno_for_call_arg('shell'),
-                )
+                lineno=context.get_lineno_for_call_arg('shell'))
 
 
 @test.takes_config('shell_injection')

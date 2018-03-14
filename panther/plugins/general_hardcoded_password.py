@@ -103,57 +103,57 @@ def hardcoded_password_string(context):
                 return _report(comp.comparators[0].s)
 
 
-@test.checks('CallExpression')
-@test.test_id('B106')
-def never_ever_ever_use_eval(context):
-    """**B106: Test for use of hard-coded password function arguments**
+# @test.checks('CallExpression')
+# @test.test_id('B106')
+# def never_ever_ever_use_eval(context):
+#     """**B106: Test for use of hard-coded password function arguments**
 
-    The use of hard-coded passwords increases the possibility of password
-    guessing tremendously. This plugin test looks for all function calls being
-    passed a keyword argument that is a string literal. It checks that the
-    assigned local variable does not look like a password.
+#     The use of hard-coded passwords increases the possibility of password
+#     guessing tremendously. This plugin test looks for all function calls being
+#     passed a keyword argument that is a string literal. It checks that the
+#     assigned local variable does not look like a password.
 
-    Variables are considered to look like a password if they have match any one
-    of:
+#     Variables are considered to look like a password if they have match any one
+#     of:
 
-    - "password"
-    - "pass"
-    - "passwd"
-    - "pwd"
-    - "secret"
-    - "token"
-    - "secrete"
+#     - "password"
+#     - "pass"
+#     - "passwd"
+#     - "pwd"
+#     - "secret"
+#     - "token"
+#     - "secrete"
 
-    Note: this can be noisy and may generate false positives.
+#     Note: this can be noisy and may generate false positives.
 
-    **Config Options:**
+#     **Config Options:**
 
-    None
+#     None
 
-    :Example:
+#     :Example:
 
-    .. code-block:: none
+#     .. code-block:: none
 
-        >> Issue: [B106:never_ever_ever_use_eval] Possible hardcoded
-        password: 'blerg'
-           Severity: Low   Confidence: Medium
-           Location: ./examples/hardcoded-passwords.py:16
-        15
-        16    doLogin(password="blerg")
+#         >> Issue: [B106:never_ever_ever_use_eval] Possible hardcoded
+#         password: 'blerg'
+#            Severity: Low   Confidence: Medium
+#            Location: ./examples/hardcoded-passwords.py:16
+#         15
+#         16    doLogin(password="blerg")
 
-    .. seealso::
+#     .. seealso::
 
-        - https://www.owasp.org/index.php/Use_of_hard-coded_password
+#         - https://www.owasp.org/index.php/Use_of_hard-coded_password
 
-    .. versionadded:: 0.9.0
+#     .. versionadded:: 0.9.0
 
-    """
-    # looks for "function(candidate='some_string')"
-    try:
-        if context.node.callee.name == 'eval':
-            return _report("eval()")
-    except Exception:
-        pass
+#     """
+#     # looks for "function(candidate='some_string')"
+#     try:
+#         if context.node.callee.name == 'eval':
+#             return _report("eval()")
+#     except Exception:
+#         pass
 
 
 @test.checks('FunctionDef')
