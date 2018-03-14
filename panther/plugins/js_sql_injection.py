@@ -209,9 +209,9 @@ def _is_dangerous_call(data):
 @test.test_id('P602')
 def hardcoded_sql_expressions_merge_function(context):
     '''Checks whether an sql query is mixed with an expression using a
-    function. It looks for the functions that contains the words
+    function. It looks for the functions that contain the words
     'join', 'append' or 'concat' and if the callee of a function
-    and its arguments contains both dangerous SQL strings and expressions
+    and its arguments contain both dangerous SQL strings and expressions
     an issue is created.
 
     See examples below:
