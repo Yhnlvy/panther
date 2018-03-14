@@ -169,7 +169,7 @@ def _is_dangerous_concatenation(node_list):
         else:
             string_list.append(found_string)
 
-    if len(string_list) == 0:
+    if not string_list:
         # If it only contains expressions we cannot judge whether
         # we are mixing a string and a variable.
 
@@ -178,7 +178,7 @@ def _is_dangerous_concatenation(node_list):
 
         return False
 
-    if len(expression_node_list) == 0:
+    if not expression_node_list:
         # All are strings so there is no mix of expressions and strings.
         return False
 
