@@ -42,14 +42,14 @@ def main():
 
     init_logger()
 
-    output_format, repo, report_fname = initialize()
+    output_format, repo, report_fname, commit_sha = initialize()
 
     if not repo:
         sys.exit(2)
 
     # #################### Find current and parent commits ####################
     try:
-        commit = repo.commit()
+        commit = repo.commit(commit_sha)
         current_commit = commit.hexsha
         LOG.info('Got current commit: [%s]', commit.name_rev)
 
@@ -57,6 +57,9 @@ def main():
         parent_commit = commit.hexsha
         LOG.info('Got parent commit: [%s]', commit.name_rev)
 
+    except git.BadName:
+        LOG.error("Unable to get commit %s", commit_sha)
+        sys.exit(2)
     except git.GitCommandError:
         LOG.error("Unable to get current or parent commit")
         sys.exit(2)
@@ -149,15 +152,24 @@ def initialize():
                'can be added and will be passed to Panther.'
     )
 
-    parser.add_argument('targets', metavar='targets', type=str, nargs='+',
-                        help='source file(s) or directory(s) to be tested')
+    parser.add_argument(
+        'targets', metavar='targets', type=str, nargs='+',
+        help='source file(s) or directory(s) to be tested'
+    )
 
-    parser.add_argument('-f', dest='output_format', action='store',
-                        default='terminal', help='specify output format',
-                        choices=valid_baseline_formats)
+    parser.add_argument(
+        '-f', dest='output_format', action='store',
+        default='terminal', help='specify output format',
+        choices=valid_baseline_formats
+    )
+
+    parser.add_argument(
+        '-c', '--commit', dest='commit_sha',
+        action='store', default=None, type=str,
+        help='commit sha to be tested'
+    )
 
     args, unknown = parser.parse_known_args()
-
     # #################### Setup Output #######################################
     # set the output format, or use a default if not provided
     output_format = (args.output_format if args.output_format
@@ -168,6 +180,13 @@ def initialize():
 
     # set the report name based on the output format
     report_fname = "{}.{}".format(report_basename, output_format)
+
+    # #################### Handle Commit #######################################
+    commit_sha = args.commit_sha
+
+    if commit_sha:
+        c_idx = panther_args.index(commit_sha)
+        panther_args[c_idx-1:c_idx] = []
 
     # #################### Check Requirements #################################
     try:
@@ -203,7 +222,12 @@ def initialize():
         LOG.error("Panther baseline must not be called with the -o option")
         valid = False
 
-    return (output_format, repo, report_fname) if valid else (None, None, None)
+    return (
+        output_format,
+        repo,
+        report_fname,
+        commit_sha
+    ) if valid else (None, None, None, None)
 
 
 if __name__ == '__main__':
