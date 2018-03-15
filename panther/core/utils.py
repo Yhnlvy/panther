@@ -8,6 +8,10 @@ import re
 import sys
 
 from panther.core import visitor
+from panther.core.visitor import CallExpression
+from panther.core.visitor import Identifier
+from panther.core.visitor import Literal
+from panther.core.visitor import MemberExpression
 
 try:
     import configparser
@@ -332,3 +336,88 @@ def clean_code(buffer):
     Example: #!/usr/bin/env node
     '''
     return re.sub(r'^#!([^\r\n]+)', '', buffer)
+
+
+def _extract_name(node, disable_conversion = False):
+    '''Tries to extract the name from a node.
+    If disable_conversion is True it does not resolve
+    the name.
+    '''
+
+    found_name = None
+
+    if isinstance(node, Identifier) and not disable_conversion:
+        found_name = '*' + node.name
+    elif isinstance(node, Literal) and not disable_conversion:
+        found_name = '*' + str(node.value)
+    else:
+        found_name = '?' + node.__class__.__name__
+
+    return found_name
+
+def extract_name_space(call_expression):
+    '''
+        Extracts a name space from a call expression.
+        Returns an array of names where each name starts
+        with '*' if it can be resolved '?' otherwise.
+
+        Example: returns ['*x','?Identifier','?MemberExpression'] for x.Identifier.MemberExpression 
+
+        Handles cases below:
+
+            x() => x
+            x.y.z() => x.y.z
+            x[y][z]() => x.Identifier.Identifier
+            x[y][z.j]() => x.Identifier.MemberExpression
+            x['y'][3]() => x.y.3
+            x['y'][3+2]() => x.y.BinaryExpression
+            x[y()][z()]() => x.CallExpression.CallExpression
+            [].x() => ArrayExpression.x
+            []['x']() => ArrayExpression.x
+            [][x]() => ArrayExpression.Identifier
+            ''.x() => Literal.x
+            ''['x']() => Literal.x
+            ''[x]() => Literal.Identifier
+            fn()() => CallExpression
+            (x=2)() => AssignmentExpression
+            Identifier.Identifier() => Identifier.Identifier
+    '''
+
+    if not isinstance(call_expression, CallExpression):
+        raise Exception('Please supply a call expression.')
+    
+    name_space = []
+    callee = call_expression.callee
+
+    # If it is a member expression recursively evaluate the expression.
+
+    if isinstance(callee, MemberExpression):
+
+        def read_property(callee):
+            '''Reads the property of callee and extracts the name.'''
+            prop_node = callee.property
+
+            # SPECIAL CASE: (x[y][z]() => x.Identifier.Identifier)
+            # For above case to work we should disable conversion.
+            # If not engine gives x.y.z which we do not want.
+        
+            disable_conversion = callee.computed and isinstance(prop_node, Identifier)
+            return _extract_name(prop_node, disable_conversion)
+        
+        # Recursively evaluate expressions
+        name_space.insert(0, read_property(callee))
+        callee = callee.object
+        while isinstance(callee, MemberExpression):
+            name_space.insert(0, read_property(callee))
+            callee = callee.object
+
+        # SPECIAL CASE: (''.x() => Literal.x)
+        # For above case to work we should disable conversion.
+        # If not engine gives .x which we do not want.
+        disable_conversion = isinstance(callee, Literal)
+        name_space.insert(0, _extract_name(callee, disable_conversion))
+
+        return name_space
+    else:
+        return [_extract_name(callee)]
+

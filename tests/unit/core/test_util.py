@@ -20,11 +20,11 @@ import os
 import shutil
 import sys
 import tempfile
-
 import testtools
 
+from panther.core.pyesprima import esprima
 from panther.core import utils as p_utils
-
+from panther.core import visitor
 
 def _touch(path):
     '''Create an empty file at ``path``.'''
@@ -280,3 +280,32 @@ class UtilTests(testtools.TestCase):
 
                 self.assertEqual(p_utils.parse_ini_file(t.name),
                                  test['expected'])
+    
+    def test_extract_name_space(self):
+
+        def test_name_space(code, name_list):
+            json_program = esprima.parse(code)
+            ast_program =  visitor.objectify(json_program.to_dict())
+
+            call_expression = ast_program.body[0].expression
+            name_space = p_utils.extract_name_space(call_expression)
+            self.assertSequenceEqual(name_space, name_list)
+        
+        test_name_space('x()',['*x'])
+        test_name_space('x.y.z()',['*x','*y','*z'])
+        test_name_space('x[y][z]()',['*x', '?Identifier', '?Identifier'])
+        test_name_space('x[y][z.j]() ',['*x','?Identifier','?MemberExpression'])
+        test_name_space("x['y'][3]()",['*x','*y','*3'])
+        test_name_space("x['y'][3+2]()",['*x','*y','?BinaryExpression'])
+        test_name_space('x[y()][z()]()',['*x','?CallExpression','?CallExpression'])
+        test_name_space('[].x()',['?ArrayExpression','*x'])
+        test_name_space("[]['x']()",['?ArrayExpression','*x'])
+        test_name_space('[][x]() ',['?ArrayExpression','?Identifier'])
+        test_name_space("''.x()",['?Literal','*x'])
+        test_name_space("''['x']()",['?Literal','*x'])
+        test_name_space("''[x]()",['?Literal','?Identifier'])
+        test_name_space("fn()()",['?CallExpression'])
+        test_name_space("(x=1)()",['?AssignmentExpression'])
+        test_name_space("Identifier.Identifier()",['*Identifier','*Identifier'])
+
+        
