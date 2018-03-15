@@ -13,29 +13,14 @@ it generates a report.
 
 Installation
 ------------
-Panther is distributed on PyPI. The best way to install it is with pip:
-
-
-Create a virtual environment (optional)::
-
-    virtualenv panther-env
 
 Install Panther::
-
-    pip install panther
-    # Or if you're working with a Python 3.5 project
-    pip3.5 install panther
+    git clone https://github.com/Yhnlvy/panther.git && cd panther
+    python3 setup.py install
 
 Run Panther::
 
     panther -r path/to/your/code
-
-
-Panther can also be installed from source. To do so, download the source tarball
-from PyPI, then install it::
-
-    python setup.py install
-
 
 Usage
 -----
@@ -147,6 +132,33 @@ Usage::
 
       P601  server_side_injection
       P602  sql_injection
+
+
+Baseline Usage
+-----
+Example usage across a code tree::
+
+    panther-baseline -r app --diff-only --commit 6ce647fd
+
+Usage::
+
+    $ panther-baseline -h
+    usage: panther-baseline [-h] [-f {txt,html,json}] [--commit COMMIT_SHA]
+                        [--diff-only]
+                        targets [targets ...]
+
+    Panther Baseline - Generates Panther results compared to a baseline
+
+    positional arguments:
+    targets               source file(s) or directory(s) to be tested
+
+    optional arguments:
+    -h, --help            show this help message and exit
+    -f {txt,html,json}    specify output format
+    --commit COMMIT_SHA   commit sha to be tested
+    --diff-only           run analysis on changed files only
+
+    Additional Panther arguments such as severity filtering (-ll) can be added and will be passed to Panther.
 
 Configuration
 -------------
@@ -289,5 +301,5 @@ Contributing
 You can test any changes with tox::
 
     pip install tox
-    tox -e debug
+    tox -e tests
     tox -e pep8

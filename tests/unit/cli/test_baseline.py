@@ -197,7 +197,7 @@ class PantherBaselineToolTests(testtools.TestCase):
         return_value = baseline.initialize()
 
         # assert panther did not run due to no git repo
-        self.assertEqual((None, None, None), return_value)
+        self.assertEqual((None, None, None, None, None), return_value)
 
     def test_initialize_git_command_failure(self):
         # Test that panther does not run when the Git command fails
@@ -218,7 +218,7 @@ class PantherBaselineToolTests(testtools.TestCase):
             return_value = baseline.initialize()
 
             # assert panther did not run due to git command failure
-            self.assertEqual((None, None, None), return_value)
+            self.assertEqual((None, None, None, None, None), return_value)
 
     def test_initialize_dirty_repo(self):
         # Test that panther does not run when the current git repository is
@@ -236,7 +236,7 @@ class PantherBaselineToolTests(testtools.TestCase):
         return_value = baseline.initialize()
 
         # assert panther did not run due to dirty repo
-        self.assertEqual((None, None, None), return_value)
+        self.assertEqual((None, None, None, None, None), return_value)
 
     @mock.patch('sys.argv', ['panther', '-f', 'txt', 'test'])
     def test_initialize_existing_report_file(self):
@@ -256,7 +256,7 @@ class PantherBaselineToolTests(testtools.TestCase):
         return_value = baseline.initialize()
 
         # assert panther did not run due to existing report file
-        self.assertEqual((None, None, None), return_value)
+        self.assertEqual((None, None, None, None, None), return_value)
 
     @mock.patch('panther.cli.baseline.panther_args', ['-o',
                 'panther_baseline_result'])
@@ -271,7 +271,7 @@ class PantherBaselineToolTests(testtools.TestCase):
         return_value = baseline.initialize()
 
         # assert panther did not run due to provided -o (--ouput) argument
-        self.assertEqual((None, None, None), return_value)
+        self.assertEqual((None, None, None, None, None), return_value)
 
     def test_initialize_existing_temp_file(self):
         # Test that panther does not run when the temporary output file exists
@@ -289,4 +289,4 @@ class PantherBaselineToolTests(testtools.TestCase):
         return_value = baseline.initialize()
 
         # assert panther did not run due to existing temporary report file
-        self.assertEqual((None, None, None), return_value)
+        self.assertEqual((None, None, None, None, None), return_value)
