@@ -34,6 +34,7 @@ def main():
     # our cleanup function needs this and can't be passed arguments
     global commit_sha
     global repo
+    global panther_args
 
     parent_commit_sha = None
     output_format = None
@@ -83,18 +84,18 @@ def main():
 
         panther_command = ['panther'] + changed_files + panther_args + output_type
         output, return_code = _run_command(panther_command)
-    else:                   
+    else:
         with baseline_setup() as t:
 
             panther_tmpfile = "{}/{}".format(t, baseline_tmp_file)
 
             steps = [{'message': 'Getting Panther baseline results',
-                    'commit_sha': parent_commit_sha,
-                    'args': panther_args + ['-f', 'json', '-o', panther_tmpfile]},
+                      'commit_sha': parent_commit_sha,
+                      'args': panther_args + ['-f', 'json', '-o', panther_tmpfile]},
 
-                    {'message': 'Comparing Panther results to baseline',
-                    'commit_sha': commit_sha,
-                    'args': panther_args + ['-b', panther_tmpfile] + output_type}]
+                     {'message': 'Comparing Panther results to baseline',
+                      'commit_sha': commit_sha,
+                      'args': panther_args + ['-b', panther_tmpfile] + output_type}]
 
             return_code = None
 
@@ -163,7 +164,7 @@ def initialize():
     )
 
     parser.add_argument(
-        '-c', '--commit', dest='commit_sha',
+        '--commit', dest='commit_sha',
         action='store', default=None, type=str,
         help='commit sha to be tested'
     )
@@ -254,7 +255,7 @@ def _run_command(cmd):
 
     if return_code not in [0, 1]:
         LOG.error("Error running command: %s\nOutput: %s\n",
-                panther_args, output)
+                  panther_args, output)
     return output, return_code
 
 
