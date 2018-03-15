@@ -1,5 +1,5 @@
 Panther
-======
+=======
 
 .. image:: https://circleci.com/gh/Yhnlvy/panther.svg?style=svg
     :target: https://circleci.com/gh/Yhnlvy/panther
@@ -15,6 +15,7 @@ Installation
 ------------
 
 Install Panther::
+
     git clone https://github.com/Yhnlvy/panther.git && cd panther
     python3 setup.py install
 
@@ -31,17 +32,17 @@ Example usage across a code tree::
 Example usage across the ``examples/`` directory, showing three lines of
 context and only reporting on the high-severity issues::
 
-    panther examples/*.py -n 3 -lll
+    panther examples/*.js -n 3 -lll
 
 Panther can be run with profiles. To run Panther against the examples directory
 using only the plugins listed in the ``ShellInjection`` profile::
 
-    panther examples/*.py -p ShellInjection
+    panther examples/*.js -p ShellInjection
 
 Panther also supports passing lines of code to scan using standard input. To
 run Panther with standard input::
 
-    cat examples/imports.py | panther -
+    cat examples/sql_injection.js | panther -
 
 Usage::
 
@@ -135,10 +136,10 @@ Usage::
 
 
 Baseline Usage
------
+--------------
 Example usage across a code tree::
 
-    panther-baseline -r app --diff-only --commit 6ce647fd
+    panther-baseline -r app/ --diff-only --commit 6ce647fd
 
 Usage::
 
@@ -197,13 +198,13 @@ Exclusions
 ----------
 In the event that a line of code triggers a Panther issue, but that the line
 has been reviewed and the issue is a false positive or acceptable for some
-other reason, the line can be marked with a ``# nosec`` and any results
+other reason, the line can be marked with a ``// nosec`` and any results
 associated with it will not be reported.
 
 For example, although this line may cause Panther to report a potential
 security issue, it will not be reported::
 
-    self.process = subprocess.Popen('/bin/echo', shell=True)  # nosec
+    var cmd = eval(user_input)  // nosec
 
 
 Vulnerability Tests
@@ -229,9 +230,10 @@ To write a test:
    examples/ that contains one or more cases of that vulnerability.
  - Consider the vulnerability you're testing for, mark the function with one
    or more of the appropriate decorators:
-   - @checks('Call')
-   - @checks('Import', 'ImportFrom')
-   - @checks('Str')
+
+   - @test.checks('CallExpression')
+   - @test.checks('TemplateLiteral')
+   - @test.checks('BinaryExpression')
  - Create a new Python source file to contain your test, you can reference
    existing tests for examples.
  - The function that you create should take a parameter "context" which is
@@ -246,7 +248,7 @@ To write a test:
 
 
 Extending Panther
-----------------
+-----------------
 
 Panther allows users to write and register extensions for checks and formatters.
 Panther will load plugins from two entry-points:
@@ -261,19 +263,22 @@ Formatters need to accept 4 things:
 - `scores`: The scores awarded to each file in the scope
 - `excluded_files`: The list of files that were excluded from the scope
 
-Plugins tend to take advantage of the `panther.checks` decorator which allows
+Plugins tend to take advantage of the `test.checks` decorator which allows
 the author to register a check for a particular type of AST node. For example
 
 ::
 
-    @panther.checks('Call')
-    def prohibit_unsafe_deserialization(context):
-        if 'unsafe_load' in context.call_function_name_qual:
-            return panther.Issue(
-                severity=panther.HIGH,
-                confidence=panther.HIGH,
-                text="Unsafe deserialization detected."
-            )
+    @test.checks('CallExpression')		
+    def eval_used(context):		
+        """Detect the use of eval"""		
+        try:		
+            if context.node.callee.name == 'eval':		
+                return panther.Issue(		
+                    severity=panther.LOW,		
+                    confidence=panther.MEDIUM,		
+                    text=("How dare you? eval()? Really?: '%s'" % value))		
+        except Exception:		
+            pass
 
 To register your plugin, you have two options:
 
@@ -291,15 +296,23 @@ To register your plugin, you have two options:
 
         [entry_points]
         panther.formatters =
-            bson = panther_bson:formatter
+            html = panther.formatters.html:report
         panther.plugins =
-            mako = panther_mako
+            eval_used = panther.plugins.js_server_side_injection:eval_used
 
-Contributing
-------------
+Code quality (tests & PEP8 compliance)
+--------------------------------------
 
 You can test any changes with tox::
 
     pip install tox
     tox -e tests
     tox -e pep8
+
+Credits
+-------
+
+    - `Bandit <https://github.com/openstack/bandit>`_ (OpenStack) 
+    - `PyEsprima <https://github.com/PiotrDabkowski/Js2Py/blob/master/examples/pyesprima.py>`_ (Js2Py, PiotrDabkowski)
+    - `Esprima AST Visitor <https://github.com/austinbyers/esprima-ast-visitor/blob/master/visitor.py>`_ (austinbyers) 
+    - `Esprima <https://github.com/jquery/esprima>`_ (jQuery) 
