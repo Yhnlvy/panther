@@ -57,7 +57,7 @@ class Metrics(object):
         multi_comment = False
         for line in lines:
             tmp = line.strip()
-            multi_comment = ('/*' in tmp) or multi_comment
+            multi_comment = tmp.startswith('/*') or multi_comment
             if bool(tmp) and not tmp.startswith('//') and not multi_comment:
                 n_loc += 1
             multi_comment = multi_comment and not ('*/' in tmp)
