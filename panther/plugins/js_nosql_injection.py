@@ -141,7 +141,7 @@ def dollar_where_used(context):
                                severity=panther.HIGH, confidence=panther.MEDIUM)
 
     except Exception as e:
-        LOG.error(e)
+        LOG.debug(e)
 
 
 @test.checks('CallExpression')
@@ -219,7 +219,7 @@ def group_used(context):
                                severity=panther.HIGH, confidence=panther.MEDIUM)
 
     except Exception as e:
-        LOG.error(e)
+        LOG.debug(e)
 
 
 @test.checks('CallExpression')
@@ -292,4 +292,4 @@ def map_reduce_used(context):
                                severity=panther.MEDIUM, confidence=panther.LOW)
 
     except Exception as e:
-        LOG.error(e)
+        LOG.debug(e)
