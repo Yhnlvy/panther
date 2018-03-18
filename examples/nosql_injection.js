@@ -1,21 +1,6 @@
-// #region hardcoded_sql_expressions_with_plus 
+// #region dollar_where_used 
 
-// var dangerous_with_plus_mixed_identifier_literal = 'SELECT Id FROM ' + query + 'WHERE Id = 6';
-
-// var dangerous_with_plus_mixed_expression_literal = 'SELECT Id FROM ' + query['key'];
-
-// var dangerous_with_plus_mixed_complex_literal = '' + ('SELECT Id FROM ' + query)
-
-// var dangerous_with_plus_a_string_and_a_number = "SELECT Id FROM MyTable WHERE Id = " + 2
-
-// var safe_with_plus_mixed_expression_literal_escape = "SELECT * FROM MyTable WHERE Id = " + connection.escape(id);
-
-// var safe_with_plus_two_literal = 'SELECT Id FROM MyTable' + ' WHERE Id = 5'
-
-// #endregion
-
-
-// db.collection.find({ $where : function | string })
+// Pattern: db.collection.find({ $where : function | string })
 
 db.collection.find({
     active: true,
@@ -24,7 +9,11 @@ db.collection.find({
     }
 });
 
-// db.runCommand({mapReduce: {}})
+// #endregion
+
+// #region map_reduce_used 
+
+// Pattern: db.runCommand({mapReduce: {}})
 
 db.runCommand({
     mapReduce: collection,
@@ -42,7 +31,7 @@ db.runCommand({
     collation: document
 });
 
-// db.collection.mapReduce()
+// Pattern: db.collection.mapReduce(...)
 
 db.collection.mapReduce(mapFn,
     reduceFn, {
@@ -58,7 +47,10 @@ db.collection.mapReduce(mapFn,
     }
 )
 
-// db.runCommand({group: {}})
+// #endregion
+
+// #region group_used
+// Pattern: db.runCommand({group: {}})
 
 db.runCommand({
     group: {
@@ -77,7 +69,7 @@ db.runCommand({
     }
 });
 
-// db.collection.group()
+// Pattern: db.collection.group(...)
 
 db.collection.group({
     key: {
@@ -95,7 +87,8 @@ db.collection.group({
     initial: {
         total: 0
     }
-})
+});
+// #endregion
 
 
 
