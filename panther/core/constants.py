@@ -23,6 +23,9 @@ NODE_MODULES = 'node_modules'
 # default plugin name pattern
 plugin_name_pattern = '*.py'
 
+# hard coded test id for nsp vulnerability
+NSP_TEST_ID = 'NSP'
+
 # default progress increment
 progress_increment = 50
 

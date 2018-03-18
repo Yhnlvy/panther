@@ -12,6 +12,7 @@ import panther
 from panther.core import config as p_config
 from panther.core import constants
 from panther.core import manager as p_manager
+from panther.core import nsp_manager as n_manager
 from panther.core import utils
 
 
@@ -236,6 +237,10 @@ def main():
         '--version', action='version',
         version='%(prog)s {version}'.format(version=panther.__version__)
     )
+    parser.add_argument(
+        '--nsp', dest='nsp', action='store_true',
+        help='scan the package.json to find vulnerable dependencies'
+    )
     parser.set_defaults(debug=False)
     parser.set_defaults(verbose=False)
     parser.set_defaults(ignore_nosec=False)
@@ -362,6 +367,11 @@ def main():
     p_mgr.run_tests()
     LOG.debug(p_mgr.p_ma)
     LOG.debug(p_mgr.metrics)
+
+    # initiate execution of tests within Nsp Manager
+    if args.nsp:
+        nsp_mgr = n_manager.NspManager(results=p_mgr.results)
+        nsp_mgr.update_issues()
 
     # trigger output of results by Panther Manager
     sev_level = constants.RANKING[args.severity - 1]
