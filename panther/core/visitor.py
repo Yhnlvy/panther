@@ -298,7 +298,7 @@ class MethodDefinition(Node):
 class Property(Node):
     @property
     def fields(self):
-        return ['key', 'value', 'kind', 'shorthand','computed']
+        return ['key', 'value', 'kind', 'shorthand', 'computed']
 
 
 class MetaProperty(Node):

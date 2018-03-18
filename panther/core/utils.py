@@ -100,6 +100,7 @@ class InvalidModulePath(Exception):
 
 class ConfigError(Exception):
     """Raised when the config file fails validation."""
+
     def __init__(self, message, config_file):
         self.config_file = config_file
         self.message = "{0} : {1}".format(config_file, message)
@@ -108,6 +109,7 @@ class ConfigError(Exception):
 
 class ProfileNotFound(Exception):
     """Raised when chosen profile cannot be found."""
+
     def __init__(self, config_file, profile):
         self.config_file = config_file
         self.profile = profile
@@ -339,10 +341,14 @@ def clean_code(buffer):
     return re.sub(r'^#!([^\r\n]+)', '', buffer)
 
 
-def extract_name(node, disable_conversion = False):
+def extract_name(node, disable_conversion=False):
     '''Tries to extract the name from a node.
     If disable_conversion is True it does not resolve
-    the name.
+    the name. If a value is extracted it contains '*'
+    sign at the start then the extracted value itself.
+    If it cannot be extracted then the first character
+    becomes '?' and the remaining part becomes the name of
+    the class.
     '''
 
     found_name = None
@@ -356,13 +362,13 @@ def extract_name(node, disable_conversion = False):
 
     return found_name
 
+
 def extract_name_space(call_expression):
-    '''
-        Extracts a name space from a call expression.
+    ''''Extracts a name space from a call expression.
         Returns an array of names where each name starts
         with '*' if it can be resolved '?' otherwise.
 
-        Example: returns ['*x','?Identifier','?MemberExpression'] for x.Identifier.MemberExpression 
+        Example: returns ['*x','?Identifier','?MemberExpression'] for x.Identifier.MemberExpression
 
         Handles cases below:
 
@@ -386,7 +392,7 @@ def extract_name_space(call_expression):
 
     if not isinstance(call_expression, CallExpression):
         raise Exception('Please supply a call expression.')
-    
+
     name_space = []
     callee = call_expression.callee
 
@@ -401,10 +407,11 @@ def extract_name_space(call_expression):
             # SPECIAL CASE: (x[y][z]() => x.Identifier.Identifier)
             # For above case to work we should disable conversion.
             # If not engine gives x.y.z which we do not want.
-        
-            disable_conversion = callee.computed and isinstance(prop_node, Identifier)
+
+            disable_conversion = callee.computed and isinstance(
+                prop_node, Identifier)
             return extract_name(prop_node, disable_conversion)
-        
+
         # Recursively evaluate expressions
         name_space.insert(0, read_property(callee))
         callee = callee.object
@@ -422,37 +429,97 @@ def extract_name_space(call_expression):
     else:
         return [extract_name(callee)]
 
-def match_pattern(name, pattern):
 
+def match_pattern(name, pattern):
+    '''This is a helper function for matching
+    patterns in a name space search. So if a '*' is
+    passed as a parameter it checks whether a name
+    is a resolved name. If '*{name}' is given it looks
+    for an exact match. Similarly if a '?' is
+    passed as a parameter it checks whether a name
+    is not a resolved name. If '?{name}' is given it looks
+    for an exact match.
+    '''
     pattern_len = len(pattern)
+
+    # Check whether they are both question mark or star
     if pattern_len == 1 and name[0] != pattern[0]:
         return False
 
+    # Check for an exact match
     if pattern_len > 1 and name != pattern:
         return False
-    
+
     return True
 
+
 def match_name_space(call_expression, pattern_list):
+    '''Gets a pattern array and a function then searches for the specific
+    pattern in the function. If it finds it returns True.
+
+    Examples of pattern_list:
+
+    1) ['*db', '*', 'find']
+
+    Matches => db.mytable.find(...) since namespace is db.mytable.find
+
+    2) ['*x', '?', '?Identifier']
+
+    Matches => x[y][z](...) since namespace is x.Identifier.Identifier
+
+    3) ['*','?','?']
+
+    Matches => x[y][z.j](...) since namespace is x.Identifier.MemberExpression
+
+    '''
+
     name_space_list = extract_name_space(call_expression)
 
-    if len(pattern_list) == 0 or len(name_space_list)!= len(pattern_list):
+    # If pattern_list contains no element or there is
+    # length mismatch return False.
+    if not pattern_list or len(name_space_list) != len(pattern_list):
         return False
-    
+
+    # If there is any mismatch in the pattern arrays then
+    # return False.
     for name, pattern in zip(name_space_list, pattern_list):
         if not match_pattern(name, pattern):
             return False
 
     return True
 
+
 def match_argument_with_object_key(call_expression, pattern_key):
+    ''''It checks whether a call expression has one argument and
+        this argument is an object and has a specific pattern of
+        key. (pattern_key)
+
+        pattern_key can either start with a question mark or a star.
+
+        For more information see the test functions.
+    '''
     node = call_expression
+
+    # Check whether there is only one argument and it is an object.
     if len(node.arguments) == 1 and isinstance(node.arguments[0], ObjectExpression):
         object_expression = node.arguments[0]
+
+        # Loop over each property if there is match in the name return True.
         for prop in object_expression.properties:
-            disable_conversion = prop.computed and isinstance(prop.key, Identifier)
+            # If the property is computed and the type is identifier
+            # we cannot know the name. So in that case disable conversion.
+            #
+            # Example:
+            #   var o = {[prop]: 'hey'};
+            #
+            # *prop should not match the above statement but ?Identifier
+            # should match.
+
+            disable_conversion = prop.computed and isinstance(
+                prop.key, Identifier)
+
             name = extract_name(prop.key, disable_conversion)
             if match_pattern(name, pattern_key):
                 return True
 
-    return False          
+    return False

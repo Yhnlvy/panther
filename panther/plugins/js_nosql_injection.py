@@ -8,81 +8,101 @@ P603: Test for NoSQL injection
 All of the following MongoDB operations permit you to run arbitrary JavaScript
 expressions directly on the server:
 
-1) $where (Operators > Query and Projection Operators > Evaluation Query Operators > $where) (Suggest using $expr) https://docs.mongodb.com/manual/reference/operator/query/where/#op._S_where
-2) mapReduce (Database Commands > Aggregation Commands > mapReduce | mongo Shell Methods > Collection Methods > db.collection.mapReduce() ) LOW
-3) group (Database Commands > Aggregation Commands > group | mongo Shell Methods > Collection Methods > db.collection.group() ) 
+1) $where
+--------------
+Reference: https://docs.mongodb.com/manual/reference/operator/query/where/#op._S_where
+Category: Operators > Query and Projection Operators > Evaluation Query Operators > $where
 
-Deprecated since version 3.4: Mongodb 3.4 deprecates the group command. Use db.collection.aggregate() with the $group stage or db.collection.mapReduce() instead.
+2) mapReduce
+--------------
+Reference: https://docs.mongodb.com/manual/reference/method/db.collection.mapReduce/
+Category: mongo Shell Methods > Collection Methods > db.collection.mapReduce()
+
+Reference 2: https://docs.mongodb.com/manual/reference/command/mapReduce/#dbcmd.mapReduce
+Category 2: Database Commands > Aggregation Commands > mapReduce
+
+3) group
+--------------
+Reference: https://docs.mongodb.com/manual/reference/method/db.collection.group/
+Category: mongo Shell Methods > Collection Methods > db.collection.group()
+
+Reference 2: https://docs.mongodb.com/manual/reference/command/group/
+Category 2: Database Commands > Aggregation Commands > group
 
 These methods can be really convenient, but they pose a huge security risk to
 your database integrity if your application does not sanitize and escape user-provided
 values properly, as proven by many reports of NoSQL injection attacks.
 
 
-
 :Example:
 
-    >> Issue: [P602:hardcoded_sql_expressions_merge_function]
-    Possible SQL injection vector through string-based query construction:
-    'Concatenation of an SQL statement using a function.'
+    >> Issue: [P603:dollar_where_used] Possible NoSQL script injection vector:
+    '$where condition detected while querying. Please use $expr instead.'
     Severity: High   Confidence: Medium
-    Location: examples/sql_injection.js:7
-    6
-    7	var dangerous_merge_function_caller_member_expression = x.y.z.concat('SELECT Id FROM ', b);
-    8
-    9	var dangerous_merge_function_mixed_arguments = a.concat('SELECT Id FROM ', b);
+    Location: examples/nosql_injection.js:20
+    19
+    20	db.collection.find({
+    21	    active: true,
+    22	    $where: function() {
 
---------------------------------------------------
+    --------------------------------------------------
+    >> Issue: [P603:map_reduce_used] Possible NoSQL script injection vector:
+    'Map reduce detected using run command. Please be aware of the security risks of using "mapReduce".'
+    Severity: Medium   Confidence: Low
+    Location: examples/nosql_injection.js:29
+    28
+    29	db.runCommand({
+    30	    mapReduce: collection,
+    31	    map: mapFn,
 
-    >> Issue: [P602:hardcoded_sql_expressions_with_plus]
-    Possible SQL injection vector through string-based query construction:
-    'Concatenation with an SQL statement and an expression using (+).'
+    --------------------------------------------------
+    >> Issue: [P603:map_reduce_used] Possible NoSQL script injection vector:
+    'Map reduce command detected while querying a collection.
+    Please be aware of the security risks of using "mapReduce".'
+    Severity: Medium   Confidence: Low
+    Location: examples/nosql_injection.js:47
+    46
+    47	db.collection.mapReduce(mapFn,
+    48	    reduceFn, {
+    49	        out: {
+
+    --------------------------------------------------
+    >> Issue: [P603:group_used] Possible NoSQL script injection vector:
+    'Grouping detected using run command. Mongodb 3.4 deprecates the group command.
+    Please use db.collection.aggregate() with the $group stage or db.collection.mapReduce() instead.'
     Severity: High   Confidence: Medium
-    Location: examples/sql_injection.js:19
-    18
-    19	var dangerous_with_plus_mixed_identifier_literal = 'SELECT Id FROM ' + query + 'WHERE Id = 6'; #noqa
-    20
-    21	var dangerous_with_plus_mixed_expression_literal = 'SELECT Id FROM ' + query['key']; #noqa
+    Location: examples/nosql_injection.js:63
+    62
+    63	db.runCommand({
+    64	    group: {
+    65	        ns: 'orders',
 
---------------------------------------------------
-
-    >> Issue: [P602:hardcoded_sql_expressions_with_template_literal]
-    Possible SQL injection vector through string-based query construction:
-    'Concatenation with an SQL statement using a template literal.'
+    --------------------------------------------------
+    >> Issue: [P603:group_used] Possible NoSQL script injection vector:
+    'Group command detected while querying a collection. Mongodb 3.4 deprecates the group command.
+    Please use db.collection.aggregate() with the $group stage or db.collection.mapReduce() instead.'
     Severity: High   Confidence: Medium
-    Location: examples/sql_injection.js:35
-    34
-    35	var dangerous_with_template_literal_function  = `SELECT Id FROM MyTable WHERE Id = ${expression()}`;
-    36
-    37	var dangerous_with_template_literal_expression  = `SELECT Id FROM MyTable WHERE Id = ${a() + 2 + 4}`;
-
---------------------------------------------------
-
-    >> Issue: [P602:hardcoded_sql_expressions_with_plus_equal]
-    Possible SQL injection vector through string-based query construction:
-    'Concatenation with an SQL statement and an expression using (+=)'
-    Severity: High   Confidence: Medium
-    Location: examples/sql_injection.js:44
-    43	var dangerous_with_plus_equal_identifier  = ''
-    44	dangerous_with_plus_equal_identifier += 'SELECT Id FROM '
-    45	dangerous_with_plus_equal_identifier += 'MyTable WHERE Id = '
-    46	dangerous_with_plus_equal_identifier += '232'
+    Location: examples/nosql_injection.js:82
+    81
+    82	db.collection.group({
+    83	    key: {
+    84	        ord_dt: 1,
 
 """
 
 import logging
 import panther
 from panther.core import test_properties as test
-from panther.core.utils import utils
+from panther.core import utils
 
 LOG = logging.getLogger(__name__)
 
 
-def _report(value, confidence):
+def _report(value, severity, confidence):
     issue_text = "Possible NoSQL script injection vector: '%s'"
 
     return panther.Issue(
-        severity=panther.HIGH,
+        severity=severity,
         confidence=confidence,
         text=(issue_text % value)
     )
@@ -114,10 +134,11 @@ def dollar_where_used(context):
 
         if is_name_space_matched:
             is_argument_key_matched = utils.match_argument_with_object_key(
-                node,  '*$where')
+                node, '*$where')
 
             if is_argument_key_matched:
-                return _report('$where condition detected while querying. Please use $expr instead.', panther.MEDIUM)
+                return _report('$where condition detected while querying. Please use $expr instead.',
+                               severity=panther.HIGH, confidence=panther.MEDIUM)
 
     except Exception as e:
         LOG.error(e)
@@ -174,7 +195,8 @@ def group_used(context):
     '''
 
     try:
-        deprecation_text = 'Mongodb 3.4 deprecates the group command. Please use db.collection.aggregate() with the $group stage or db.collection.mapReduce() instead.'
+        deprecation_text = 'Mongodb 3.4 deprecates the group command. Please use db.collection.aggregate()\
+        with the $group stage or db.collection.mapReduce() instead.'
 
         node = context.node
 
@@ -182,7 +204,8 @@ def group_used(context):
             node, ['*db', '*', '*group'])
 
         if is_name_space_matched:
-            return _report('Group command detected while querying a collection. ' + deprecation_text, panther.MEDIUM)
+            return _report('Group command detected while querying a collection. ' + deprecation_text,
+                           severity=panther.HIGH, confidence=panther.MEDIUM)
 
         is_name_space_matched = utils.match_name_space(
             node, ['*db', '*runCommand'])
@@ -192,7 +215,8 @@ def group_used(context):
                 node, '*group')
 
             if is_argument_key_matched:
-                return _report('Grouping detected using run command. ' + deprecation_text, panther.MEDIUM)
+                return _report('Grouping detected using run command. ' + deprecation_text,
+                               severity=panther.HIGH, confidence=panther.MEDIUM)
 
     except Exception as e:
         LOG.error(e)
@@ -253,7 +277,8 @@ def map_reduce_used(context):
             node, ['*db', '*', '*mapReduce'])
 
         if is_name_space_matched:
-            return _report('Map reduce command detected while querying a collection. ' + warning_text, panther.LOW)
+            return _report('Map reduce command detected while querying a collection. ' + warning_text,
+                           severity=panther.MEDIUM, confidence=panther.LOW)
 
         is_name_space_matched = utils.match_name_space(
             node, ['*db', '*runCommand'])
@@ -263,7 +288,8 @@ def map_reduce_used(context):
                 node, '*mapReduce')
 
             if is_argument_key_matched:
-                return _report('Map reduce detected using run command. ' + warning_text, panther.LOW)
+                return _report('Map reduce detected using run command. ' + warning_text,
+                               severity=panther.MEDIUM, confidence=panther.LOW)
 
     except Exception as e:
         LOG.error(e)
