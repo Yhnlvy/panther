@@ -349,13 +349,10 @@ class UtilTests(testtools.TestCase):
         self.assertTrue(test_argument('x({my_key:value})','*my_key'))
         self.assertTrue(test_argument('x.y.z({"my_key":value})','*my_key'))
         self.assertTrue(test_argument('x[y][z.j]({"my_key":value})','*my_key'))
-        
-        # No way to access prop.computed when fixed uncomment lines below.
-        # self.assertTrue(test_argument("x[y][z.j]({my_key:{[prop]: 'hey',['b' + 'ar']: 'there'}})",'?Identifier'))
-        # self.assertTrue(test_argument("x[y][z.j]({my_key:{[prop]: 'hey',['b' + 'ar']: 'there'}})",'?'))
-
+        self.assertTrue(test_argument("x[y][z.j]({[prop]: 'hey',['b' + 'ar']: 'there'})",'?Identifier'))
+        self.assertTrue(test_argument("x[y][z.j]({[prop]: 'hey',['b' + 'ar']: 'there'})",'?'))
         self.assertTrue(test_argument("[]['x']({fn:function(){return 1;}})",'*fn'))
-        # self.assertFalse(test_argument("x[y][z.j]({my_key:{[prop]: 'hey',['b' + 'ar']: 'there'}})",'*prop'))
-        # self.assertFalse(test_argument("x[y][z.j]({my_key:{[prop]: 'hey',['b' + 'ar']: 'there'}})",'*'))
+        self.assertFalse(test_argument("x[y][z.j]({[prop]: 'hey',['b' + 'ar']: 'there'})",'*prop'))
+        self.assertFalse(test_argument("x[y][z.j]({[prop]: 'hey',['b' + 'ar']: 'there'})",'*'))
 
 

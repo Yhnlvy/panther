@@ -450,10 +450,7 @@ def match_argument_with_object_key(call_expression, pattern_key):
     if len(node.arguments) == 1 and isinstance(node.arguments[0], ObjectExpression):
         object_expression = node.arguments[0]
         for prop in object_expression.properties:
-            
-            # No way to access prop.computed when fixed uncomment line below.
-            # disable_conversion = prop.computed and isinstance(prop.key, Identifier)
-            disable_conversion = False
+            disable_conversion = prop.computed and isinstance(prop.key, Identifier)
             name = extract_name(prop.key, disable_conversion)
             if match_pattern(name, pattern_key):
                 return True
