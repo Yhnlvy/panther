@@ -308,4 +308,54 @@ class UtilTests(testtools.TestCase):
         test_name_space("(x=1)()",['?AssignmentExpression'])
         test_name_space("Identifier.Identifier()",['*Identifier','*Identifier'])
 
+    def test_match_pattern(self):
+        self.assertTrue(p_utils.match_pattern('*test','*test'))
+        self.assertTrue(p_utils.match_pattern('*test','*'))
+        self.assertTrue(p_utils.match_pattern('?Identifier','?Identifier'))
+        self.assertTrue(p_utils.match_pattern('?Identifier','?'))
+        self.assertFalse(p_utils.match_pattern('?Identifier','*'))
+        self.assertFalse(p_utils.match_pattern('*test','?'))
+        self.assertFalse(p_utils.match_pattern('*test','*other_test'))
+        self.assertFalse(p_utils.match_pattern('?Identifier','?MemberExpression'))
+
+    def test_match_name_space(self):
+
+        def test_name_space(code, pattern_list):
+            json_program = esprima.parse(code)
+            ast_program =  visitor.objectify(json_program.to_dict())
+
+            call_expression = ast_program.body[0].expression
+            is_matched = p_utils.match_name_space(call_expression, pattern_list)
+            return is_matched        
+
+        self.assertTrue(test_name_space('x()',['*x']))
+        self.assertTrue(test_name_space('x.y.z()',['*x','*','*z']))
+        self.assertTrue(test_name_space('x[y][z]()',['*x', '?', '?Identifier']))
+        self.assertTrue(test_name_space('x[y][z.j]() ',['*','?','?']))
+        self.assertFalse(test_name_space("x['y'][3]()",['*','*yx','*3']))
+        self.assertFalse(test_name_space("x['y'][3+2]()",['*x','*y','*']))
+        self.assertFalse(test_name_space('x[y()][z()]()',['*a','?CallExpression','?CallExpression']))
+        self.assertFalse(test_name_space('[].x()',['ArrayExpression','*x']))
+        self.assertFalse(test_name_space("[]['x']()",['?Identifier','*']))
+
+    def test_match_argument_with_object_key(self):
+        def test_argument(code, pattern_key):
+            json_program = esprima.parse(code)
+            ast_program =  visitor.objectify(json_program.to_dict())
+            call_expression = ast_program.body[0].expression
+            is_matched = p_utils.match_argument_with_object_key(call_expression, pattern_key)
+            return is_matched
+
+        self.assertTrue(test_argument('x({my_key:value})','*my_key'))
+        self.assertTrue(test_argument('x.y.z({"my_key":value})','*my_key'))
+        self.assertTrue(test_argument('x[y][z.j]({"my_key":value})','*my_key'))
         
+        # No way to access prop.computed when fixed uncomment lines below.
+        # self.assertTrue(test_argument("x[y][z.j]({my_key:{[prop]: 'hey',['b' + 'ar']: 'there'}})",'?Identifier'))
+        # self.assertTrue(test_argument("x[y][z.j]({my_key:{[prop]: 'hey',['b' + 'ar']: 'there'}})",'?'))
+
+        self.assertTrue(test_argument("[]['x']({fn:function(){return 1;}})",'*fn'))
+        # self.assertFalse(test_argument("x[y][z.j]({my_key:{[prop]: 'hey',['b' + 'ar']: 'there'}})",'*prop'))
+        # self.assertFalse(test_argument("x[y][z.j]({my_key:{[prop]: 'hey',['b' + 'ar']: 'there'}})",'*'))
+
+

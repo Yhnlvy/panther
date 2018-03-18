@@ -73,46 +73,197 @@ values properly, as proven by many reports of NoSQL injection attacks.
 import logging
 import panther
 from panther.core import test_properties as test
-from panther.core.visitor import CallExpression
-from panther.core.visitor import Identifier
-from panther.core.visitor import Literal
-from panther.core.visitor import MemberExpression
+from panther.core.utils import utils
 
 LOG = logging.getLogger(__name__)
 
 
-def _report(value):
-    issue_text = "Possible SQL injection vector \
-    through string-based query construction: '%s'"
+def _report(value, confidence):
+    issue_text = "Possible NoSQL script injection vector: '%s'"
 
     return panther.Issue(
         severity=panther.HIGH,
-        confidence=panther.MEDIUM,
+        confidence=confidence,
         text=(issue_text % value)
     )
 
 
-
-
 @test.checks('CallExpression')
-@test.test_id('P602')
-def hardcoded_sql_expressions_merge_function(context):
-    '''Checks whether an sql query is mixed with an expression using a
-    function. It looks for the functions that contain the words
-    'join', 'append' or 'concat' and if the callee of a function
-    and its arguments contain both dangerous SQL strings and expressions
-    an issue is created.
+@test.test_id('P603')
+def dollar_where_used(context):
+    '''Checks whether a query contains a $where filtering.
+    To catch the call it looks for db.{any_collection}.find
+    pattern in the call and checks whether first argument is
+    an object and it contains the key "$where".
 
-    See examples below:
+    See example below:
 
-    var dangerous_merge_function_direct = concat('SELECT Id FROM ', a, b);
-    var dangerous_merge_function_join = ['SELECT Id FROM ', query].join('');
+    db.collection.find({
+        active: true,
+        $where: function() {
+            return obj.credits - obj.debits < $userInput;
+        }
+    });
     '''
 
     try:
-        return _report('')
+        node = context.node
+
+        is_name_space_matched = utils.match_name_space(
+            node, ['*db', '*', '*find'])
+
+        if is_name_space_matched:
+            is_argument_key_matched = utils.match_argument_with_object_key(
+                node,  '*$where')
+
+            if is_argument_key_matched:
+                return _report('$where condition detected while querying. Please use $expr instead.', panther.MEDIUM)
 
     except Exception as e:
         LOG.error(e)
 
 
+@test.checks('CallExpression')
+@test.test_id('P603')
+def group_used(context):
+    '''Checks whether a query contains an unsafe grouping.
+    To catch the call it looks for db.{any_collection}.group
+    pattern in the call or db.runCommand({}) pattern with a
+    key named 'group'.
+
+    See examples below:
+
+    1)
+
+    db.collection.group({
+        key: {
+            ord_dt: 1,
+            'item.sku': 1
+        },
+        cond: {
+            ord_dt: {
+                $gt: new Date('01/01/2012')
+            }
+        },
+        reduce: function(curr, result) {
+            result.total += curr.item.qty;
+        },
+        initial: {
+            total: 0
+        }
+    });
+
+    2)
+
+    db.runCommand({
+        group: {
+            ns: 'orders',
+            key: {
+                ord_dt: 1,
+                'item.sku': 1
+            },
+            cond: {
+                ord_dt: {
+                    $gt: new Date('01/01/2012')
+                }
+            },
+            $reduce: reduceFn,
+            initial: {}
+        }
+    });
+    '''
+
+    try:
+        deprecation_text = 'Mongodb 3.4 deprecates the group command. Please use db.collection.aggregate() with the $group stage or db.collection.mapReduce() instead.'
+
+        node = context.node
+
+        is_name_space_matched = utils.match_name_space(
+            node, ['*db', '*', '*group'])
+
+        if is_name_space_matched:
+            return _report('Group command detected while querying a collection. ' + deprecation_text, panther.MEDIUM)
+
+        is_name_space_matched = utils.match_name_space(
+            node, ['*db', '*runCommand'])
+
+        if is_name_space_matched:
+            is_argument_key_matched = utils.match_argument_with_object_key(
+                node, '*group')
+
+            if is_argument_key_matched:
+                return _report('Grouping detected using run command. ' + deprecation_text, panther.MEDIUM)
+
+    except Exception as e:
+        LOG.error(e)
+
+
+@test.checks('CallExpression')
+@test.test_id('P603')
+def map_reduce_used(context):
+    '''Checks whether a query contains a possible unsafe map reduce.
+    To catch the call it looks for db.{any_collection}.mapReduce
+    pattern in the call or db.runCommand({}) pattern with a
+    key named 'mapReduce'.
+
+    See examples below:
+
+    1)
+
+    db.collection.mapReduce(mapFn,
+        reduceFn, {
+            out: {
+                merge: "map_reduce_example"
+            },
+            query: {
+                ord_date: {
+                    $gt: new Date('01/01/2012')
+                }
+            },
+            finalize: finalizeFn
+        }
+    );
+
+    2)
+
+        db.runCommand({
+            mapReduce: collection,
+            map: mapFn,
+            reduce: reduceFn,
+            finalize: finalizeFn,
+            out: output,
+            query: document,
+            sort: document,
+            limit: 5,
+            scope: document,
+            jsMode: true,
+            verbose: false,
+            bypassDocumentValidation: false,
+            collation: document
+        });
+
+    '''
+
+    try:
+        warning_text = 'Please be aware of the security risks of using "mapReduce".'
+
+        node = context.node
+
+        is_name_space_matched = utils.match_name_space(
+            node, ['*db', '*', '*mapReduce'])
+
+        if is_name_space_matched:
+            return _report('Map reduce command detected while querying a collection. ' + warning_text, panther.LOW)
+
+        is_name_space_matched = utils.match_name_space(
+            node, ['*db', '*runCommand'])
+
+        if is_name_space_matched:
+            is_argument_key_matched = utils.match_argument_with_object_key(
+                node, '*mapReduce')
+
+            if is_argument_key_matched:
+                return _report('Map reduce detected using run command. ' + warning_text, panther.LOW)
+
+    except Exception as e:
+        LOG.error(e)

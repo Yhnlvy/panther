@@ -12,6 +12,7 @@ from panther.core.visitor import CallExpression
 from panther.core.visitor import Identifier
 from panther.core.visitor import Literal
 from panther.core.visitor import MemberExpression
+from panther.core.visitor import ObjectExpression
 
 try:
     import configparser
@@ -338,7 +339,7 @@ def clean_code(buffer):
     return re.sub(r'^#!([^\r\n]+)', '', buffer)
 
 
-def _extract_name(node, disable_conversion = False):
+def extract_name(node, disable_conversion = False):
     '''Tries to extract the name from a node.
     If disable_conversion is True it does not resolve
     the name.
@@ -402,7 +403,7 @@ def extract_name_space(call_expression):
             # If not engine gives x.y.z which we do not want.
         
             disable_conversion = callee.computed and isinstance(prop_node, Identifier)
-            return _extract_name(prop_node, disable_conversion)
+            return extract_name(prop_node, disable_conversion)
         
         # Recursively evaluate expressions
         name_space.insert(0, read_property(callee))
@@ -415,9 +416,46 @@ def extract_name_space(call_expression):
         # For above case to work we should disable conversion.
         # If not engine gives .x which we do not want.
         disable_conversion = isinstance(callee, Literal)
-        name_space.insert(0, _extract_name(callee, disable_conversion))
+        name_space.insert(0, extract_name(callee, disable_conversion))
 
         return name_space
     else:
-        return [_extract_name(callee)]
+        return [extract_name(callee)]
 
+def match_pattern(name, pattern):
+
+    pattern_len = len(pattern)
+    if pattern_len == 1 and name[0] != pattern[0]:
+        return False
+
+    if pattern_len > 1 and name != pattern:
+        return False
+    
+    return True
+
+def match_name_space(call_expression, pattern_list):
+    name_space_list = extract_name_space(call_expression)
+
+    if len(pattern_list) == 0 or len(name_space_list)!= len(pattern_list):
+        return False
+    
+    for name, pattern in zip(name_space_list, pattern_list):
+        if not match_pattern(name, pattern):
+            return False
+
+    return True
+
+def match_argument_with_object_key(call_expression, pattern_key):
+    node = call_expression
+    if len(node.arguments) == 1 and isinstance(node.arguments[0], ObjectExpression):
+        object_expression = node.arguments[0]
+        for prop in object_expression.properties:
+            
+            # No way to access prop.computed when fixed uncomment line below.
+            # disable_conversion = prop.computed and isinstance(prop.key, Identifier)
+            disable_conversion = False
+            name = extract_name(prop.key, disable_conversion)
+            if match_pattern(name, pattern_key):
+                return True
+
+    return False          

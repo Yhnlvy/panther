@@ -42,6 +42,22 @@ db.runCommand({
     collation: document
 });
 
+// db.collection.mapReduce()
+
+db.collection.mapReduce(mapFn,
+    reduceFn, {
+        out: {
+            merge: "map_reduce_example"
+        },
+        query: {
+            ord_date: {
+                $gt: new Date('01/01/2012')
+            }
+        },
+        finalize: finalizeFn
+    }
+)
+
 // db.runCommand({group: {}})
 
 db.runCommand({
@@ -81,21 +97,6 @@ db.collection.group({
     }
 })
 
-// db.collection.mapReduce()
-
-db.collection.mapReduce(mapFn,
-    reduceFn, {
-        out: {
-            merge: "map_reduce_example"
-        },
-        query: {
-            ord_date: {
-                $gt: new Date('01/01/2012')
-            }
-        },
-        finalize: finalizeFn
-    }
-)
 
 
 
