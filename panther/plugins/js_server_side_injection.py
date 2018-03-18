@@ -65,7 +65,7 @@ def _check_global_call(context, function_name):
                     if callee.object.name == 'global':
                         return _report("Use of global.%s(...)" % function_name)
     except Exception as e:
-        LOG.error(e)
+        LOG.debug(e)
 
 
 @test.test_id('P601')

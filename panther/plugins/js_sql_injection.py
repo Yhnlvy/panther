@@ -253,7 +253,7 @@ def hardcoded_sql_expressions_merge_function(context):
                 return _report(issue_text)
 
     except Exception as e:
-        LOG.error(e)
+        LOG.debug(e)
 
 
 @test.checks('BinaryExpression')
@@ -282,7 +282,7 @@ def hardcoded_sql_expressions_with_plus(context):
                 return _report(issue_text)
 
     except Exception as e:
-        LOG.error(e)
+        LOG.debug(e)
 
 
 @test.checks('TemplateLiteral')
@@ -313,7 +313,7 @@ def hardcoded_sql_expressions_with_template_literal(context):
             return _report(issue_text)
 
     except Exception as e:
-        LOG.error(e)
+        LOG.debug(e)
 
 
 @test.checks('AssignmentExpression')
@@ -343,4 +343,4 @@ def hardcoded_sql_expressions_with_plus_equal(context):
                 return _report(issue_text)
 
     except Exception as e:
-        LOG.error(e)
+        LOG.debug(e)
