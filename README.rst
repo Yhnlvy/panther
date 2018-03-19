@@ -103,6 +103,7 @@ Usage::
       --ini INI_PATH        path to a .panther file that supplies command line
                             arguments
       --version             show program's version number and exit
+      --nsp                 scan the package.json to find vulnerable dependencies
 
     CUSTOM FORMATTING
     -----------------
@@ -315,4 +316,5 @@ Credits
     - `Bandit <https://github.com/openstack/bandit>`_ (OpenStack) 
     - `PyEsprima <https://github.com/PiotrDabkowski/Js2Py/blob/master/examples/pyesprima.py>`_ (Js2Py, PiotrDabkowski)
     - `Esprima AST Visitor <https://github.com/austinbyers/esprima-ast-visitor/blob/master/visitor.py>`_ (austinbyers) 
-    - `Esprima <https://github.com/jquery/esprima>`_ (jQuery) 
+    - `Esprima <https://github.com/jquery/esprima>`_ (jQuery)
+    - `Node Security Platform (nsp) <https://github.com/nodesecurity/nsp>`_ (nodesecurity) 
