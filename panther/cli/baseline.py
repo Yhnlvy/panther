@@ -36,6 +36,7 @@ def main():
     global repo
     global panther_args
 
+    saved_commit_sha = None
     parent_commit_sha = None
     output_format = None
     repo = None
@@ -50,6 +51,7 @@ def main():
 
     # #################### Find current and parent commits ####################
     try:
+        saved_commit_sha = repo.commit().hexsha
         commit = repo.commit(commit_sha)
         commit_sha = commit.hexsha
         LOG.info('Got current commit: [%s]', commit.name_rev)
@@ -105,6 +107,8 @@ def main():
 
                 panther_command = ['panther'] + step['args']
                 output, return_code = _run_command(panther_command)
+    repo.head.reset(commit=saved_commit_sha, working_tree=True)
+
     # #################### Output and exit ####################################
     # print output or display message about written report
     if output_format == default_output_format:
@@ -247,7 +251,9 @@ def _run_command(cmd):
     try:
         output = subprocess.check_output(cmd)
     except subprocess.CalledProcessError as e:
-        output = e.output.decode('utf-8')
+        output = e.output
+        if isinstance(output, bytes):
+            output = output.decode('utf-8')
         return_code = e.returncode
     else:
         return_code = 0
