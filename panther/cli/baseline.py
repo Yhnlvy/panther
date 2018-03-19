@@ -247,7 +247,7 @@ def _run_command(cmd):
     try:
         output = subprocess.check_output(cmd)
     except subprocess.CalledProcessError as e:
-        output = e.output
+        output = e.output.decode('utf-8')
         return_code = e.returncode
     else:
         return_code = 0
