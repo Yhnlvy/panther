@@ -33,6 +33,7 @@ These methods can be really convenient, but they pose a huge security risk to
 your database integrity if your application does not sanitize and escape user-provided
 values properly, as proven by many reports of NoSQL injection attacks.
 
+For more info see: https://docs.mongodb.com/manual/faq/fundamentals/#javascript
 
 :Example:
 
