@@ -73,22 +73,25 @@ class Issue(object):
         :param tabbed: Use tabbing in the output
         :return: strings of code
         '''
-        lines = []
-        max_lines = max(max_lines, 1)
-        lmin = max(1, self.lineno - max_lines // 2)
-        lmax = lmin + len(self.linerange) + max_lines - 1
+        if self.test_id == constants.NSP_TEST_ID:
+            return self.code
+        else:
+            lines = []
+            max_lines = max(max_lines, 1)
+            lmin = max(1, self.lineno - max_lines // 2)
+            lmax = lmin + len(self.linerange) + max_lines - 1
 
-        tmplt = "%i\t%s" if tabbed else "%i %s"
-        for line in moves.xrange(lmin, lmax):
-            text = linecache.getline(self.fname, line)
+            tmplt = "%i\t%s" if tabbed else "%i %s"
+            for line in moves.xrange(lmin, lmax):
+                text = linecache.getline(self.fname, line)
 
-            if isinstance(text, bytes):
-                text = text.decode('utf-8')
+                if isinstance(text, bytes):
+                    text = text.decode('utf-8')
 
-            if not len(text):
-                break
-            lines.append(tmplt % (line, text))
-        return ''.join(lines)
+                if not len(text):
+                    break
+                lines.append(tmplt % (line, text))
+            return ''.join(lines)
 
     def as_dict(self, with_code=True):
         '''Convert the issue to a dict of values for outputting.'''
@@ -104,6 +107,9 @@ class Issue(object):
 
         if with_code:
             out['code'] = self.get_code()
+        if self.test_id == constants.NSP_TEST_ID:
+            out['code'] = self.code
+
         return out
 
     def from_dict(self, data, with_code=True):
