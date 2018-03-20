@@ -11,6 +11,7 @@ from panther.core import issue
 
 LOG = logging.getLogger(__name__)
 
+ADVISORIES = 'advisories.json'
 SUCCESS_CODE = 0
 
 """
@@ -29,12 +30,13 @@ class NspManager(object):
         '''Initialize the class with the tests manager results'''
         self.nsp_report = {}
         self.results = results
+        self.cves = {}
 
     @property
     def has_nsp(self):
         '''Return True if nsp is installed globally on the machine'''
         try:
-            return_code = call('nsp --version', shell=True,
+            return_code = call('nsp gather', shell=True,
                                stdout=DEVNULL, stderr=DEVNULL)
         except Exception as e:
             LOG.error(e)
@@ -57,14 +59,15 @@ class NspManager(object):
                 pass
         return False
 
-    @staticmethod
-    def _format_issue_desc(vuln):
+    def _format_issue_desc(self, vuln):
         '''Format the description of the issue'''
         msg = "Vulnerable version: {vv}\nPatched versions: {pv}\nRecommendation:\n{reco}"
+        msg += "\n{cves}" if len(self.cves.get(vuln['id'], [])) else ''
         issue_desc = msg.format(
             vv=vuln['vulnerable_versions'],
             pv=vuln['patched_versions'],
-            reco=vuln['recommendation']
+            reco=vuln['recommendation'],
+            cves='\n'.join(self.cves[vuln['id']])
         )
         return issue_desc
 
@@ -84,9 +87,20 @@ class NspManager(object):
             level = panther.HIGH
         return level
 
+    def _fetch_cves(self):
+        '''Parse the advisories.json and fetch cve by vulnerability id'''
+        vuln_ids = [vuln['id'] for vuln in self.nsp_report]
+        try:
+            nsp_data = json.load(open(ADVISORIES))
+            self.cves = {entry['id']: entry['cves'] for entry in nsp_data if entry['id'] in vuln_ids}
+            os.remove(ADVISORIES)
+        except Exception:
+            pass
+
     def update_issues(self):
         '''Updates the issues with dependencies vulnerabilities'''
         if self.run_check():
+            self._fetch_cves()
             for vuln in self.nsp_report:
                 i = issue.Issue(None)
                 i.from_dict({
@@ -96,7 +110,7 @@ class NspManager(object):
                     'line_range': [0, 1],
                     'test_name': NspManager._format_issue_name(vuln),
                     'issue_text': ' > '.join(vuln['path']),
-                    'code': NspManager._format_issue_desc(vuln),
+                    'code': self._format_issue_desc(vuln),
                     'issue_confidence': panther.HIGH,
                     'issue_severity': NspManager._get_severity_level(vuln)
                 })
