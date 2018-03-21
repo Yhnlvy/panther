@@ -8,7 +8,7 @@ from panther.core.pyesprima import esprima
 from panther.core import tester as p_tester
 from panther.core import utils as p_utils
 from panther.core import visitor
-
+from panther.core.tracer.route_finder import RouteFinder
 
 LOG = logging.getLogger(__name__)
 
@@ -109,4 +109,9 @@ class PantherNodeVisitor(object):
         data = p_utils.clean_code(data)
         f_ast = esprima.parse(data, {'loc': True})
         self.generic_visit(f_ast.to_dict())
+
+        rf = RouteFinder(f_ast.to_dict())
+        rf.extract_imports()
+
+        rf.find()
         return self.scores
