@@ -362,9 +362,8 @@ def extract_name(node, disable_conversion=False):
 
     return found_name
 
-
-def extract_name_space(call_expression):
-    ''''Extracts a name space from a call expression.
+def extract_name_space_from_expression(expression):
+    ''''Extracts a name space from an expression.
         Returns an array of names where each name starts
         with '*' if it can be resolved '?' otherwise.
 
@@ -389,45 +388,57 @@ def extract_name_space(call_expression):
             (x=2)() => AssignmentExpression
             Identifier.Identifier() => Identifier.Identifier
     '''
-
-    if not isinstance(call_expression, CallExpression):
-        raise Exception('Please supply a call expression.')
-
     name_space = []
-    callee = call_expression.callee
 
-    # If it is a member expression recursively evaluate the expression.
-
-    if isinstance(callee, MemberExpression):
-
-        def read_property(callee):
-            '''Reads the property of callee and extracts the name.'''
-            prop_node = callee.property
+     # If it is a member expression recursively evaluate the expression.
+    if isinstance(expression, MemberExpression):
+        def read_property(member):
+            '''Reads the property of member and extracts the name.'''
+            prop_node = member.property
 
             # SPECIAL CASE: (x[y][z]() => x.Identifier.Identifier)
             # For above case to work we should disable conversion.
             # If not engine gives x.y.z which we do not want.
 
-            disable_conversion = callee.computed and isinstance(
+            disable_conversion = member.computed and isinstance(
                 prop_node, Identifier)
             return extract_name(prop_node, disable_conversion)
 
         # Recursively evaluate expressions
-        name_space.insert(0, read_property(callee))
-        callee = callee.object
-        while isinstance(callee, MemberExpression):
-            name_space.insert(0, read_property(callee))
-            callee = callee.object
+        name_space.insert(0, read_property(expression))
+        member = expression.object
+        while isinstance(member, MemberExpression):
+            name_space.insert(0, read_property(member))
+            member = member.object
 
         # SPECIAL CASE: (''.x() => Literal.x)
         # For above case to work we should disable conversion.
         # If not engine gives .x which we do not want.
-        disable_conversion = isinstance(callee, Literal)
-        name_space.insert(0, extract_name(callee, disable_conversion))
+        disable_conversion = isinstance(member, Literal)
+        name_space.insert(0, extract_name(member, disable_conversion))
 
         return name_space
     else:
-        return [extract_name(callee)]
+        return [extract_name(expression)]
+        
+
+def extract_name_space(call_expression):
+    ''''Extracts a name space from a call expression.
+        Returns an array of names where each name starts
+        with '*' if it can be resolved '?' otherwise.
+
+        Example: returns ['*x','?Identifier','?MemberExpression'] for x.Identifier.MemberExpression
+
+        See extract_name_space_from_expression to see handled cases.
+    '''
+
+    if not isinstance(call_expression, CallExpression):
+        raise Exception('Please supply a call expression.')
+
+    expression = call_expression.callee
+
+    return extract_name_space_from_expression(expression)
+
 
 
 def match_pattern(name, pattern):
@@ -452,10 +463,9 @@ def match_pattern(name, pattern):
 
     return True
 
-
-def match_name_space(call_expression, pattern_list):
-    '''Gets a pattern array and a function then searches for the specific
-    pattern in the function. If it finds it returns True.
+def match_name_space(expression, pattern_list):
+    '''Gets a pattern array and a function (or expression) then searches for the specific
+    pattern in the function (or expression). If it finds it returns True.
 
     Examples of pattern_list:
 
@@ -473,7 +483,10 @@ def match_name_space(call_expression, pattern_list):
 
     '''
 
-    name_space_list = extract_name_space(call_expression)
+    if isinstance(expression, CallExpression):
+        name_space_list = extract_name_space(expression)
+    else:
+        name_space_list = extract_name_space_from_expression(expression)
 
     # If pattern_list contains no element or there is
     # length mismatch return False.
