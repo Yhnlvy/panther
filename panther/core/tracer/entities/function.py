@@ -8,7 +8,7 @@ class Function(object):
     def __repr__(self):
         ls = []
         ls.append("File Path: '%s'" % self.file_path)
-        ls.append("Identifier: '%s'" % self.identifier)
+        ls.append("Identifier: '%s'" % '[Anonymous]' if self.identifier is None else self.identifier)
         # ls.append("Node: '%s'" % self.node.dict())
 
         return '\n'.join(ls)
