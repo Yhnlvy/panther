@@ -362,6 +362,7 @@ def extract_name(node, disable_conversion=False):
 
     return found_name
 
+
 def extract_name_space_from_expression(expression):
     ''''Extracts a name space from an expression.
         Returns an array of names where each name starts
@@ -390,7 +391,7 @@ def extract_name_space_from_expression(expression):
     '''
     name_space = []
 
-     # If it is a member expression recursively evaluate the expression.
+    # If it is a member expression recursively evaluate the expression.
     if isinstance(expression, MemberExpression):
         def read_property(member):
             '''Reads the property of member and extracts the name.'''
@@ -420,7 +421,7 @@ def extract_name_space_from_expression(expression):
         return name_space
     else:
         return [extract_name(expression)]
-        
+
 
 def extract_name_space(call_expression):
     ''''Extracts a name space from a call expression.
@@ -438,7 +439,6 @@ def extract_name_space(call_expression):
     expression = call_expression.callee
 
     return extract_name_space_from_expression(expression)
-
 
 
 def match_pattern(name, pattern):
@@ -462,6 +462,7 @@ def match_pattern(name, pattern):
         return False
 
     return True
+
 
 def match_name_space(expression, pattern_list):
     '''Gets a pattern array and a function (or expression) then searches for the specific
@@ -536,3 +537,18 @@ def match_argument_with_object_key(call_expression, pattern_key):
                 return True
 
     return False
+
+
+def try_extract_string_value(node):
+    '''Tries to extract a string from a node.'''
+
+    found_string = None
+
+    # Check whether raw node starts with either (') or ("").
+    if isinstance(node, Literal):
+        raw_literal = node.raw
+        is_string = raw_literal.startswith('"') or raw_literal.startswith("'")
+        if is_string:
+            found_string = node.value
+
+    return found_string

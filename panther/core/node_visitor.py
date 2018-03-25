@@ -109,9 +109,4 @@ class PantherNodeVisitor(object):
         data = p_utils.clean_code(data)
         f_ast = esprima.parse(data, {'loc': True})
         self.generic_visit(f_ast.to_dict())
-
-        rf = RouteFinder(f_ast.to_dict())
-        rf.extract_imports()
-
-        rf.find()
         return self.scores
