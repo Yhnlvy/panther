@@ -1,13 +1,13 @@
-import testtools
 import os
-from panther.core.tracer.route_finder import RouteFinder
-from panther.core.tracer.file_extractor import FileExtractor
 from panther.core.tracer.diver import Diver
+from panther.core.tracer.route_finder import RouteFinder
+import testtools
 
 
 class TracerTests(testtools.TestCase):
 
     def setUp(self):
+
         super(TracerTests, self).setUp()
         self.test_rel_directory = 'examples/tracer'
 
@@ -17,4 +17,4 @@ class TracerTests(testtools.TestCase):
         rf = RouteFinder()
         routes = rf.create_routes(file_path)
         diver = Diver(routes)
-        diver.dive_all(file_path, depth = 3)
+        diver.dive_all(file_path, depth=3)

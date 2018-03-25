@@ -8,7 +8,6 @@ from panther.core.pyesprima import esprima
 from panther.core import tester as p_tester
 from panther.core import utils as p_utils
 from panther.core import visitor
-from panther.core.tracer.route_finder import RouteFinder
 
 LOG = logging.getLogger(__name__)
 
