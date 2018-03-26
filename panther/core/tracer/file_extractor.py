@@ -20,8 +20,8 @@ class FileExtractor(object):
         self.function_definition_cache = {}
 
     def create_program_cache(self, file_path):
-        '''Creates an AST of a program from a file path
-        and saves to cache with the key file_path.
+        '''Create an AST of a program from a file path
+        and saves to cache with file_path as key.
         '''
         with open(file_path, 'r') as f:
             code = f.read()
@@ -30,9 +30,9 @@ class FileExtractor(object):
         self.program_cache[file_path] = ast_program
 
     def create_import_cache(self, file_path):
-        '''Extracts all imports using the AST of a program and
+        '''Extract all imports using the AST of a program and
         builds a dictionary of the form <variable_name, module_path> and
-        saves to cache with the key file_path.
+        saves to cache with file_path as key.
         Supported Patterns:
             var x = require(...)
         '''
@@ -54,9 +54,9 @@ class FileExtractor(object):
         self.import_cache[file_path] = imports
 
     def create_function_definition_cache(self, file_path):
-        '''Extracts all function definitions using the AST of a program and
+        '''Extract all function definitions using the AST of a program and
         builds a dictionary of the form <variable_name, (FunctionDeclaration | FunctionExpression)>
-        and saves to cache with the key file_path.
+        and saves to cache file_path as key.
         Supported Patterns:
             1) var x = fn(...):
             2) var x = fn(...), y = fn2(...)
@@ -91,21 +91,19 @@ class FileExtractor(object):
                 resolved_assignment = check_variable_assignment_function(
                     node.left, node.right)
                 if resolved_assignment:
-                    function_definitions[resolved_assignment[0]
-                                         ] = resolved_assignment[1]
+                    function_definitions[resolved_assignment[0]] = resolved_assignment[1]
             # Check for var x = function(){}, y = function(){}
             elif isinstance(node, VariableDeclaration):
                 for declaration in node.declarations:
                     resolved_assignment = check_variable_assignment_function(
                         declaration.id, declaration.init)
                 if resolved_assignment:
-                    function_definitions[resolved_assignment[0]
-                                         ] = resolved_assignment[1]
+                    function_definitions[resolved_assignment[0]] = resolved_assignment[1]
 
         self.function_definition_cache[file_path] = function_definitions
 
     def get_imports(self, file_path):
-        '''Serves extracted imports. If the imports are present in the cache
+        '''Serve extracted imports. If the imports are present in the cache
         it returns the cached entry else it builds the cache and returns.
         '''
         if file_path not in self.import_cache:
@@ -113,7 +111,7 @@ class FileExtractor(object):
         return self.import_cache[file_path]
 
     def get_program(self, file_path):
-        '''Serves the AST of the program. If the AST is present in the cache
+        '''Serve the AST of the program. If the AST is present in the cache
         it returns the cached entry else it builds the cache and returns.
         '''
         if file_path not in self.program_cache:
@@ -122,7 +120,7 @@ class FileExtractor(object):
         return self.program_cache[file_path]
 
     def get_function_definitions(self, file_path):
-        '''Serves the function definitions of a program. If function declarations are
+        '''Serve the function definitions of a program. If function declarations are
         in the cache it returns the cached entry else it builds the cache and returns.
         '''
         if file_path not in self.function_definition_cache:
@@ -131,7 +129,7 @@ class FileExtractor(object):
         return self.function_definition_cache[file_path]
 
     def resolve_path(self, file_path, relative_path):
-        '''It resolves the next file path using the current file path
+        '''Resolve the next file path using the current file path
         and relative import path.
         '''
         file_dir = os.path.dirname(file_path)
@@ -149,28 +147,21 @@ class FileExtractor(object):
         return Function(file_path=file_path, identifier=identifier, node=function_node)
 
     def try_fetch_function(self, file_path, module_name, identifier):
-        '''It tries to jump to a module name and tries to fetch a function
+        '''Try to jump to a module name and tries to fetch a function
         using the identifier. If it can fetch it returns.
         '''
 
         # Check whether we have an import registered.
-
         imports = self.get_imports(file_path)
-
         relative_module_path = imports.get(module_name, None)
-
         if relative_module_path is None:
             return None
 
         # Jump to next file and search for the function.
-
         next_file_path = self.resolve_path(file_path, relative_module_path)
-
         function = self.try_match_function(next_file_path, identifier)
-
         if function is None:
             return None
 
         function.caller = '%s.%s' % (module_name, identifier)
-
         return function

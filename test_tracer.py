@@ -17,4 +17,7 @@ class TracerTests(testtools.TestCase):
         rf = RouteFinder()
         routes = rf.create_routes(file_path)
         diver = Diver(routes)
-        diver.dive_all(file_path, depth=3)
+        vulnerability_count = diver.dive_all(file_path, depth=3)
+        self.assertEqual(vulnerability_count, 2)
+        vulnerability_count = diver.dive_all(file_path, depth=2)
+        self.assertEqual(vulnerability_count, 1)

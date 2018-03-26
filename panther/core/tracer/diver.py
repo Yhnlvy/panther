@@ -1,3 +1,4 @@
+import logging
 from panther.core import config
 from panther.core import meta_ast
 from panther.core import metrics
@@ -7,14 +8,17 @@ from panther.core.tracer.file_extractor import FileExtractor
 from panther.core import utils
 from panther.core.visitor import CallExpression
 
+LOG = logging.getLogger(__name__)
+
 
 class Diver(object):
     def __init__(self, routes):
         self.routes = routes
         self.extractor = FileExtractor()
+        self.vulnerability_count = 0
 
     def find(self, function):
-        '''Finds and returns functions that are called in a given function.
+        '''Find and return functions that are called in a given function.
         If the function name is an string identifier it looks for a function
         in the same document. If the caller is a member expression like
         module.fn() it looks for the module in the require call and if it can
@@ -23,7 +27,7 @@ class Diver(object):
         file_path = function.file_path
         function_list = []
         for node in function.node.traverse():
-            function = None
+            callee = None
 
             # Track call expressions
             if isinstance(node, CallExpression):
@@ -31,24 +35,30 @@ class Diver(object):
 
                 # If we have match of an identifier function call like fn()
                 if utils.match_name_space(call_expression, ['*']):
+                    # Extract name space give us all names as a list.
+                    # So we get the first element of the list which
+                    # contains *function_name. Then we remove the star
+                    # character to get the actual name.
                     identifier = utils.extract_name_space(
                         call_expression)[0][1:]
-                    function = self.extractor.try_match_function(
+                    callee = self.extractor.try_match_function(
                         file_path, identifier)
                 # Check whether we have a call like module.fn()
                 elif utils.match_name_space(call_expression, ['*', '*']):
                     name_space = utils.extract_name_space(call_expression)
+                    # Since we get an array of the form ['*module_name','*fn_name']
+                    # we use below indexing to extract module_name and identifier.
                     module_name = name_space[0][1:]
                     identifier = name_space[1][1:]
-                    function = self.extractor.try_fetch_function(
+                    callee = self.extractor.try_fetch_function(
                         file_path, module_name, identifier)
-            if function:
-                function_list.append(function)
+            if callee:
+                function_list.append(callee)
 
         return function_list
 
     def test(self, file_path, node):
-        '''It tests a given function node with plugins
+        '''Test a given function node with plugins
         and returns test results.
         '''
         nv = node_visitor.PantherNodeVisitor(
@@ -66,22 +76,38 @@ class Diver(object):
         return nv.tester.results
 
     def dive_all(self, file_path, depth=1):
-        '''For all entry function in routes dives for the vulnerabilities.'''
+        '''Each route has an array of entry functions to start diving process.
+        So for each entry function in each route it recursively scans for
+        the vulnerabilities.
+        '''
+        self.vulnerability_count = 0
         for route in self.routes:
             for function in route.entry_point_functions:
                 self.dive(function, [route], depth)
 
+        return self.vulnerability_count
+
+    def format_stack_trace(self, stack_trace):
+        '''Format an array of functions with a splitter.'''
+        return '\n----------------\n'.join(map(repr, stack_trace))
+
     def dive(self, function, stack_trace, depth):
-        '''It recursively searches for vulnerabilities.'''
+        '''Search recursively for vulnerabilities. Stop when
+        either a vulnerability is encountered or depth limit is reached.
+        '''
         depth -= 1
         stack_trace.append(function)
         test_result = self.test(function.file_path, function.node)
         if test_result:
-            print('\n\nVulnerability Detected!\n\n' +
-                  '\n----------------\n'.join(map(repr, stack_trace)))
+            formatted_stack_trace = self.format_stack_trace(stack_trace)
+            header_text = '\n\nVulnerability Detected!\n\n%s'
+            LOG.debug(header_text, formatted_stack_trace)
+            self.vulnerability_count += 1
         else:
-            if depth == 0:
-                print('Path search finished but nothing found.', stack_trace)
+            if not depth:
+                formatted_stack_trace = self.format_stack_trace(stack_trace)
+                header_text = '\n\nPath search finished but nothing found. See stack trace below.\n\n%s'
+                LOG.debug(header_text, formatted_stack_trace)
             else:
                 other_functions = self.find(function)
                 if other_functions:

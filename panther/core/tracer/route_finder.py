@@ -27,7 +27,7 @@ class RouteFinder(object):
                     if utils.match_name_space(node, ['*', '*' + method]):
                         # Check whether we have any arguments
                         if node.arguments:
-                            # First argument is a pattern.
+                            # Check whether first argument is a route pattern.
                             first_arg = node.arguments[0]
                             found_string = utils.try_extract_string_value(
                                 first_arg)

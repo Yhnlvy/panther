@@ -3,8 +3,8 @@ class Function(object):
     def __init__(self, file_path, identifier, node, caller=None):
         self.file_path = file_path
         self.identifier = identifier
-        self.caller = caller
         self.node = node
+        self.caller = caller
 
     def __repr__(self):
         ls = []
