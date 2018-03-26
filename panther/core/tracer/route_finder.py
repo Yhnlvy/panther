@@ -14,7 +14,7 @@ class RouteFinder(object):
         self.methods = ['get', 'post', 'put', 'delete', 'patch']
         self.extractor = FileExtractor()
 
-    def create_routes(self, file_path):
+    def fetch_routes(self, file_path):
         '''Tries to find routes of a file.
             Supported Patterns:
             app.method() where app is a free choice.

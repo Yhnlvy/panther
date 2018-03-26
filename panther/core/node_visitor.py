@@ -101,7 +101,7 @@ class PantherNodeVisitor(object):
     def process(self, data):
         '''Main process loop
 
-        Build and process the AST
+        Build and process the AST for a given file data
         :param lines: lines code to process
         :return score: the aggregated score for the current file
         '''

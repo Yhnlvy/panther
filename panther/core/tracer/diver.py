@@ -11,11 +11,23 @@ from panther.core.visitor import CallExpression
 LOG = logging.getLogger(__name__)
 
 
+class colors(object):
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
+
+
 class Diver(object):
-    def __init__(self, routes):
+    def __init__(self, routes, debug=False):
         self.routes = routes
         self.extractor = FileExtractor()
         self.vulnerability_count = 0
+        self.debug = debug
 
     def find(self, function):
         '''Find and return functions that are called in a given function.
@@ -62,11 +74,13 @@ class Diver(object):
         and returns test results.
         '''
         nv = node_visitor.PantherNodeVisitor(
-            file_path, meta_ast.PantherMetaAst(),
+            file_path,
+            meta_ast.PantherMetaAst(),
             test_set.PantherTestSet(config, profile=None),
             True,
             set(),
-            metrics.Metrics())
+            metrics.Metrics()
+        )
         nv.generic_visit(node)
         # TODO(izel): Do something with results.
         # if nv.tester.results:
@@ -91,23 +105,36 @@ class Diver(object):
         '''Format an array of functions with a splitter.'''
         return '\n----------------\n'.join(map(repr, stack_trace))
 
+    def format_issues(self, results):
+        '''Format an array of issues'''
+        msgs = [
+            "\nLine: %s - %s\n%s" % (issue.lineno, issue.text, issue.get_code())
+            for issue in results
+        ]
+        return '----------------\n'.join(msgs)
+
     def dive(self, function, stack_trace, depth):
-        '''Search recursively for vulnerabilities. Stop when
-        either a vulnerability is encountered or depth limit is reached.
+        '''Search recursively for vulnerabilities. Stop when either
+        a vulnerability is encountered or depth limit is reached.
         '''
         depth -= 1
         stack_trace.append(function)
         test_result = self.test(function.file_path, function.node)
         if test_result:
             formatted_stack_trace = self.format_stack_trace(stack_trace)
-            header_text = '\n\nVulnerability Detected!\n\n%s'
-            LOG.debug(header_text, formatted_stack_trace)
+            formatted_report = self.format_issues(test_result)
+            header_text = colors.HEADER + '\n============================\n' + colors.ENDC
+            print(
+                header_text + colors.OKBLUE + formatted_stack_trace + colors.ENDC,
+                colors.WARNING + formatted_report + colors.ENDC
+            )
             self.vulnerability_count += 1
         else:
             if not depth:
-                formatted_stack_trace = self.format_stack_trace(stack_trace)
-                header_text = '\n\nPath search finished but nothing found. See stack trace below.\n\n%s'
-                LOG.debug(header_text, formatted_stack_trace)
+                if self.debug:
+                    formatted_stack_trace = self.format_stack_trace(stack_trace)
+                    header_text = '\n\nPath search finished but nothing found. See stack trace below.\n\n'
+                    print(header_text, formatted_stack_trace)
             else:
                 other_functions = self.find(function)
                 if other_functions:

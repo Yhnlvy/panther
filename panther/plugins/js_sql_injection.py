@@ -84,8 +84,7 @@ LOG = logging.getLogger(__name__)
 
 
 def _report(value):
-    issue_text = "Possible SQL injection vector \
-    through string-based query construction: '%s'"
+    issue_text = "Possible SQL injection vector through string-based query construction: '%s'"
 
     return panther.Issue(
         severity=panther.HIGH,
