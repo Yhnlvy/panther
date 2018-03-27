@@ -162,6 +162,28 @@ Usage::
 
     Additional Panther arguments such as severity filtering (-ll) can be added and will be passed to Panther.
 
+
+Backtracing (Experimental)
+--------------------------
+Example usage across a code tree::
+    
+    python3 panther/core/tracer/main.py examples/tracer/basic.js --depth 2
+
+Usage::
+
+    $ python3 panther/core/tracer/main.py -h
+
+    Panther Backtracer - automatically fetches route definition and performs a sink to source analysis
+
+    positional arguments:
+    entry_points   entry points of the project where the routes are defined
+
+    optional arguments:
+    -h, --help     show this help message and exit
+    -d, --debug    turn on debug mode
+    --depth DEPTH  maximum analysis depth to backtrace vulnerabilities
+
+
 Configuration
 -------------
 An optional config file may be supplied and may include:

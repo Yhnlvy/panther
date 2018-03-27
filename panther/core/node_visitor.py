@@ -9,7 +9,6 @@ from panther.core import tester as p_tester
 from panther.core import utils as p_utils
 from panther.core import visitor
 
-
 LOG = logging.getLogger(__name__)
 
 
@@ -102,7 +101,7 @@ class PantherNodeVisitor(object):
     def process(self, data):
         '''Main process loop
 
-        Build and process the AST
+        Build and process the AST for a given file data
         :param lines: lines code to process
         :return score: the aggregated score for the current file
         '''
